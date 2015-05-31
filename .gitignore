@@ -1,6 +1,5 @@
 .#*
 *~
-apps/face/priv/static/nitrogen
 Mnesia*
 .applist
 erl_crash.dump
@@ -11,3 +10,4 @@ rels/web/devbox
 index.js
 protocol.js
 .rebar
+ebin
