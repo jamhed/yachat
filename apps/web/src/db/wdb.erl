@@ -6,6 +6,7 @@
 
 metainfo() -> 
     #schema{name=kvs,tables=[
+        #table{name=user,fields=record_info(fields,user), keys=[facebook_id, email]},
         #table{name=conv,fields=record_info(fields,conv), keys=[]},
         #table{name=user_conv, fields=record_info(fields, user_conv), keys=[user_id, conv_id]},
         #table{name=conv_msg, fields=record_info(fields, conv_msg), keys=[]},

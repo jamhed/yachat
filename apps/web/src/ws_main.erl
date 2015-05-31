@@ -11,20 +11,13 @@ init(_Transport, Req, Opts, _Active) ->
    ?INFO("init() pid:~p opts:~p active:~p ", [self(), Opts, _Active]),
    {ok, Req, #state{}}.
 
-stream({text, <<"ping">>}, Req, State) ->
-   {reply, jiffy:encode([<<"pong">>]), Req, State};
-
-stream({text, JSON}, Req, State) ->
+stream(JSON, Req, State) ->
    [ Msg | Args ] = jiffy:decode(JSON),
    ?INFO("JSON MSG: ~p ARGS: ~p", [Msg, Args]),
    Raw = json_msg(Msg, Args),
    Reply = jiffy:encode(Raw),
    ?INFO("JSON REPLY: ~p", [Reply]),
-   {reply, Reply, Req, State};
-
-stream(Data, Req, State) ->
-   ?INFO("message received ~p", [Data]),
-   {ok, Req, State}.
+   {reply, Reply, Req, State}.
 
 info({msg, _Sender, Data}, Req, State) ->
    ?INFO("MSG: ~p", [Data]),
@@ -45,8 +38,6 @@ terminate(_Req, State) ->
 get_user(Id) -> dbd:get(user, Id).
 get_user_by_fb(Id) -> dbd:index(user, facebook_id, Id).
 get_user_by_email(Id) -> dbd:index(user, email, Id).
-
-make_uid() -> erlang:phash2( [now(), make_ref()], 4294967296 ).
 
 clear_online_table([]) -> ok;
 clear_online_table([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online_table(T).
@@ -76,6 +67,9 @@ send_msg(Cid, UserId, Message) ->
    wdb:conv_notify(Cid, UserId, Message),
    MsgId.
 
+
+json_msg(<<"ping">>, []) -> [pong];
+
 % check user existance by id
 json_msg(M = <<"user">>, [Uid]) ->
    ?INFO("~s uid:~s", [M, Uid]),
@@ -103,7 +97,7 @@ json_msg(M = <<"user/email">>, [Email]) ->
    case get_user_by_email(Email) of
       {ok, #user{id=Uid}}              -> [M, ok, Uid];
       {error, not_found}               -> [M, fail];
-      _                                -> [M, fail, protocol]
+      Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 json_msg(M = <<"user/info">>, [Uid]) ->
@@ -115,12 +109,12 @@ json_msg(M = <<"user/info">>, L) ->
 % create new user
 json_msg(M = <<"user/new">>, []) ->
    ?INFO("~s new", [M]),
-   NewUID = make_uid(),
+   NewUID = dbd:make_uid(),
    case dbd:put(U = #user{id=NewUID}) of
       ok    ->
          user_online(U, self()),
          [M, new, NewUID];
-      _     -> [M, fail, protocol]
+      Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 % login by email and password

@@ -21,11 +21,11 @@ check_config() ->
    {DBD, SCHEMA}.
 
 
-modules() -> cfg:get(schema).
+modules() -> cfg:get_a(db, schema).
 
 initialize()            ->
    DBA=?DBA,
-   Schema = cfg:get(schema),
+   Schema = cfg:get_a(db, schema),
    join(),
    DBA:initialize(Schema).
 
@@ -43,6 +43,8 @@ count(Name)             -> DBA=?DBA, DBA:count(Name).
 all(Name)               -> DBA=?DBA, DBA:all(Name).
 next_id(Name, Incr)     -> DBA=?DBA, DBA:next_id(Name, Incr).
 next_id(Name)           -> DBA=?DBA, DBA:next_id(Name, 1).
+
+make_uid() -> erlang:phash2( [now(), make_ref()], 4294967296 ).
 
 index(Name, Key, Value) ->
    DBA=?DBA,

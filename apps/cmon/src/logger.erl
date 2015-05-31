@@ -8,7 +8,7 @@ get_app() ->
    end.
 
 
-log(Module, Line, _String, Args, Fun) ->
+log_f(Module, Line, _String, Args, Fun) ->
    case lists:member(Module, cfg:get(log_modules, [])) of
       true ->
          String = get_app() ++ "/" ++ atom_to_list(Module) ++ "." ++ integer_to_list(Line) ++ ": " ++ _String ++ "~n",
@@ -16,6 +16,11 @@ log(Module, Line, _String, Args, Fun) ->
       false ->
          skip
    end.
+
+log(Module, Line, _String, Args, Fun) ->
+   String = get_app() ++ "/" ++ atom_to_list(Module) ++ "." ++ integer_to_list(Line) ++ ": " ++ _String ++ "~n",
+   error_logger:Fun(String, Args).
+
 
 info(Module, Line, String, Args)       -> log(Module, Line, String, Args, info_msg).
 warning(Module, Line, String, Args)    -> log(Module, Line, String, Args, warning_msg).
