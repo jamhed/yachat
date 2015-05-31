@@ -4,6 +4,7 @@
 
 -export([init/4, stream/3, info/3, terminate/2]).
 -export([clear_online_table/1]).
+-export([get_user/1]).
 
 -record(state, {}).
 
@@ -67,17 +68,18 @@ send_msg(Cid, UserId, Message) ->
    wdb:conv_notify(Cid, UserId, Message),
    MsgId.
 
-
 json_msg(<<"ping">>, []) -> [pong];
 
 % check user existance by id
-json_msg(M = <<"user">>, [Uid]) ->
-   ?INFO("~s uid:~s", [M, Uid]),
+json_msg(M = <<"user">>, [_Uid]) ->
+   Uid = binary_to_integer(_Uid),
+   ?INFO("~s uid:~p", [M, Uid]),
    case get_user(Uid) of
       {ok, User} ->
          user_online(User, self()),
          [M, ok, User#user.id];
-      _ ->
+      Err ->
+         ?INFO("~s uid: ~p fail: ~p", [M, Uid, Err]),
          [M, fail]
    end;
 
