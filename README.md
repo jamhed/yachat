@@ -1,6 +1,8 @@
 YChat
 =====
 
+Yet another Erlang-based WebSockets Chat.
+
 TODO
 ====
 
