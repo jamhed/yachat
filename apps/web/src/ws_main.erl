@@ -1,6 +1,5 @@
 -module(ws_main).
--include_lib("kvs/include/user.hrl").
--include_lib("web/include/logger.hrl").
+-include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
 -export([init/4, stream/3, info/3, terminate/2]).

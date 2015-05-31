@@ -1,0 +1,1 @@
+[kernel,stdlib,cmon,db,web,crypto,cowlib,jiffy,ranch,cowboy,asn1,compiler,hipe,inets,mnesia,public_key,runtime_tools,ssl,syntax_tools,tools,webtool,xmerl]

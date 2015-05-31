@@ -2,7 +2,7 @@
 -compile(export_all).
 
 log(Module, Line, _String, Args, Fun) ->
-   case lists:member(Module, cfg:get(log_modules, []) of
+   case lists:member(Module, cfg:get(log_modules, [])) of
       true ->
          String = atom_to_list(Module) ++ "." ++ integer_to_list(Line) ++ ": " ++ _String ++ "~n",
          error_logger:Fun(String, Args);
