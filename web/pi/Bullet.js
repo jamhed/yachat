@@ -35,13 +35,17 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
       this.bullet.onmessage = (function(_this) {
         return function(e) {
           var args, data, msg;
-          data = JSON.parse(e.data);
-          msg = data[0], args = 2 <= data.length ? slice.call(data, 1) : [];
-          return _this.event(msg, args);
+          if (e.data !== "ping") {
+            data = JSON.parse(e.data);
+            msg = data[0], args = 2 <= data.length ? slice.call(data, 1) : [];
+            return _this.event(msg, args);
+          }
         };
       })(this);
       this.bullet.onheartbeat = (function(_this) {
-        return function() {};
+        return function() {
+          return _this.bullet.send("ping");
+        };
       })(this);
       this.sub("#bullet@user/new", (function(_this) {
         return function(e, args) {

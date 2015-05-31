@@ -16,11 +16,12 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
       @bullet.onclose = =>
 
       @bullet.onmessage = (e) =>
-         data = JSON.parse e.data
-         [ msg, args... ] = data
-         @event msg, args
+         if e.data != "ping"
+            data = JSON.parse e.data
+            [ msg, args... ] = data
+            @event msg, args
 
-      @bullet.onheartbeat = =>
+      @bullet.onheartbeat = => @bullet.send "ping"
 
       @sub "#bullet@user/new", (e, args) =>
          

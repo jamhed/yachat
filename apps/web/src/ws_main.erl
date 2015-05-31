@@ -13,12 +13,17 @@ init(_Transport, Req, Opts, _Active) ->
    {ok, Req, #state{}}.
 
 stream(JSON, Req, State) ->
-   [ Msg | Args ] = jiffy:decode(JSON),
-   ?INFO("JSON MSG: ~p ARGS: ~p", [Msg, Args]),
-   Raw = json_msg(Msg, Args),
-   Reply = case Raw of <<"pong">> -> Raw; _ -> jiffy:encode(Raw) end,
-   ?INFO("JSON REPLY: ~p", [Reply]),
-   {reply, Reply, Req, State}.
+   ?INFO("RAW: ~p", [JSON]),
+   case JSON of
+      <<"ping">> -> {reply, JSON, Req, State};
+      _ ->
+         [ Msg | Args ] = jiffy:decode(JSON),
+         ?INFO("JSON MSG: ~p ARGS: ~p", [Msg, Args]),
+         Raw = json_msg(Msg, Args),
+         Reply = case Raw of <<"ping">> -> Raw; _ -> jiffy:encode(Raw) end,
+         ?INFO("JSON REPLY: ~p", [Reply]),
+         {reply, Reply, Req, State}
+   end.
 
 info({msg, _Sender, Data}, Req, State) ->
    ?INFO("MSG: ~p", [Data]),
@@ -68,7 +73,7 @@ send_msg(Cid, UserId, Message) ->
    wdb:conv_notify(Cid, UserId, Message),
    MsgId.
 
-json_msg(<<"ping">>, []) -> <<"pong">>;
+json_msg(M = <<"ping">>, []) -> M;
 
 % check user existance by id
 json_msg(M = <<"user">>, [Uid]) ->
