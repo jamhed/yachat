@@ -16,13 +16,13 @@ define(["pi/Pi"], function(Pi) {
     };
 
     Dumper.prototype.init = function() {
-      return this.sub("#bullet@stub", (function(_this) {
+      return this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
-          var response, row;
-          response = args[0];
+          var convId, response, row, senderId;
+          convId = args[0], senderId = args[1], response = args[2];
           row = $("<div>").addClass(_this.a.row);
           row.html(response);
-          return _this.e.append(row);
+          return _this.e.prepend(row);
         };
       })(this));
     };

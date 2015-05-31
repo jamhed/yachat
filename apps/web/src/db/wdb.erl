@@ -5,7 +5,7 @@
 -include_lib("stdlib/include/qlc.hrl").
 
 metainfo() -> 
-    #schema{name=kvs,tables=[
+    #schema{name=dbd,tables=[
         #table{name=user,fields=record_info(fields,user), keys=[facebook_id, email]},
         #table{name=conv,fields=record_info(fields,conv), keys=[]},
         #table{name=user_conv, fields=record_info(fields, user_conv), keys=[user_id, conv_id]},
@@ -16,7 +16,7 @@ metainfo() ->
     ]}.
 
 user_detail(Uid) ->
-	case kvs:get(user, Uid) of
+	case dbd:get(user, Uid) of
 		{ok, #user{ id=Id, username=Name }} -> [Id, Name];
 		_ -> []
 	end.
@@ -45,12 +45,20 @@ query_conv_id(Uid1, Uid2) ->
 	do(Q).
 
 make_conv(Uid1, Uid2, Type) ->
-	Cid = kvs:next_id(conv, 1),
-	kvs:put(#conv{id=Cid, type=Type, stamp=now()}),
-	kvs:put(#user_conv{id=kvs:next_id(user_conv,1), user_id=Uid1, conv_id=Cid, stamp=now()}),
-	kvs:put(#user_conv{id=kvs:next_id(user_conv,1), user_id=Uid2, conv_id=Cid, stamp=now()}),
+	Cid = dbd:make_uid(),
+	dbd:put(#conv{id=Cid, type=Type, stamp=now()}),
+	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid1, conv_id=Cid, stamp=now()}),
+	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid2, conv_id=Cid, stamp=now()}),
 	Cid.
 
+make_conv(Uid) ->
+	Cid = dbd:make_uid(),
+	dbd:put(#conv{id=Cid, type="generic", stamp=now()}),
+	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()}),
+	Cid.
+
+join_conv(Uid, Cid) ->
+	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()}).
 
 find_conv(Uid1, Uid2, Type) ->
 	case [ query_conv(Id,Type) || Id <- query_conv_id(Uid1, Uid2) ] of
@@ -59,8 +67,8 @@ find_conv(Uid1, Uid2, Type) ->
 	end.
 
 msg(Cid, UserId, Message) ->
-	MsgId = kvs:next_id(message,1),
-	kvs:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message}),
+	MsgId = dbd:next_id(message,1),
+	dbd:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message}),
 	MsgId.
 
 query_conv_users(Cid) ->

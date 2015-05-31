@@ -5,7 +5,7 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
    init: ->
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
       
-      @bullet = $.bullet @uri
+      @bullet = $.bullet @uri, disableWebSocket: false
 
       @bullet.onopen = () =>
          console.log "conn()"
@@ -41,8 +41,18 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
          else
             @event "login", @user_id
 
+      @sub "#bullet@conv/new", (e, args) =>
+         [ status, convId ] = args
+         @convId = convId
+         
+      @sub "#bullet@conv/join", (e, args) =>
+         [ status, convId ] = args
+         @convId = convId
+ 
+      console.log @bullet.transport()
+
    get_user_id: ->
-      @user_id = @globalGet "user_id" 
+      @user_id = parseInt @globalGet "user_id" 
       if ! @user_id
          @send "user/new"
       else
@@ -51,7 +61,15 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
    send: (msg...) ->
       @bullet.send JSON.stringify msg  
 
-   test: ->
-      @send "test", "msg"
+   new_conv: ->
+      chatId = parseInt $("#chatId").val()
+      if chatId
+         @send "conv/join", @user_id, chatId
+      else
+         @send "conv/new", @user_id
+
+   send_msg: (msg) ->
+      console.log "send_msg", msg
+      @send "msg/conv", @user_id, @convId, msg
 
    error: (m...) -> console.log m

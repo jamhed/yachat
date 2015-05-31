@@ -17,7 +17,9 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
 
     Bullet.prototype.init = function() {
       this.uri = this.a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/";
-      this.bullet = $.bullet(this.uri);
+      this.bullet = $.bullet(this.uri, {
+        disableWebSocket: false
+      });
       this.bullet.onopen = (function(_this) {
         return function() {
           console.log("conn()");
@@ -53,7 +55,7 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
           }
         };
       })(this));
-      return this.sub("#bullet@user", (function(_this) {
+      this.sub("#bullet@user", (function(_this) {
         return function(e, args) {
           var status;
           status = args[0];
@@ -65,10 +67,25 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
           }
         };
       })(this));
+      this.sub("#bullet@conv/new", (function(_this) {
+        return function(e, args) {
+          var convId, status;
+          status = args[0], convId = args[1];
+          return _this.convId = convId;
+        };
+      })(this));
+      this.sub("#bullet@conv/join", (function(_this) {
+        return function(e, args) {
+          var convId, status;
+          status = args[0], convId = args[1];
+          return _this.convId = convId;
+        };
+      })(this));
+      return console.log(this.bullet.transport());
     };
 
     Bullet.prototype.get_user_id = function() {
-      this.user_id = this.globalGet("user_id");
+      this.user_id = parseInt(this.globalGet("user_id"));
       if (!this.user_id) {
         return this.send("user/new");
       } else {
@@ -82,8 +99,19 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
       return this.bullet.send(JSON.stringify(msg));
     };
 
-    Bullet.prototype.test = function() {
-      return this.send("test", "msg");
+    Bullet.prototype.new_conv = function() {
+      var chatId;
+      chatId = parseInt($("#chatId").val());
+      if (chatId) {
+        return this.send("conv/join", this.user_id, chatId);
+      } else {
+        return this.send("conv/new", this.user_id);
+      }
+    };
+
+    Bullet.prototype.send_msg = function(msg) {
+      console.log("send_msg", msg);
+      return this.send("msg/conv", this.user_id, this.convId, msg);
     };
 
     Bullet.prototype.error = function() {

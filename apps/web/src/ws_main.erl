@@ -16,7 +16,7 @@ stream(JSON, Req, State) ->
    [ Msg | Args ] = jiffy:decode(JSON),
    ?INFO("JSON MSG: ~p ARGS: ~p", [Msg, Args]),
    Raw = json_msg(Msg, Args),
-   Reply = jiffy:encode(Raw),
+   Reply = case Raw of <<"pong">> -> Raw; _ -> jiffy:encode(Raw) end,
    ?INFO("JSON REPLY: ~p", [Reply]),
    {reply, Reply, Req, State}.
 
@@ -68,11 +68,10 @@ send_msg(Cid, UserId, Message) ->
    wdb:conv_notify(Cid, UserId, Message),
    MsgId.
 
-json_msg(<<"ping">>, []) -> [pong];
+json_msg(<<"ping">>, []) -> <<"pong">>;
 
 % check user existance by id
-json_msg(M = <<"user">>, [_Uid]) ->
-   Uid = binary_to_integer(_Uid),
+json_msg(M = <<"user">>, [Uid]) ->
    ?INFO("~s uid:~p", [M, Uid]),
    case get_user(Uid) of
       {ok, User} ->
@@ -174,6 +173,20 @@ json_msg(M = <<"conv/list">>, [UserId, ConvId]) ->
    List = wdb:list(UserId, ConvId),
    Full = wdb:users_detail(List),
    [M, ok, Full];
+
+% create group
+json_msg(M = <<"conv/new">>, [_UserId]) ->
+   Cid = wdb:make_conv(_UserId),
+   [M, ok, Cid];
+
+% join group
+json_msg(M = <<"conv/join">>, [UserId, ConvId]) ->
+   wdb:join_conv(UserId, ConvId),
+   [M, ok, ConvId];
+
+% leave group
+json_msg(M = <<"conv/leave">>, [UserId, ConvId]) ->
+   [M, ok, UserId, ConvId];
 
 % stub in case of missing handlers
 json_msg(Stub, Args) ->
