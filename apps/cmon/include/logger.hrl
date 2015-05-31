@@ -1,3 +1,0 @@
--define(INFO(S,A),logger:info(?MODULE, ?LINE, S, A)).
--define(ERR(S,A),logger:error(?MODULE, ?LINE, S, A)).
--define(WARN(S,A),logger:warning(?MODULE, ?LINE, S, A)).

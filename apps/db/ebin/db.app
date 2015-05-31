@@ -1,7 +1,0 @@
-{application,db,
-             [{description,"WS.Chat.DB"},
-              {vsn,"1"},
-              {registered,[]},
-              {applications,[kernel,stdlib]},
-              {env,[]},
-              {modules,[]}]}.
