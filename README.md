@@ -3,6 +3,14 @@ YChat
 
 Yet another Erlang-based WebSockets Chat.
 
+INSTALL
+=======
+
+$ git clone git@github.com:jamhed/pi-redux-js.git ./pi
+$ bower install
+$ make
+$ make console
+
 TODO
 ====
 
