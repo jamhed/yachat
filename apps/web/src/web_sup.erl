@@ -9,10 +9,10 @@ start_link() -> supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
     {ok, _} = cowboy:start_http(http, 100, 
-         [{port, 8080}],
+         [{port, 9080}],
          [
             {env, [{dispatch, dispatch_rules()}]},
-            {timeout, 120}
+            {timeout, 60}
          ]
       ),
     {ok, {{one_for_one, 5, 10}, []}}.
