@@ -31,7 +31,8 @@ info({msg, _Sender, Data}, Req, State) ->
 
 info({new_msg, ConvId, SenderId, Text}, Req, State) ->
    ?INFO("TEXT MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
-   Reply = jiffy:encode([new_msg, ConvId, SenderId, Text]),
+   Reply = jiffy:encode([new_msg, ConvId, wdb:user_detail(SenderId), Text]),
+   ?INFO("JSON MSG: ~p", [Reply]),
    {reply, Reply, Req, State}.
 
 terminate(_Req, State) ->
@@ -70,7 +71,7 @@ user_offline(Pid) ->
 
 send_msg(Cid, UserId, Message) ->
    MsgId = wdb:msg(Cid, UserId, Message),
-   wdb:conv_notify(Cid, UserId, Message),
+   wdb:conv_notify(Cid, UserId, MsgId),
    MsgId.
 
 json_msg(M = <<"ping">>, []) -> M;
@@ -116,11 +117,11 @@ json_msg(M = <<"user/info">>, L) ->
 json_msg(M = <<"user/new">>, []) ->
    ?INFO("~s new", [M]),
    NewUID = dbd:make_uid(),
-   case dbd:put(U = #user{id=NewUID}) of
+   case dbd:put(U = #user{id=NewUID, stamp=now()}) of
       ok    ->
          user_online(U, self()),
          [M, new, NewUID];
-      Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
+      Err   -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 % login by email and password

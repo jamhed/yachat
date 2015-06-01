@@ -15,9 +15,11 @@ metainfo() ->
         #table{name=user_online, fields=record_info(fields, user_online), keys=[user_id, pid]}
     ]}.
 
+user_to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
+
 user_detail(Uid) ->
 	case dbd:get(user, Uid) of
-		{ok, #user{ id=Id, username=Name }} -> [Id, Name];
+		{ok, #user{ id=Id, username=Name, email=Email }} -> [Id, Name, Email];
 		_ -> []
 	end.
 
@@ -67,8 +69,8 @@ find_conv(Uid1, Uid2, Type) ->
 	end.
 
 msg(Cid, UserId, Message) ->
-	MsgId = dbd:next_id(message,1),
-	dbd:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message}),
+	MsgId = dbd:next_id(message),
+	dbd:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message, stamp=now()}),
 	MsgId.
 
 query_conv_users(Cid) ->
@@ -88,7 +90,9 @@ msg_notify(Cid, SenderId, Message, [ H | T]) ->
 	msg_notify(Cid, SenderId, Message, T);
 msg_notify(_, _, _, []) -> ok.
 
-conv_notify(Cid, SenderId, Message) -> msg_notify( Cid, SenderId, Message, query_conv_pids(Cid) ).
+conv_notify(Cid, SenderId, MsgId) ->
+   {ok, #message{text=Text,stamp=Stamp}} = dbd:get(message, MsgId),
+   msg_notify( Cid, SenderId, [cvt:now_to_time_binary(Stamp), Text], query_conv_pids(Cid) ).
 
 do(Q) ->
 	F = fun() -> qlc:e(Q) end,

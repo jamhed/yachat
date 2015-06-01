@@ -12,17 +12,18 @@ define(["pi/Pi"], function(Pi) {
     }
 
     Dumper.prototype.attr = function() {
-      return Dumper.__super__.attr.apply(this, arguments).concat(["row"]);
+      return Dumper.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
     };
 
     Dumper.prototype.init = function() {
       return this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
-          var convId, response, row, senderId;
-          convId = args[0], senderId = args[1], response = args[2];
-          row = $("<div>").addClass(_this.a.row);
-          row.html(response);
-          return _this.e.prepend(row);
+          var convId, email, id, name, ref, ref1, stamp, stamp_div, text, text_div;
+          convId = args[0], (ref = args[1], id = ref[0], name = ref[1], email = ref[2]), (ref1 = args[2], stamp = ref1[0], text = ref1[1]);
+          text_div = $("<div>").addClass(_this.a.text).html(text);
+          stamp_div = $("<div>").addClass(_this.a.stamp).html(stamp);
+          _this.e.prepend(text_div);
+          return _this.e.prepend(stamp_div);
         };
       })(this));
     };
