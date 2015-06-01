@@ -53,8 +53,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @sub "#bullet@user/info", (e, args) =>
          [ status, [userId, name, email] ] = args
-         if !email
+         @globalSet "user_id", userId
+         @user_id = userId
+         if email == "undefined"
             @event "anonymous", @user_id
+         else
+            @event "registered", args
 
       @sub "#bullet@user/login", (e, args) =>
          [ status, user_id ] = args
@@ -89,6 +93,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    login: (a...) ->
       h = (new Util()).list2hash a
       @send "user/login", h.email, h.password
+
+   logout: ->
+      @send "user/logout"
+      @user_id = null
+      @globalSet "user_id", @user_id
+      @get_user_id()
 
    register_email: (a...) ->
       h = (new Util()).list2hash a

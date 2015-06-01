@@ -3,6 +3,7 @@
 -include_lib("db/include/metainfo.hrl").
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
+-include_lib("cmon/include/logger.hrl").
 
 metainfo() -> 
     #schema{name=dbd,tables=[
@@ -46,6 +47,11 @@ query_conv_id(Uid1, Uid2) ->
 			]),
 	do(Q).
 
+is_user_in_conv(Uid, Cid) ->
+	Q = qlc:q([ {Uid,Cid} || #user_conv{ user_id=_Uid, conv_id=_Cid } <- mnesia:table(user_conv), Uid == _Uid, Cid == _Cid ]),
+	do(Q).
+
+
 make_conv(Uid1, Uid2, Type) ->
 	Cid = dbd:make_uid(),
 	dbd:put(#conv{id=Cid, type=Type, stamp=now()}),
@@ -60,7 +66,10 @@ make_conv(Uid) ->
 	Cid.
 
 join_conv(Uid, Cid) ->
-	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()}).
+   case is_user_in_conv(Uid,Cid) of
+      []  -> dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()});
+      Err -> Err
+   end.
 
 find_conv(Uid1, Uid2, Type) ->
 	case [ query_conv(Id,Type) || Id <- query_conv_id(Uid1, Uid2) ] of

@@ -90,8 +90,12 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          if (!email) {
+          _this.globalSet("user_id", userId);
+          _this.user_id = userId;
+          if (email === "undefined") {
             return _this.event("anonymous", _this.user_id);
+          } else {
+            return _this.event("registered", args);
           }
         };
       })(this));
@@ -141,6 +145,13 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = (new Util()).list2hash(a);
       return this.send("user/login", h.email, h.password);
+    };
+
+    Bullet.prototype.logout = function() {
+      this.send("user/logout");
+      this.user_id = null;
+      this.globalSet("user_id", this.user_id);
+      return this.get_user_id();
     };
 
     Bullet.prototype.register_email = function() {

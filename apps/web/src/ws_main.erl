@@ -137,6 +137,11 @@ json_msg(M = <<"user/login">>, [Email, Password]) ->
       _                                         -> [M, fail, protocol]
    end;
 
+json_msg(M = <<"user/logout">>, []) ->
+   ?INFO("~s", [M]),
+   user_offline(self()),
+   [M, ok];
+
 % update personal information
 json_msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
    ?INFO("~p uid:~p email:~p name:~p", [M, Uid, Email, Name]),
