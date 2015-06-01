@@ -25,6 +25,17 @@ body {
 <input type="button" class="btn" value="Cancel" style="margin-left: 40px" pi="pi/Button" target="parent@close">
 </div>
 </script>
+
+<script pi="pi/Source" name="dialog/error" type="text/x-dot">
+<div pi="Dialog/Simple" title="Error">
+   <div>
+      {{! it.text }}
+   </div>
+   <div style="margin-top: 20px">
+      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+   </div>
+</div>
+</script>
 <!-- END TEMPLATES -->
 
    <nav class="navbar navbar-inverse navbar-fixed-top">

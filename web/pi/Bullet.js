@@ -64,7 +64,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           var status;
           status = args[0];
           if (status === "fail") {
-            _this.error("Cannot confirm UID, request New", _this.user_id);
+            _this.error("Cannot confirm UID, request New");
             return _this.send("user/new");
           } else {
             _this.send("user/info", _this.user_id);
@@ -104,7 +104,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
             _this.send("user/info", _this.user_id);
             return _this.event("login", _this.user_id);
           } else {
-            return _this.error("Login", user_id);
+            return _this.error("Login or password error");
           }
         };
       })(this));
@@ -158,7 +158,9 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     Bullet.prototype.error = function() {
       var m;
       m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      return console.log(m);
+      return this.rt.append("dialog/error", {
+        text: m
+      });
     };
 
     return Bullet;

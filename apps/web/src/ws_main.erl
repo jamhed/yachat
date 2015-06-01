@@ -128,9 +128,12 @@ json_msg(M = <<"user/new">>, []) ->
 json_msg(M = <<"user/login">>, [Email, Password]) ->
    ?INFO("~s email:~s password:~s", [M, Email, Password]),
    case dbd:index(user, email, Email) of
-      [#user{id=Uid, password=Password}]        -> [M, ok, Uid];
+      [#user{id=Uid, password=Password}]        ->
+         user_offline(self()),
+         user_online(#user{id=Uid}, self()),
+         [M, ok, Uid];
       []                                        -> [M, fail, match];
-      [#user{id=Uid}]                           -> [M, fail, match];
+      [U]                                       -> [M, fail, match]; % password
       _                                         -> [M, fail, protocol]
    end;
 

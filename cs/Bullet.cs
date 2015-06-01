@@ -37,7 +37,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          [ status ] = args
          
          if status == "fail"
-            @error "Cannot confirm UID, request New", @user_id
+            @error "Cannot confirm UID, request New"
             @send "user/new"
          else
             @send "user/info", @user_id
@@ -63,7 +63,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
             @send "user/info", @user_id
             @event "login", @user_id
          else
-            @error "Login", user_id # user_id = cause
+            @error "Login or password error" # user_id = cause
    
       console.log @bullet.transport()
 
@@ -98,4 +98,5 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       console.log "send_msg", msg
       @send "msg/conv", @user_id, @convId, msg
 
-   error: (m...) -> console.log m
+   error: (m...) -> 
+      @rt.append "dialog/error", text: m
