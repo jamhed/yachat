@@ -14,11 +14,9 @@ $ make console
 TODO
 ====
 
-1. Check double joins to conv
 2. Check database arguments for correctness (existance)
-3. Leave conv
 4. Online status
-5. Conv users
+5. List Conv users
 6. Names in messages
 7. Remove double buttons
 
@@ -29,4 +27,6 @@ DONE
 3. User registration with names and emails
 4. User names
 5. Error messages as dialogs
+6. Leave conv
+7. Check double joins to conv
 
