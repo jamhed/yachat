@@ -131,7 +131,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       return this.bullet.send(JSON.stringify(msg));
     };
 
-    Bullet.prototype.new_conv = function() {
+    Bullet.prototype.join_conv = function() {
       var chatId;
       chatId = parseInt($("#chatId").val());
       if (chatId) {
@@ -139,6 +139,10 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       } else {
         return this.send("conv/new", this.user_id);
       }
+    };
+
+    Bullet.prototype.leave_conv = function() {
+      return this.send("conv/leave", this.user_id, this.convId);
     };
 
     Bullet.prototype.login = function() {

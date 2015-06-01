@@ -20,6 +20,7 @@ TODO
 4. Online status
 5. Conv users
 6. Names in messages
+7. Remove double buttons
 
 DONE
 ====

@@ -48,7 +48,7 @@ query_conv_id(Uid1, Uid2) ->
 	do(Q).
 
 is_user_in_conv(Uid, Cid) ->
-	Q = qlc:q([ {Uid,Cid} || #user_conv{ user_id=_Uid, conv_id=_Cid } <- mnesia:table(user_conv), Uid == _Uid, Cid == _Cid ]),
+	Q = qlc:q([ Id || #user_conv{ id=Id, user_id=_Uid, conv_id=_Cid } <- mnesia:table(user_conv), Uid == _Uid, Cid == _Cid ]),
 	do(Q).
 
 
@@ -70,6 +70,8 @@ join_conv(Uid, Cid) ->
       []  -> dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()});
       Err -> Err
    end.
+
+leave_conv(Uid,Cid) -> [ dbd:delete(user_conv, Id) || Id <- is_user_in_conv(Uid,Cid) ].
 
 find_conv(Uid1, Uid2, Type) ->
 	case [ query_conv(Id,Type) || Id <- query_conv_id(Uid1, Uid2) ] of

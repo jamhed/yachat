@@ -200,6 +200,7 @@ json_msg(M = <<"conv/join">>, [UserId, ConvId]) ->
 
 % leave group
 json_msg(M = <<"conv/leave">>, [UserId, ConvId]) ->
+   wdb:leave_conv(UserId,ConvId),
    [M, ok, UserId, ConvId];
 
 % stub in case of missing handlers

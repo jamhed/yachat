@@ -81,12 +81,15 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    # Public, called as @rpc
 
-   new_conv: ->
+   join_conv: ->
       chatId = parseInt $("#chatId").val()
       if chatId
          @send "conv/join", @user_id, chatId
       else
          @send "conv/new", @user_id
+
+   leave_conv: ->
+      @send "conv/leave", @user_id, @convId
 
    login: (a...) ->
       h = (new Util()).list2hash a

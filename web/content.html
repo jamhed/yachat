@@ -1,3 +1,11 @@
+<script pi="pi/Source" name="button/join" type="text/x-dot">
+<input type="button" class="btn" value="Join/Create" pi="pi/Button" target="#bullet@join_conv">
+</script>
+
+<script pi="pi/Source" name="button/leave" type="text/x-dot">
+<button type="button" class="btn" pi="pi/Button" target="#bullet@leave_conv">Leave</button>
+</script>
+
 <div class="container">
 
   <div class="row">
@@ -5,7 +13,9 @@
         <div class="form-inline">
            <div class="form-group">
               <input type="text" class="form-control" id="chatId" placeholder="Chat ID" pi="Conv">
-              <input type="button" class="btn" value="Join/Create" pi="pi/Button" target="#bullet@new_conv">
+              <span pi="Conv/Status" join="button/join" leave="button/leave">
+                <input type="button" class="btn" value="Join/Create" pi="pi/Button" target="#bullet@join_conv">
+              </span>
            </div><!-- /.form-group -->
         </div><!-- /.form-inline -->
      </div><!-- col-md-12 -->
