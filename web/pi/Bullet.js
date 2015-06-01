@@ -3,7 +3,7 @@ var extend = function(child, parent) { for (var key in parent) { if (hasProp.cal
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
+define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -67,6 +67,7 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
             _this.error("Cannot confirm UID, request New", _this.user_id);
             return _this.send("user/new");
           } else {
+            _this.send("user/info", _this.user_id);
             return _this.event("login", _this.user_id);
           }
         };
@@ -83,6 +84,28 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
           var convId, status;
           status = args[0], convId = args[1];
           return _this.convId = convId;
+        };
+      })(this));
+      this.sub("#bullet@user/info", (function(_this) {
+        return function(e, args) {
+          var email, name, ref, status, userId;
+          status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
+          if (!email) {
+            return _this.event("anonymous", _this.user_id);
+          }
+        };
+      })(this));
+      this.sub("#bullet@user/login", (function(_this) {
+        return function(e, args) {
+          var status, user_id;
+          status = args[0], user_id = args[1];
+          if (status === "ok") {
+            _this.user_id = user_id;
+            _this.send("user/info", _this.user_id);
+            return _this.event("login", _this.user_id);
+          } else {
+            return _this.error("Login", user_id);
+          }
         };
       })(this));
       return console.log(this.bullet.transport());
@@ -111,6 +134,20 @@ define(["pi/Pi", "/js/bullet.js"], function(Pi, Bullet) {
       } else {
         return this.send("conv/new", this.user_id);
       }
+    };
+
+    Bullet.prototype.login = function() {
+      var a, h;
+      a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      h = (new Util()).list2hash(a);
+      return this.send("user/login", h.email, h.password);
+    };
+
+    Bullet.prototype.register_email = function() {
+      var a, h;
+      a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      h = (new Util()).list2hash(a);
+      return this.send("user/register", this.user_id, h.email, h.password, h.username, h.gender);
     };
 
     Bullet.prototype.send_msg = function(msg) {

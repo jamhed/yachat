@@ -1,4 +1,4 @@
-define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
+define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet extends Pi
 
    attr: -> super.concat ["uri"]
 
@@ -40,6 +40,7 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
             @error "Cannot confirm UID, request New", @user_id
             @send "user/new"
          else
+            @send "user/info", @user_id
             @event "login", @user_id
 
       @sub "#bullet@conv/new", (e, args) =>
@@ -49,7 +50,21 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
       @sub "#bullet@conv/join", (e, args) =>
          [ status, convId ] = args
          @convId = convId
- 
+
+      @sub "#bullet@user/info", (e, args) =>
+         [ status, [userId, name, email] ] = args
+         if !email
+            @event "anonymous", @user_id
+
+      @sub "#bullet@user/login", (e, args) =>
+         [ status, user_id ] = args
+         if status == "ok"
+            @user_id = user_id
+            @send "user/info", @user_id
+            @event "login", @user_id
+         else
+            @error "Login", user_id # user_id = cause
+   
       console.log @bullet.transport()
 
    get_user_id: ->
@@ -62,12 +77,22 @@ define ["pi/Pi", "/js/bullet.js"], (Pi, Bullet) -> class Bullet extends Pi
    send: (msg...) ->
       @bullet.send JSON.stringify msg  
 
+   # Public, called as @rpc
+
    new_conv: ->
       chatId = parseInt $("#chatId").val()
       if chatId
          @send "conv/join", @user_id, chatId
       else
          @send "conv/new", @user_id
+
+   login: (a...) ->
+      h = (new Util()).list2hash a
+      @send "user/login", h.email, h.password
+
+   register_email: (a...) ->
+      h = (new Util()).list2hash a
+      @send "user/register", @user_id, h.email, h.password, h.username, h.gender
 
    send_msg: (msg) ->
       console.log "send_msg", msg

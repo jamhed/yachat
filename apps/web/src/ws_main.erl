@@ -107,10 +107,10 @@ json_msg(M = <<"user/email">>, [Email]) ->
       Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
-json_msg(M = <<"user/info">>, [Uid]) ->
+json_msg(M = <<"user/info">>, [Uid]) -> % [UserId, Name, Email]
    [M, ok, wdb:user_detail(Uid)];
 
-json_msg(M = <<"user/info">>, L) ->
+json_msg(M = <<"user/info">>, L) -> 
    [M, ok, wdb:users_detail(L)];
 
 % create new user
@@ -125,18 +125,18 @@ json_msg(M = <<"user/new">>, []) ->
    end;
 
 % login by email and password
-json_msg(M = <<"login">>, [Email, Password]) ->
+json_msg(M = <<"user/login">>, [Email, Password]) ->
    ?INFO("~s email:~s password:~s", [M, Email, Password]),
    case dbd:index(user, email, Email) of
-      {ok, #user{id=Uid, password=Password}}    -> [M, ok, Uid];
-      {ok, _}                                   -> [M, fail, match];
-      {error, not_found}                        -> [M, fail, match];
+      [#user{id=Uid, password=Password}]        -> [M, ok, Uid];
+      []                                        -> [M, fail, match];
+      [#user{id=Uid}]                           -> [M, fail, match];
       _                                         -> [M, fail, protocol]
    end;
 
 % update personal information
-json_msg(M = <<"register">>, [Uid, Email, Password, Name, Gender]) ->
-   ?INFO("~s uid:~s email:~s name:~s", [M, Uid, Email, Name]),
+json_msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
+   ?INFO("~p uid:~p email:~p name:~p", [M, Uid, Email, Name]),
    case get_user(Uid) of
       {ok, User}  ->
          dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}),
@@ -147,7 +147,7 @@ json_msg(M = <<"register">>, [Uid, Email, Password, Name, Gender]) ->
 
 % this comes from facebook auth
 %  r.id, r.email, r.first_name, r.last_name, r.name, r.gender
-json_msg(M = <<"facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
+json_msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
    ?INFO("~s uid:~s fb_id:~s email:~s name:~s", [M, Uid, Id, Email, UserName]),
    case get_user(Uid) of
       {ok, User}  ->
@@ -181,8 +181,8 @@ json_msg(M = <<"conv/list">>, [UserId, ConvId]) ->
    [M, ok, Full];
 
 % create group
-json_msg(M = <<"conv/new">>, [_UserId]) ->
-   Cid = wdb:make_conv(_UserId),
+json_msg(M = <<"conv/new">>, [UserId]) ->
+   Cid = wdb:make_conv(UserId),
    [M, ok, Cid];
 
 % join group

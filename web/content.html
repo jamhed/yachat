@@ -1,0 +1,31 @@
+<div class="container">
+
+  <div class="row">
+     <div class="col-md-12">
+        <div class="form-inline">
+           <div class="form-group">
+              <input type="text" class="form-control" id="chatId" placeholder="Chat ID" pi="Conv">
+              <input type="button" class="btn" value="Join/Create" pi="pi/Button" target="#bullet@new_conv">
+           </div><!-- /.form-group -->
+        </div><!-- /.form-inline -->
+     </div><!-- col-md-12 -->
+  </div><!-- /.row -->
+      
+  <div class="row" style="margin-top:10px">
+     <div class="col-md-12">
+        <div class="form-inline">
+           <div class="form-group" style="width: 100%">
+              <input type="text" style="width: 100%" class="form-control" placeholder="Message" pi="Msg" target="#bullet@send_msg">
+           </div>
+        </div>
+     </div>
+  </div>
+
+  <div class="container-fluid">
+     <div class="row" pi="Dumper"
+        text="col-md-11 col-sm-11 col-xs-10"
+        stamp="col-md-1 col-sm-1 col-xs-2"
+        style="margin-top: 10px"></div>
+  </div>
+
+</div><!-- /.container -->
