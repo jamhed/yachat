@@ -18,7 +18,9 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     Bullet.prototype.init = function() {
       this.uri = this.a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/";
       this.bullet = $.bullet(this.uri, {
-        disableWebSocket: false
+        disableWebSocket: false,
+        disableEventSource: true,
+        disableXHRPolling: true
       });
       this.bullet.onopen = (function(_this) {
         return function() {
@@ -99,7 +101,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user/login", (function(_this) {
+      return this.sub("#bullet@user/login", (function(_this) {
         return function(e, args) {
           var status, user_id;
           status = args[0], user_id = args[1];
@@ -112,7 +114,6 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      return console.log(this.bullet.transport());
     };
 
     Bullet.prototype.get_user_id = function() {

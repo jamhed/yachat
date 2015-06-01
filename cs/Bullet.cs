@@ -5,7 +5,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    init: ->
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
       
-      @bullet = $.bullet @uri, disableWebSocket: false
+      @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
 
       @bullet.onopen = () =>
          console.log "conn()"
@@ -69,8 +69,6 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @error "Login or password error" # user_id = cause
    
-      console.log @bullet.transport()
-
    get_user_id: ->
       @user_id = parseInt @globalGet "user_id" 
       if ! @user_id
