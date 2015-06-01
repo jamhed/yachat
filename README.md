@@ -14,11 +14,13 @@ $ make console
 TODO
 ====
 
+1. On online list conv where we are in
 2. Check database arguments for correctness (existance)
 4. Online status
 5. List Conv users
 6. Names in messages
-7. Remove double buttons
+7. Remove double buttons in templates and in places
+8. On register auto-login
 
 DONE
 ====

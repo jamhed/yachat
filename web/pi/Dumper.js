@@ -18,12 +18,15 @@ define(["pi/Pi"], function(Pi) {
     Dumper.prototype.init = function() {
       return this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
-          var convId, email, id, name, ref, ref1, stamp, stamp_div, text, text_div;
+          var convId, display, email, holder, id, name, ref, ref1, stamp, stamp_div, text, text_div;
           convId = args[0], (ref = args[1], id = ref[0], name = ref[1], email = ref[2]), (ref1 = args[2], stamp = ref1[0], text = ref1[1]);
+          display = name ? name : email ? email : id;
           text_div = $("<div>").addClass(_this.a.text).html(text);
-          stamp_div = $("<div>").addClass(_this.a.stamp).html(stamp);
-          _this.e.prepend(text_div);
-          return _this.e.prepend(stamp_div);
+          stamp_div = $("<div>").addClass(_this.a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":");
+          holder = $("<div>").addClass("row");
+          holder.prepend(text_div);
+          holder.prepend(stamp_div);
+          return _this.e.prepend(holder);
         };
       })(this));
     };
