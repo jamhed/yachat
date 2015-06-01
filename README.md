@@ -16,11 +16,11 @@ TODO
 
 1. On online list conv where we are in
 2. Check database arguments for correctness (existance)
-4. Online status
+4. Online status (connection on/off)
 5. List Conv users
-6. Names in messages
 7. Remove double buttons in templates and in places
 8. On register auto-login
+9. On logout clear everything
 
 DONE
 ====
@@ -31,4 +31,5 @@ DONE
 5. Error messages as dialogs
 6. Leave conv
 7. Check double joins to conv
+8. Names in messages
 
