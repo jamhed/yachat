@@ -23,7 +23,6 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          if e.data != "ping"
             data = JSON.parse e.data
             [ msg, args... ] = data
-            @log msg, args
             @event msg, args
 
       @bullet.onheartbeat = => @bullet.send "ping"
@@ -109,9 +108,11 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    # utility functions
 
    check_user_id: ->
-      userId = parseInt @globalGet "user_id"
-      if userId
-         @send "user", userId,
+      @wait_ajax_done () =>
+         @log "AJAX DONE"
+         userId = parseInt @globalGet "user_id"
+         if userId
+            @send "user", userId,
  
    user_status: (status, userRec) ->
       @log "user status:", status
@@ -120,7 +121,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    conv_status: (status, convId) ->
       @_conv_status = status
-      @log "conv/status/#{status}", convId
+      @log "conv status:", status, convId
       @event "conv/status/#{status}", convId
 
    set_conv_id: (convId) ->
@@ -134,12 +135,18 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    error: (m...) -> 
       @rt.append "dialog/error", text: m 
 
+   event: (e,args) =>
+      @log "EVENT", e, args
+      super e, args
+
    log: (m...) ->
+      console.log m
       $("#log").append [m], "\n"
       
    # methods
 
    send: (msg...) ->
+      @log "MSG", msg
       @bullet.send JSON.stringify msg  
 
    # public methods, called as @rpc

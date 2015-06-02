@@ -41,12 +41,11 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
           return _this.rpc("#bullet@query_convs");
         };
       })(this));
-      this.sub("#bullet@user/status/anonymous", (function(_this) {
+      return this.sub("#bullet@user/status/anonymous", (function(_this) {
         return function(ev, args) {
           return _this.rpc("#bullet@query_convs");
         };
       })(this));
-      return this.rpc("#bullet@query_convs");
     };
 
     return ConvStatus;
