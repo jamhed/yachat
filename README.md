@@ -35,4 +35,5 @@ DONE
 9. Remove double buttons in templates and in places
 10. On logout clear everything
 11. On register auto-login
+12. Refactor message/db to modules
 

@@ -18,30 +18,4 @@ metainfo() ->
 
 
 
-msg(Cid, UserId, Message) ->
-	MsgId = dbd:next_id(message),
-	dbd:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message, stamp=now()}),
-	MsgId.
-
-query_user_pids(Uid) ->
-	Q = qlc:q([ U#user_online.pid || U <- mnesia:table(user_online), U#user_online.user_id == Uid ]),
-	dbd:do(Q).
-
-query_user_convs(Uid) ->
-	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
-	dbd:do(Q).
-
-query_users_pids(UserIdList) -> [ query_user_pids(Uid) || Uid <- UserIdList ].
-
-query_conv_pids(Cid) -> lists:flatten( query_users_pids( db_conv:users(Cid) ) ).
-
-msg_notify(Cid, SenderId, Message, [ H | T]) ->
-	H ! {new_msg, Cid, SenderId, Message},
-	msg_notify(Cid, SenderId, Message, T);
-msg_notify(_, _, _, []) -> ok.
-
-conv_notify(Cid, SenderId, MsgId) ->
-   {ok, #message{text=Text,stamp=Stamp}} = dbd:get(message, MsgId),
-   msg_notify( Cid, SenderId, [cvt:now_to_time_binary(Stamp), Text], query_conv_pids(Cid) ).
-
 

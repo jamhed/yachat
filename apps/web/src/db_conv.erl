@@ -20,7 +20,6 @@ get_by_type(Id, Type) ->
 		_   -> {err, not_found}
 	end.
 
-
 find(Uid1, Uid2, Type) ->
 	case [ get_by_type(Id,Type) || Id <- get_by_users(Uid1, Uid2) ] of
 		[{ok, C}]  -> {ok, C};
@@ -58,9 +57,16 @@ join(Uid, Cid) ->
 
 leave(Uid, Cid) -> [ dbd:delete(user_conv, Id) || Id <- is_user_in(Uid, Cid) ].
 
-
 history(Cid) -> history(Cid, 10).
 
 history(Cid, Limit) ->
    Q = qlc:q([ M || M <- mnesia:table(message), M#message.conv_id == Cid ]),
    dbd:limit(Q, Limit).
+
+pids(Cid) -> lists:flatten( db_user:pids( users(Cid) ) ).
+
+notify(Cid, UserId, MsgId) ->
+   {ok, #message{text=Text,stamp=Stamp}} = db_msg:get(MsgId),
+   db_msg:notify( Cid, UserId, [cvt:now_to_time_binary(Stamp), Text], db_conv:pids(Cid) ).
+
+

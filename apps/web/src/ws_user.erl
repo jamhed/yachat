@@ -96,7 +96,7 @@ msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
 
 msg(M = <<"user/conv_list">>, [Uid]) ->
    ?INFO("~s uid:~p", [M, Uid]),
-   Convs = wdb:query_user_convs(Uid),
+   Convs = db_user:conv(Uid),
    [M, ok, Convs];
 
 % no match in this module

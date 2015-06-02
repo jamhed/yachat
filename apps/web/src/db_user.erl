@@ -15,6 +15,14 @@ detail(Uid) ->
 		_ -> []
 	end.
 
+conv(Uid) ->
+	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
+	dbd:do(Q).
+
+pids([H | T]) -> [ pids(H) ] ++ [ pids(Uid) || Uid <- T ];
+pids(Uid) ->
+	Q = qlc:q([ U#user_online.pid || U <- mnesia:table(user_online), U#user_online.user_id == Uid ]),
+	dbd:do(Q).
 
 
 get(Id) -> dbd:get(user, Id).
