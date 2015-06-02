@@ -10,8 +10,10 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @bullet.onopen = () =>
          @log "conn()"
-         @user_status "not_logged"
-         @check_user_id()
+         @wait_ajax_done () =>
+            @log "AJAX DONE"
+            @user_status "not_logged"
+            @check_user_id()
       
       @bullet.ondisconnect = =>
          @user_status "not_logged"
@@ -108,11 +110,9 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    # utility functions
 
    check_user_id: ->
-      @wait_ajax_done () =>
-         @log "AJAX DONE"
-         userId = parseInt @globalGet "user_id"
-         if userId
-            @send "user", userId,
+      userId = parseInt @globalGet "user_id"
+      if userId
+         @send "user", userId,
  
    user_status: (status, userRec) ->
       @log "user status:", status

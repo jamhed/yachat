@@ -28,8 +28,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       this.bullet.onopen = (function(_this) {
         return function() {
           _this.log("conn()");
-          _this.user_status("not_logged");
-          return _this.check_user_id();
+          return _this.wait_ajax_done(function() {
+            _this.log("AJAX DONE");
+            _this.user_status("not_logged");
+            return _this.check_user_id();
+          });
         };
       })(this);
       this.bullet.ondisconnect = (function(_this) {
@@ -161,16 +164,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.check_user_id = function() {
-      return this.wait_ajax_done((function(_this) {
-        return function() {
-          var userId;
-          _this.log("AJAX DONE");
-          userId = parseInt(_this.globalGet("user_id"));
-          if (userId) {
-            return _this.send("user", userId);
-          }
-        };
-      })(this));
+      var userId;
+      userId = parseInt(this.globalGet("user_id"));
+      if (userId) {
+        return this.send("user", userId);
+      }
     };
 
     Bullet.prototype.user_status = function(status, userRec) {
