@@ -72,6 +72,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          [ status, convList ] = args
          convId = parseInt @globalGet "conv_id"
          if convId in convList
+            @set_conv_id convId
             @conv_status "join", convId
          else
             @conv_status "part"
@@ -80,8 +81,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @sub "#bullet@conv/new", (e, args) =>
          [ status, convId ] = args
-         @set_conv_id convId
-         @conv_status "join", convId
+         if status == "ok"
+            @set_conv_id convId
+            @conv_status "join", convId
+         else
+            @set_conv_id null
+            @conv_status "part"
          
       @sub "#bullet@conv/join", (e, args) =>
          [ status, convId ] = args
@@ -90,8 +95,8 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @sub "#bullet@conv/leave", (e, args) =>
          [ status, convId ] = args
-         @set_conv_id null
          @conv_status "part", convId
+         @set_conv_id null
 
    # utility functions
 
@@ -137,14 +142,18 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       if chatId
          @send "conv/join", @user_id, chatId
       else
-         @send "conv/new", @user_id
+         if @user_id
+            @send "conv/new", @user_id
 
    leave_conv: ->
-      @send "conv/leave", @user_id, @convId
+      @send "conv/leave", @user_id, @conv_id
 
    login: (a...) ->
       h = (new Util()).list2hash a
       @send "user/login", h.email, h.password
+
+   anonymous: ->
+      @send "user/new"
 
    logout: ->
       @send "user/logout"
@@ -155,5 +164,5 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       h = (new Util()).list2hash a
       @send "user/register", @user_id, h.email, h.password, h.username, h.gender
 
-   send_msg: (msg) -> @send "msg/conv", @user_id, @convId, msg
+   send_msg: (msg) -> @send "msg/conv", @user_id, @conv_id, msg
 

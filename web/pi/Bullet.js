@@ -108,6 +108,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           status = args[0], convList = args[1];
           convId = parseInt(_this.globalGet("conv_id"));
           if (indexOf.call(convList, convId) >= 0) {
+            _this.set_conv_id(convId);
             return _this.conv_status("join", convId);
           } else {
             return _this.conv_status("part");
@@ -118,8 +119,13 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          _this.set_conv_id(convId);
-          return _this.conv_status("join", convId);
+          if (status === "ok") {
+            _this.set_conv_id(convId);
+            return _this.conv_status("join", convId);
+          } else {
+            _this.set_conv_id(null);
+            return _this.conv_status("part");
+          }
         };
       })(this));
       this.sub("#bullet@conv/join", (function(_this) {
@@ -134,8 +140,8 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          _this.set_conv_id(null);
-          return _this.conv_status("part", convId);
+          _this.conv_status("part", convId);
+          return _this.set_conv_id(null);
         };
       })(this));
     };
@@ -196,12 +202,14 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       if (chatId) {
         return this.send("conv/join", this.user_id, chatId);
       } else {
-        return this.send("conv/new", this.user_id);
+        if (this.user_id) {
+          return this.send("conv/new", this.user_id);
+        }
       }
     };
 
     Bullet.prototype.leave_conv = function() {
-      return this.send("conv/leave", this.user_id, this.convId);
+      return this.send("conv/leave", this.user_id, this.conv_id);
     };
 
     Bullet.prototype.login = function() {
@@ -209,6 +217,10 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = (new Util()).list2hash(a);
       return this.send("user/login", h.email, h.password);
+    };
+
+    Bullet.prototype.anonymous = function() {
+      return this.send("user/new");
     };
 
     Bullet.prototype.logout = function() {
@@ -225,7 +237,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.send_msg = function(msg) {
-      return this.send("msg/conv", this.user_id, this.convId, msg);
+      return this.send("msg/conv", this.user_id, this.conv_id, msg);
     };
 
     return Bullet;

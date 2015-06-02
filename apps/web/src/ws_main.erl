@@ -196,6 +196,9 @@ json_msg(M = <<"conv/list">>, [UserId, ConvId]) ->
    [M, ok, Full];
 
 % create group
+json_msg(M = <<"conv/new">>, [null]) ->
+   [M, fail, null_id];
+
 json_msg(M = <<"conv/new">>, [UserId]) ->
    Cid = wdb:make_conv(UserId),
    [M, ok, Cid];
