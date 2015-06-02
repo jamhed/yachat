@@ -6,6 +6,17 @@
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("cmon/include/logger.hrl").
 
+to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
+
+detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
+detail(Uid) ->
+	case dbd:get(user, Uid) of
+		{ok, #user{ id=Id, username=Name, email=Email }} -> [Id, Name, Email];
+		_ -> []
+	end.
+
+
+
 get(Id) -> dbd:get(user, Id).
 get_by_fb(Id) -> dbd:index(user, facebook_id, Id).
 get_by_email(Id) -> dbd:index(user, email, Id).
@@ -14,7 +25,6 @@ clear_online([]) -> ok;
 clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online(T).
 
 drop_online_status([]) -> ok;
-
 drop_online_status([#user_online{id=Id, pid=Pid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
    dbd:delete(user_online, Id),
@@ -32,12 +42,3 @@ online(#user{id=Uid}, Pid) ->
       [_ | _] ->
          ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid])
    end.
-
-map_uid(Uid) ->
-   case get(Uid) of
-      {ok, #user{id=Uid,username=Name,email=Email}}  -> [Uid,Name,Email];
-      _        -> []
-   end.
-
-
-

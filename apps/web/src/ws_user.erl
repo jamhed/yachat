@@ -35,10 +35,10 @@ msg(M = <<"user/email">>, [Email]) ->
    end;
 
 msg(M = <<"user/info">>, [Uid]) -> % [UserId, Name, Email]
-   [M, ok, wdb:user_detail(Uid)];
+   [M, ok, db_user:detail(Uid)];
 
 msg(M = <<"user/info">>, L) -> 
-   [M, ok, wdb:users_detail(L)];
+   [M, ok, db_user:detail(L)];
 
 % create new user
 msg(M = <<"user/new">>, []) ->

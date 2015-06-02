@@ -33,7 +33,7 @@ info({msg, _Sender, Data}, Req, State) ->
 
 info({new_msg, ConvId, SenderId, Text}, Req, State) ->
    ?INFO("TEXT MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
-   Reply = jiffy:encode([new_msg, ConvId, wdb:user_detail(SenderId), Text]),
+   Reply = jiffy:encode([new_msg, ConvId, db_user:detail(SenderId), Text]),
    ?INFO("JSON MSG: ~p", [Reply]),
    {reply, Reply, Req, State}.
 

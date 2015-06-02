@@ -74,3 +74,19 @@ get(Name, Key, Default) ->
             ?INFO("get() name:~p key:~p default:~p", [Name, Key, Default]),
             DBA:put({Name,Key,Default}),
             {ok,Default} end.
+
+limit(QH, Limit) ->
+   %% use a cursor to grab only Limit records
+   F = fun() ->
+      QC = qlc:cursor(qlc:sort(QH, {order, descending})),
+      M = qlc:next_answers(QC, Limit),
+      qlc:delete_cursor(QC),
+      M
+   end,
+   {atomic, Msgs} = mnesia:transaction(F),
+   Msgs.
+
+do(Q) ->
+	F = fun() -> qlc:e(Q) end,
+	{atomic, Val} = mnesia:transaction(F),
+	Val.
