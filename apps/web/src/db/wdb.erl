@@ -96,6 +96,24 @@ query_user_convs(Uid) ->
 	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
 	do(Q).
 
+
+limit(QH, Limit) ->
+   %% use a cursor to grab only Limit records
+   F = fun() ->
+      QC = qlc:cursor(qlc:sort(QH, {order, descending})),
+      M = qlc:next_answers(QC, Limit),
+      qlc:delete_cursor(QC),
+      M
+   end,
+   {atomic, Msgs} = mnesia:transaction(F),
+   Msgs.
+
+conv_history(Cid) -> conv_history(Cid, 10).
+
+conv_history(Cid, Limit) ->
+   Q = qlc:q([ M || M <- mnesia:table(message), M#message.conv_id == Cid ]),
+   limit(Q, Limit).
+
 query_users_pids(UserIdList) -> [ query_user_pids(Uid) || Uid <- UserIdList ].
 
 query_conv_pids(Cid) -> lists:flatten( query_users_pids( query_conv_users(Cid) ) ).

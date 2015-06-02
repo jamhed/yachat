@@ -16,19 +16,51 @@ define(["pi/Pi"], function(Pi) {
     };
 
     Dumper.prototype.init = function() {
-      return this.sub("#bullet@new_msg", (function(_this) {
+      this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
-          var convId, display, email, holder, id, name, ref, ref1, stamp, stamp_div, text, text_div;
-          convId = args[0], (ref = args[1], id = ref[0], name = ref[1], email = ref[2]), (ref1 = args[2], stamp = ref1[0], text = ref1[1]);
-          display = name !== "undefined" ? name : email !== "undefined" ? email : id;
-          text_div = $("<div>").addClass(_this.a.text).html(text);
-          stamp_div = $("<div>").addClass(_this.a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":");
-          holder = $("<div>").addClass("row");
-          holder.prepend(text_div);
-          holder.prepend(stamp_div);
-          return _this.e.prepend(holder);
+          var convId, msg, user;
+          convId = args[0], user = args[1], msg = args[2];
+          return _this.append(user, msg);
         };
       })(this));
+      this.sub("#bullet@conv/history", (function(_this) {
+        return function(e, args) {
+          var i, len, msg, ref, results, row, rows, status, user;
+          status = args[0], rows = args[1];
+          ref = rows.reverse();
+          results = [];
+          for (i = 0, len = ref.length; i < len; i++) {
+            row = ref[i];
+            user = row[0], msg = row[1];
+            results.push(_this.append(user, msg));
+          }
+          return results;
+        };
+      })(this));
+      this.sub("#bullet@conv/status/part", (function(_this) {
+        return function(e, args) {
+          return _this.e.empty();
+        };
+      })(this));
+      return this.sub("#bullet@conv/status/join", (function(_this) {
+        return function(e, args) {
+          _this.rpc("#bullet@conv_history");
+          return _this.e.empty();
+        };
+      })(this));
+    };
+
+    Dumper.prototype.append = function(user, msg) {
+      var display, email, holder, id, name, stamp, stamp_div, text, text_div;
+      id = user[0], name = user[1], email = user[2];
+      stamp = msg[0], text = msg[1];
+      display = name !== "undefined" ? name : email !== "undefined" ? email : id;
+      text_div = $("<div>").addClass(this.a.text).html(text);
+      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":");
+      holder = $("<div>").addClass("row");
+      holder.prepend(text_div);
+      holder.prepend(stamp_div);
+      return this.e.prepend(holder);
     };
 
     return Dumper;

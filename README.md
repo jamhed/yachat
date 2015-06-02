@@ -18,9 +18,7 @@ TODO
 2. Check database arguments for correctness (existance)
 4. Online status (connection on/off)
 5. List Conv users
-7. Remove double buttons in templates and in places
 8. On register auto-login
-9. On logout clear everything
 
 DONE
 ====
@@ -32,4 +30,6 @@ DONE
 6. Leave conv
 7. Check double joins to conv
 8. Names in messages
+9. Remove double buttons in templates and in places
+10. On logout clear everything
 

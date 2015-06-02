@@ -74,6 +74,12 @@ send_msg(Cid, UserId, Message) ->
    wdb:conv_notify(Cid, UserId, MsgId),
    MsgId.
 
+map_uid(Uid) ->
+   case get_user(Uid) of
+      {ok, #user{id=Uid,username=Name,email=Email}}  -> [Uid,Name,Email];
+      _        -> []
+   end.
+
 json_msg(M = <<"ping">>, []) -> M;
 
 % check user existance by id
@@ -148,11 +154,11 @@ json_msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
    case get_user(Uid) of
       {ok, User}  ->
          case dbd:index(user, email, Email) of
-            []  -> dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}), [M, ok];
+            []  -> dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}), [M, ok, Uid];
             _   -> [M, fail, exists]
          end;
       _ ->
-         [M, fail, uid]
+         [M, fail, no_user_id]
    end;
 
 % this comes from facebook auth
@@ -194,6 +200,10 @@ json_msg(M = <<"conv/list">>, [UserId, ConvId]) ->
    List = wdb:list(UserId, ConvId),
    Full = wdb:users_detail(List),
    [M, ok, Full];
+
+json_msg(M = <<"conv/history">>, [Cid]) ->
+   H = [ [map_uid(Uid), [cvt:now_to_time_binary(Stamp), Text]] || #message{stamp=Stamp,text=Text,user_id=Uid} <- wdb:conv_history(Cid) ],
+   [M, ok, H];
 
 % create group
 json_msg(M = <<"conv/new">>, [null]) ->

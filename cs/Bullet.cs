@@ -60,6 +60,13 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @user_status "registered", [userId, name, email]
          
+      @sub "#bullet@user/register", (e, args) =>
+         [status, userId] = args
+         if status == "ok"
+            @send "user/info", userId
+            window.location = "#"
+         else
+            @error "Register Error", userId
 
       @sub "#bullet@user/login", (e, args) =>
          [ status, userId ] = args
@@ -147,6 +154,9 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    leave_conv: ->
       @send "conv/leave", @user_id, @conv_id
+
+   conv_history: ->
+      @send "conv/history", @conv_id
 
    login: (a...) ->
       h = (new Util()).list2hash a

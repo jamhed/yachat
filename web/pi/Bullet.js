@@ -91,6 +91,18 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
+      this.sub("#bullet@user/register", (function(_this) {
+        return function(e, args) {
+          var status, userId;
+          status = args[0], userId = args[1];
+          if (status === "ok") {
+            _this.send("user/info", userId);
+            return window.location = "#";
+          } else {
+            return _this.error("Register Error", userId);
+          }
+        };
+      })(this));
       this.sub("#bullet@user/login", (function(_this) {
         return function(e, args) {
           var status, userId;
@@ -210,6 +222,10 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
 
     Bullet.prototype.leave_conv = function() {
       return this.send("conv/leave", this.user_id, this.conv_id);
+    };
+
+    Bullet.prototype.conv_history = function() {
+      return this.send("conv/history", this.conv_id);
     };
 
     Bullet.prototype.login = function() {
