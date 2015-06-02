@@ -18,7 +18,9 @@ TODO
 2. Check database arguments for correctness (existance)
 4. Online status (connection on/off)
 5. List Conv users
-8. On register auto-login
+6. Update profile
+7. Facebook auth
+8. User offline/online events
 
 DONE
 ====
@@ -32,4 +34,5 @@ DONE
 8. Names in messages
 9. Remove double buttons in templates and in places
 10. On logout clear everything
+11. On register auto-login
 
