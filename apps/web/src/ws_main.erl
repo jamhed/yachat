@@ -147,8 +147,10 @@ json_msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
    ?INFO("~p uid:~p email:~p name:~p", [M, Uid, Email, Name]),
    case get_user(Uid) of
       {ok, User}  ->
-         dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}),
-         [M, ok];
+         case dbd:index(user, email, Email) of
+            []  -> dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}), [M, ok];
+            _   -> [M, fail, exists]
+         end;
       _ ->
          [M, fail, uid]
    end;
