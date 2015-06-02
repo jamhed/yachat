@@ -3,17 +3,21 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    attr: -> super.concat ["uri"]
 
    init: ->
+
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
       
       @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
 
       @bullet.onopen = () =>
          console.log "conn()"
-         @get_user_id()
+         @user_status "not_logged"
+         @check_user_id()
       
       @bullet.ondisconnect = =>
+         @user_status "not_logged"
       
       @bullet.onclose = =>
+         @user_status "not_logged"
 
       @bullet.onmessage = (e) =>
          if e.data != "ping"
@@ -23,64 +27,111 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @bullet.onheartbeat = => @bullet.send "ping"
 
+      # events handlers
+
+      # user events (logged, registered, not_logged)
+
       @sub "#bullet@user/new", (e, args) =>
          
-         [ status, number ] = args
+         [ status, userId ] = args
 
          if status == "new"
-            @user_id = number
-            @globalSet "user_id", @user_id
+            @set_user_id userId
+            @user_status "anonymous"
          else
-            @error "Cannot Get UID"
+            @user_status ="not_logged"
+            @error "Server protocol"
 
       @sub "#bullet@user", (e, args) =>
-         [ status ] = args
+         [ status, userId ] = args
          
          if status == "fail"
-            @error "Cannot confirm UID, request New"
             @send "user/new"
          else
-            @send "user/info", @user_id
-            @event "login", @user_id
-
-      @sub "#bullet@conv/new", (e, args) =>
-         [ status, convId ] = args
-         @convId = convId
-         
-      @sub "#bullet@conv/join", (e, args) =>
-         [ status, convId ] = args
-         @convId = convId
+            @send "user/info", userId
 
       @sub "#bullet@user/info", (e, args) =>
          [ status, [userId, name, email] ] = args
-         @globalSet "user_id", userId
-         @user_id = userId
+         
+         @set_user_id userId
+        
          if email == "undefined"
-            @event "anonymous", @user_id
+            @user_status "anonymous", [userId]
          else
-            @event "registered", args
+            @user_status "registered", [userId, name, email]
+         
 
       @sub "#bullet@user/login", (e, args) =>
-         [ status, user_id ] = args
+         [ status, userId ] = args
          if status == "ok"
-            @user_id = user_id
-            @send "user/info", @user_id
-            @event "login", @user_id
+            @send "user/info", userId
          else
-            @error "Login or password error" # user_id = cause
-   
-   get_user_id: ->
-      @user_id = parseInt @globalGet "user_id" 
-      if ! @user_id
-         @send "user/new"
-      else
-         @send "user", @user_id
+            @error "Login or password error: " + cause # userId = cause
+
+      @sub "#bullet@user/conv_list", (e, args) =>
+         [ status, convList ] = args
+         convId = parseInt @globalGet "conv_id"
+         if convId in convList
+            @conv_status "join", convId
+         else
+            @conv_status "part"
+  
+      # conversation events (join, part)
+
+      @sub "#bullet@conv/new", (e, args) =>
+         [ status, convId ] = args
+         @set_conv_id convId
+         @conv_status "join", convId
          
+      @sub "#bullet@conv/join", (e, args) =>
+         [ status, convId ] = args
+         @set_conv_id convId
+         @conv_status "join", convId
+
+      @sub "#bullet@conv/leave", (e, args) =>
+         [ status, convId ] = args
+         @set_conv_id null
+         @conv_status "part", convId
+
+   # utility functions
+
+   check_user_id: ->
+      userId = parseInt @globalGet "user_id"
+      if userId
+         @send "user", userId,
+ 
+   user_status: (status, userRec) ->
+      console.log "user status:", status
+      @_user_status = status
+      @event "user/status/#{status}", userRec
+
+   conv_status: (status, convId) ->
+      @_conv_status = status
+      console.log "conv/status/#{status}", convId
+      @event "conv/status/#{status}", convId
+
+   set_conv_id: (convId) ->
+      @globalSet "conv_id", convId
+      @conv_id = convId
+
+   set_user_id: (userId) ->
+      @globalSet "user_id", userId
+      @user_id = userId
+
+   error: (m...) -> 
+      @rt.append "dialog/error", text: m 
+      
+   # methods
+
    send: (msg...) ->
       @bullet.send JSON.stringify msg  
 
-   # Public, called as @rpc
-
+   # public methods, called as @rpc
+   
+   query_convs: ->
+      userId = parseInt @globalGet "user_id"
+      @send "user/conv_list", userId
+        
    join_conv: ->
       chatId = parseInt $("#chatId").val()
       if chatId
@@ -97,17 +148,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    logout: ->
       @send "user/logout"
-      @user_id = null
-      @globalSet "user_id", @user_id
-      @get_user_id()
+      @set_user_id null
+      @user_status "not_logged"
 
    register_email: (a...) ->
       h = (new Util()).list2hash a
       @send "user/register", @user_id, h.email, h.password, h.username, h.gender
 
-   send_msg: (msg) ->
-      console.log "send_msg", msg
-      @send "msg/conv", @user_id, @convId, msg
+   send_msg: (msg) -> @send "msg/conv", @user_id, @convId, msg
 
-   error: (m...) -> 
-      @rt.append "dialog/error", text: m

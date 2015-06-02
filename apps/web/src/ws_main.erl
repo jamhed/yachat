@@ -158,7 +158,7 @@ json_msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
 % this comes from facebook auth
 %  r.id, r.email, r.first_name, r.last_name, r.name, r.gender
 json_msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
-   ?INFO("~s uid:~s fb_id:~s email:~s name:~s", [M, Uid, Id, Email, UserName]),
+   ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case get_user(Uid) of
       {ok, User}  ->
          dbd:put(User#user{email=Email, username=UserName, sex=Gender, facebook_id=Id}),
@@ -166,6 +166,11 @@ json_msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
       _ ->
          [M, fail, uid]
    end;
+
+json_msg(M = <<"user/conv_list">>, [Uid]) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   Convs = wdb:query_user_convs(Uid),
+   [M, ok, Convs];
 
 % p2p message, create conv if not exists
 json_msg(M = <<"msg/p2p">>, [UserId, PeerId, Message]) ->

@@ -1,14 +1,26 @@
 define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvStatus extends aPi
 
-   attr: -> super.concat ["join", "leave"]
+   attr: -> super.concat ["join", "leave", "display"]
 
    init: ->
-      @sub "#bullet@conv/join", (ev, args) =>
+      @sub "#bullet@conv/status/join", (ev, convId) =>
+         $(@a.display).val convId
          @e.html mSource.get(@a.leave)
          @rt.pi @e
-      @sub "#bullet@conv/new", (ev, args) =>
-         @e.html mSource.get(@a.leave)
-         @rt.pi @e
-      @sub "#bullet@conv/leave", (ev) =>
+
+      @sub "#bullet@conv/status/part", (ev, args) =>
+         $(@a.display).val ""
          @e.html mSource.get(@a.join)
          @rt.pi @e
+
+      @sub "#bullet@user/status/not_logged", (ev, args) =>
+         @e.html mSource.get(@a.join)
+         @rt.pi @e
+
+      @sub "#bullet@user/status/registered", (ev, args) =>
+         @rpc "#bullet@query_convs"
+
+      @sub "#bullet@user/status/anonymous", (ev, args) =>
+         @rpc "#bullet@query_convs"
+
+      @rpc "#bullet@query_convs"

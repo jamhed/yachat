@@ -12,28 +12,41 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
     }
 
     ConvStatus.prototype.attr = function() {
-      return ConvStatus.__super__.attr.apply(this, arguments).concat(["join", "leave"]);
+      return ConvStatus.__super__.attr.apply(this, arguments).concat(["join", "leave", "display"]);
     };
 
     ConvStatus.prototype.init = function() {
-      this.sub("#bullet@conv/join", (function(_this) {
-        return function(ev, args) {
+      this.sub("#bullet@conv/status/join", (function(_this) {
+        return function(ev, convId) {
+          $(_this.a.display).val(convId);
           _this.e.html(mSource.get(_this.a.leave));
           return _this.rt.pi(_this.e);
         };
       })(this));
-      this.sub("#bullet@conv/new", (function(_this) {
+      this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
-          _this.e.html(mSource.get(_this.a.leave));
-          return _this.rt.pi(_this.e);
-        };
-      })(this));
-      return this.sub("#bullet@conv/leave", (function(_this) {
-        return function(ev) {
+          $(_this.a.display).val("");
           _this.e.html(mSource.get(_this.a.join));
           return _this.rt.pi(_this.e);
         };
       })(this));
+      this.sub("#bullet@user/status/not_logged", (function(_this) {
+        return function(ev, args) {
+          _this.e.html(mSource.get(_this.a.join));
+          return _this.rt.pi(_this.e);
+        };
+      })(this));
+      this.sub("#bullet@user/status/registered", (function(_this) {
+        return function(ev, args) {
+          return _this.rpc("#bullet@query_convs");
+        };
+      })(this));
+      this.sub("#bullet@user/status/anonymous", (function(_this) {
+        return function(ev, args) {
+          return _this.rpc("#bullet@query_convs");
+        };
+      })(this));
+      return this.rpc("#bullet@query_convs");
     };
 
     return ConvStatus;

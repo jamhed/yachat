@@ -92,6 +92,10 @@ query_user_pids(Uid) ->
 	Q = qlc:q([ U#user_online.pid || U <- mnesia:table(user_online), U#user_online.user_id == Uid ]),
 	do(Q).
 
+query_user_convs(Uid) ->
+	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
+	do(Q).
+
 query_users_pids(UserIdList) -> [ query_user_pids(Uid) || Uid <- UserIdList ].
 
 query_conv_pids(Cid) -> lists:flatten( query_users_pids( query_conv_users(Cid) ) ).

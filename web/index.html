@@ -37,6 +37,18 @@ body {
 </div>
 </script>
 
+<script pi="pi/Source" name="dialog/info" type="text/x-dot">
+<div pi="Dialog/Simple" title="Info">
+   <div>
+      {{! it.text }}
+   </div>
+   <div style="margin-top: 20px">
+      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+   </div>
+</div>
+</script>
+
+
 <script pi="pi/Source" name="button/login" type="text/x-dot">
 <button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
 </script>
@@ -44,6 +56,14 @@ body {
 <script pi="pi/Source" name="button/logout" type="text/x-dot">
 <span style="color: white; margin-right: 20px">{{! it.display }}</span>
 <button type="submit" class="btn btn-default" pi="pi/Button" target="#bullet@logout">Logout</button>
+</script>
+
+<script pi="pi/Source" name="menu/logout" type="text/x-dot">
+<a href="#profile">Profile</a>
+</script>
+
+<script pi="pi/Source" name="menu/login" type="text/x-dot">
+<a href="#register">Register</a>
 </script>
 
 
@@ -63,12 +83,10 @@ body {
          <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                <li><a href="#about">About</a></li>
-               <li><a href="#register">Register</a></li>
                <li><a href="#contact">Contact</a></li>
+               <li pi="Login/Status" login="menu/login" logout="menu/logout"></li>
             </ul>
-            <div class="navbar-form navbar-right" pi="Login/Status" login="button/login" logout="button/logout">
-               <button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
-            </div>
+            <div class="navbar-form navbar-right" pi="Login/Status" login="button/login" logout="button/logout"></div>
          </div><!--/.nav-collapse -->
       </div>
    </nav>

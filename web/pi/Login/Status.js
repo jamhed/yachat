@@ -16,10 +16,10 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
     };
 
     LoginStatus.prototype.init = function() {
-      this.sub("#bullet@registered", (function(_this) {
+      this.sub("#bullet@user/status/registered", (function(_this) {
         return function(ev, args) {
-          var displayName, email, name, ref, status, tmpl, userId;
-          status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
+          var displayName, email, name, tmpl, userId;
+          userId = args[0], name = args[1], email = args[2];
           displayName = name ? name : email;
           tmpl = mSource.get(_this.a.logout);
           _this.e.html(tmpl({
@@ -28,7 +28,13 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
           return _this.rt.pi(_this.e);
         };
       })(this));
-      return this.sub("#bullet@user/logout", (function(_this) {
+      this.sub("#bullet@user/status/not_logged", (function(_this) {
+        return function(ev) {
+          _this.e.html(mSource.get(_this.a.login));
+          return _this.rt.pi(_this.e);
+        };
+      })(this));
+      return this.sub("#bullet@user/status/anonymous", (function(_this) {
         return function(ev) {
           _this.e.html(mSource.get(_this.a.login));
           return _this.rt.pi(_this.e);
