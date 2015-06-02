@@ -25,7 +25,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       });
       this.bullet.onopen = (function(_this) {
         return function() {
-          console.log("conn()");
+          _this.log("conn()");
           _this.user_status("not_logged");
           return _this.check_user_id();
         };
@@ -46,6 +46,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           if (e.data !== "ping") {
             data = JSON.parse(e.data);
             msg = data[0], args = 2 <= data.length ? slice.call(data, 1) : [];
+            _this.log(msg, args);
             return _this.event(msg, args);
           }
         };
@@ -167,14 +168,14 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.user_status = function(status, userRec) {
-      console.log("user status:", status);
+      this.log("user status:", status);
       this._user_status = status;
       return this.event("user/status/" + status, userRec);
     };
 
     Bullet.prototype.conv_status = function(status, convId) {
       this._conv_status = status;
-      console.log("conv/status/" + status, convId);
+      this.log("conv/status/" + status, convId);
       return this.event("conv/status/" + status, convId);
     };
 
@@ -194,6 +195,12 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       return this.rt.append("dialog/error", {
         text: m
       });
+    };
+
+    Bullet.prototype.log = function() {
+      var m;
+      m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      return $("#log").append([m], "\n");
     };
 
     Bullet.prototype.send = function() {

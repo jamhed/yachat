@@ -9,7 +9,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
 
       @bullet.onopen = () =>
-         console.log "conn()"
+         @log "conn()"
          @user_status "not_logged"
          @check_user_id()
       
@@ -23,6 +23,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          if e.data != "ping"
             data = JSON.parse e.data
             [ msg, args... ] = data
+            @log msg, args
             @event msg, args
 
       @bullet.onheartbeat = => @bullet.send "ping"
@@ -113,13 +114,13 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          @send "user", userId,
  
    user_status: (status, userRec) ->
-      console.log "user status:", status
+      @log "user status:", status
       @_user_status = status
       @event "user/status/#{status}", userRec
 
    conv_status: (status, convId) ->
       @_conv_status = status
-      console.log "conv/status/#{status}", convId
+      @log "conv/status/#{status}", convId
       @event "conv/status/#{status}", convId
 
    set_conv_id: (convId) ->
@@ -132,6 +133,9 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    error: (m...) -> 
       @rt.append "dialog/error", text: m 
+
+   log: (m...) ->
+      $("#log").append [m], "\n"
       
    # methods
 
