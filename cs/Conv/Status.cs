@@ -22,3 +22,6 @@ define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvStatus extends aPi
 
       @sub "#bullet@user/status/anonymous", (ev, args) =>
          @rpc "#bullet@query_convs"
+
+      @wait_ajax_done =>
+         @rpc "#bullet@query_convs"

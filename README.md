@@ -21,6 +21,8 @@ TODO
 6. Update profile
 7. Facebook auth
 8. User offline/online events
+9. Separate config file (not sys.options)
+10. Load profile data
 
 DONE
 ====

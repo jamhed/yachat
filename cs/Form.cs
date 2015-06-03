@@ -4,10 +4,10 @@ define ["pi/Pi"], (aPi) -> class aForm extends aPi
 
    constructor: ->
       super
-      @sub "init", (ev, data) =>
+      @handler "init", (ev, data) =>
          @deserialize $(@a.el), (name: k, value: v for k,v of data)
       
-      @sub "reset", (ev, data) =>
+      @handler "reset", (ev, data) =>
          @reset $(@a.el)
          @pub @a.target, data: {} if @a.target
 

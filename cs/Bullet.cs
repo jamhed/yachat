@@ -9,12 +9,11 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
 
       @bullet.onopen = () =>
-         @log "conn()"
-         @wait_ajax_done () =>
-            @log "AJAX DONE"
+         @debug "conn()"
+         @wait_ajax_done =>
             @user_status "not_logged"
             @check_user_id()
-      
+     
       @bullet.ondisconnect = =>
          @user_status "not_logged"
       
@@ -79,7 +78,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       @sub "#bullet@user/conv_list", (e, args) =>
          [ status, convList ] = args
-         convId = parseInt @globalGet "conv_id"
+         convId = parseInt @localGet "conv_id"
          if convId in convList
             @set_conv_id convId
             @conv_status "join", convId
@@ -110,49 +109,50 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    # utility functions
 
    check_user_id: ->
-      userId = parseInt @globalGet "user_id"
+      userId = parseInt @localGet "user_id"
       if userId
          @send "user", userId,
  
    user_status: (status, userRec) ->
-      @log "user status:", status
+      @debug "user status:", status
       @_user_status = status
       @event "user/status/#{status}", userRec
 
    conv_status: (status, convId) ->
       @_conv_status = status
-      @log "conv status:", status, convId
+      @debug "conv status:", status, convId
       @event "conv/status/#{status}", convId
 
    set_conv_id: (convId) ->
-      @globalSet "conv_id", convId
+      @localSet "conv_id", convId
       @conv_id = convId
 
    set_user_id: (userId) ->
-      @globalSet "user_id", userId
+      @localSet "user_id", userId
       @user_id = userId
 
    error: (m...) -> 
       @rt.append "dialog/error", text: m 
 
    event: (e,args) =>
-      @log "EVENT", e, args
+      @debug "EVENT", e, args
       super e, args
 
-   log: (m...) ->
-      console.log m
-      $("#log").append [m], "\n"
       
    # methods
 
    send: (msg...) ->
-      @log "MSG", msg
+      @debug "MSG", msg
       @bullet.send JSON.stringify msg  
 
    # public methods, called as @rpc
-   
+
+   user_info: ->
+      userId = parseInt @localGet "user_id"
+      @send "user/info", userId
+    
    query_convs: ->
-      userId = parseInt @globalGet "user_id"
+      userId = parseInt @localGet "user_id"
       @send "user/conv_list", userId
         
    join_conv: ->

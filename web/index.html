@@ -27,6 +27,9 @@ body {
 </div>
 </script>
 
+<div id="router" pi="pi/Router"></div>
+<div pi="pi/Content" get uri router="#router"></div>
+
 <script pi="pi/Source" name="dialog/error" type="text/x-dot">
 <div pi="Dialog/Simple" title="Error">
    <div>
@@ -95,7 +98,6 @@ body {
 
    <div id="bullet" pi="Bullet"></div>
 
-   <div pi="pi/Content" get uri></div>
 
    <!-- 
    <pre id="log" style="margin-top: 100px"></pre>

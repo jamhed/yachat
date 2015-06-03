@@ -19,7 +19,10 @@ define ["pi/Pi"], (Pi) -> class Dumper extends Pi
       @sub "#bullet@conv/status/join", (e, args) =>
          @rpc "#bullet@conv_history"
          @e.empty()
-
+      
+      @wait_ajax_done () =>
+         @debug "AJAX DONE"
+ 
    append: (user, msg) ->
       [id,name,email] = user
       [stamp,text] = msg

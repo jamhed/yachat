@@ -42,10 +42,15 @@ define(["pi/Pi"], function(Pi) {
           return _this.e.empty();
         };
       })(this));
-      return this.sub("#bullet@conv/status/join", (function(_this) {
+      this.sub("#bullet@conv/status/join", (function(_this) {
         return function(e, args) {
           _this.rpc("#bullet@conv_history");
           return _this.e.empty();
+        };
+      })(this));
+      return this.wait_ajax_done((function(_this) {
+        return function() {
+          return _this.debug("AJAX DONE");
         };
       })(this));
     };

@@ -13,7 +13,7 @@ define(["pi/Pi"], function(aPi) {
 
     function aForm() {
       aForm.__super__.constructor.apply(this, arguments);
-      this.sub("init", (function(_this) {
+      this.handler("init", (function(_this) {
         return function(ev, data) {
           var k, v;
           return _this.deserialize($(_this.a.el), (function() {
@@ -30,7 +30,7 @@ define(["pi/Pi"], function(aPi) {
           })());
         };
       })(this));
-      this.sub("reset", (function(_this) {
+      this.handler("reset", (function(_this) {
         return function(ev, data) {
           _this.reset($(_this.a.el));
           if (_this.a.target) {

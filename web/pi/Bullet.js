@@ -27,9 +27,8 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       });
       this.bullet.onopen = (function(_this) {
         return function() {
-          _this.log("conn()");
+          _this.debug("conn()");
           return _this.wait_ajax_done(function() {
-            _this.log("AJAX DONE");
             _this.user_status("not_logged");
             return _this.check_user_id();
           });
@@ -123,7 +122,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, convList, status;
           status = args[0], convList = args[1];
-          convId = parseInt(_this.globalGet("conv_id"));
+          convId = parseInt(_this.localGet("conv_id"));
           if (indexOf.call(convList, convId) >= 0) {
             _this.set_conv_id(convId);
             return _this.conv_status("join", convId);
@@ -165,31 +164,31 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
 
     Bullet.prototype.check_user_id = function() {
       var userId;
-      userId = parseInt(this.globalGet("user_id"));
+      userId = parseInt(this.localGet("user_id"));
       if (userId) {
         return this.send("user", userId);
       }
     };
 
     Bullet.prototype.user_status = function(status, userRec) {
-      this.log("user status:", status);
+      this.debug("user status:", status);
       this._user_status = status;
       return this.event("user/status/" + status, userRec);
     };
 
     Bullet.prototype.conv_status = function(status, convId) {
       this._conv_status = status;
-      this.log("conv status:", status, convId);
+      this.debug("conv status:", status, convId);
       return this.event("conv/status/" + status, convId);
     };
 
     Bullet.prototype.set_conv_id = function(convId) {
-      this.globalSet("conv_id", convId);
+      this.localSet("conv_id", convId);
       return this.conv_id = convId;
     };
 
     Bullet.prototype.set_user_id = function(userId) {
-      this.globalSet("user_id", userId);
+      this.localSet("user_id", userId);
       return this.user_id = userId;
     };
 
@@ -202,27 +201,26 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.event = function(e, args) {
-      this.log("EVENT", e, args);
+      this.debug("EVENT", e, args);
       return Bullet.__super__.event.call(this, e, args);
-    };
-
-    Bullet.prototype.log = function() {
-      var m;
-      m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      console.log(m);
-      return $("#log").append([m], "\n");
     };
 
     Bullet.prototype.send = function() {
       var msg;
       msg = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      this.log("MSG", msg);
+      this.debug("MSG", msg);
       return this.bullet.send(JSON.stringify(msg));
+    };
+
+    Bullet.prototype.user_info = function() {
+      var userId;
+      userId = parseInt(this.localGet("user_id"));
+      return this.send("user/info", userId);
     };
 
     Bullet.prototype.query_convs = function() {
       var userId;
-      userId = parseInt(this.globalGet("user_id"));
+      userId = parseInt(this.localGet("user_id"));
       return this.send("user/conv_list", userId);
     };
 
