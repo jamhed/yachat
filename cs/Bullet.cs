@@ -32,7 +32,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       # user events (logged, registered, not_logged)
 
-      @sub "#bullet@user/new", (e, args) =>
+      @handler "user/new", (e, args) =>
          
          [ status, userId ] = args
 
@@ -43,7 +43,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
             @user_status ="not_logged"
             @error "Server protocol"
 
-      @sub "#bullet@user", (e, args) =>
+      @handler "user", (e, args) =>
          [ status, userId ] = args
          
          if status == "fail"
@@ -51,7 +51,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @send "user/info", userId
 
-      @sub "#bullet@user/info", (e, args) =>
+      @handler "user/info", (e, args) =>
          [ status, [userId, name, email] ] = args
          
          @set_user_id userId
@@ -61,7 +61,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @user_status "registered", [userId, name, email]
          
-      @sub "#bullet@user/register", (e, args) =>
+      @handler "user/register", (e, args) =>
          [status, userId] = args
          if status == "ok"
             @send "user/info", userId
@@ -69,14 +69,14 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @error "Register Error", userId
 
-      @sub "#bullet@user/login", (e, args) =>
+      @handler "user/login", (e, args) =>
          [ status, userId ] = args
          if status == "ok"
             @send "user/info", userId
          else
             @error "Login or password error: " + cause # userId = cause
 
-      @sub "#bullet@user/conv_list", (e, args) =>
+      @handler "user/conv_list", (e, args) =>
          [ status, convList ] = args
          convId = parseInt @localGet "conv_id"
          if convId in convList
@@ -87,7 +87,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
   
       # conversation events (join, part)
 
-      @sub "#bullet@conv/new", (e, args) =>
+      @handler "conv/new", (e, args) =>
          [ status, convId ] = args
          if status == "ok"
             @set_conv_id convId
@@ -96,14 +96,18 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
             @set_conv_id null
             @conv_status "part"
          
-      @sub "#bullet@conv/join", (e, args) =>
+      @handler "conv/join", (e, args) =>
          [ status, convId ] = args
          @set_conv_id convId
          @conv_status "join", convId
 
-      @sub "#bullet@conv/leave", (e, args) =>
+      @handler "conv/leave", (e, args) =>
          [ status, convId ] = args
          @conv_status "part", convId
+         @set_conv_id null
+
+      @handler "user/logout", (e, args) =>
+         @conv_status "part", null
          @set_conv_id null
 
    # utility functions

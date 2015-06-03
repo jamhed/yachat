@@ -59,7 +59,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           return _this.bullet.send("ping");
         };
       })(this);
-      this.sub("#bullet@user/new", (function(_this) {
+      this.handler("user/new", (function(_this) {
         return function(e, args) {
           var status, userId;
           status = args[0], userId = args[1];
@@ -72,7 +72,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user", (function(_this) {
+      this.handler("user", (function(_this) {
         return function(e, args) {
           var status, userId;
           status = args[0], userId = args[1];
@@ -83,7 +83,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user/info", (function(_this) {
+      this.handler("user/info", (function(_this) {
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
@@ -95,7 +95,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user/register", (function(_this) {
+      this.handler("user/register", (function(_this) {
         return function(e, args) {
           var status, userId;
           status = args[0], userId = args[1];
@@ -107,7 +107,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user/login", (function(_this) {
+      this.handler("user/login", (function(_this) {
         return function(e, args) {
           var status, userId;
           status = args[0], userId = args[1];
@@ -118,7 +118,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@user/conv_list", (function(_this) {
+      this.handler("user/conv_list", (function(_this) {
         return function(e, args) {
           var convId, convList, status;
           status = args[0], convList = args[1];
@@ -131,7 +131,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@conv/new", (function(_this) {
+      this.handler("conv/new", (function(_this) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
@@ -144,7 +144,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.sub("#bullet@conv/join", (function(_this) {
+      this.handler("conv/join", (function(_this) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
@@ -152,11 +152,17 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           return _this.conv_status("join", convId);
         };
       })(this));
-      return this.sub("#bullet@conv/leave", (function(_this) {
+      this.handler("conv/leave", (function(_this) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
           _this.conv_status("part", convId);
+          return _this.set_conv_id(null);
+        };
+      })(this));
+      return this.handler("user/logout", (function(_this) {
+        return function(e, args) {
+          _this.conv_status("part", null);
           return _this.set_conv_id(null);
         };
       })(this));
