@@ -20,7 +20,6 @@ TODO
 5. List Conv users
 6. Update profile
 7. Facebook auth
-8. User offline/online events
 9. Separate config file (not sys.options)
 10. Load profile data
 
@@ -38,4 +37,5 @@ DONE
 10. On logout clear everything
 11. On register auto-login
 12. Refactor message/db to modules
+13. User offline/online events
 

@@ -18,5 +18,7 @@ notify(Cid, SenderId, Message, [ H | T]) ->
 	H ! {new_msg, Cid, SenderId, Message},
 	notify(Cid, SenderId, Message, T).
 
-
-
+sys_notify(_, _, _, []) -> ok;
+sys_notify(Cid, UserId, Message, [ H | T]) ->
+	H ! {sys_msg, Cid, UserId, Message},
+	notify(Cid, UserId, Message, T).

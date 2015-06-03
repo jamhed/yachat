@@ -35,7 +35,14 @@ info({new_msg, ConvId, SenderId, Text}, Req, State) ->
    ?INFO("TEXT MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
    Reply = jiffy:encode([new_msg, ConvId, db_user:detail(SenderId), Text]),
    ?INFO("JSON MSG: ~p", [Reply]),
+   {reply, Reply, Req, State};
+
+info({sys_msg, ConvId, Uid, Status}, Req, State) ->
+   ?INFO("SYS MSG: ~p ~p ~p", [ConvId, Uid, Status]),
+   Reply = jiffy:encode([sys_msg, ConvId, db_user:detail(Uid), Status]),
+   ?INFO("JSON MSG: ~p", [Reply]),
    {reply, Reply, Req, State}.
+
 
 terminate(_Req, State) ->
    ?INFO("terminate: pid:~p state: ~p", [self(), State]),

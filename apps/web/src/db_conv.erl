@@ -67,6 +67,10 @@ pids(Cid) -> lists:flatten( db_user:pids( users(Cid) ) ).
 
 notify(Cid, UserId, MsgId) ->
    {ok, #message{text=Text,stamp=Stamp}} = db_msg:get(MsgId),
+   notify(Cid, UserId, Stamp, Text).
+
+notify(Cid, UserId, Stamp, Text) ->
    db_msg:notify( Cid, UserId, [cvt:now_to_time_binary(Stamp), Text], db_conv:pids(Cid) ).
 
-
+sys_notify(Cid, UserId, Text) ->
+   db_msg:sys_notify( Cid, UserId, [cvt:now_to_time_binary(now()), Text], db_conv:pids(Cid) ).
