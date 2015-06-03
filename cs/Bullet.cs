@@ -74,7 +74,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          if status == "ok"
             @send "user/info", userId
          else
-            @error "Login or password error: " + cause # userId = cause
+            @error "Login or password error: " + userId 
 
       @handler "user/conv_list", (e, args) =>
          [ status, convList ] = args

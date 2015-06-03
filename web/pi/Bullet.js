@@ -114,7 +114,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           if (status === "ok") {
             return _this.send("user/info", userId);
           } else {
-            return _this.error("Login or password error: " + cause);
+            return _this.error("Login or password error: " + userId);
           }
         };
       })(this));
