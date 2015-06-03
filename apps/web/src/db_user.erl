@@ -47,7 +47,6 @@ offline(Pid) ->
 
 notify_conv(_,_,[]) -> ok;
 notify_conv(Uid, Text, [H | T]) ->
-   ?INFO("notify_conv ~p ~p ~p", [H, Uid, Text]),
    db_conv:sys_notify(H, Uid, Text),
    notify_conv(Uid, Text, T).
 
