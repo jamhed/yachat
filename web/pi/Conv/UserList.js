@@ -19,7 +19,6 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
       this.sub("#bullet@conv/users", (function(_this) {
         return function(ev, args) {
           var List, email, i, id, len, name, ref, status, tmpl;
-          _this.debug("USERS", args);
           _this.empty();
           status = args[0], List = args[1];
           tmpl = _this.rt.source(_this.a.view);
@@ -40,15 +39,15 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
       })(this));
       return this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_conv_users");
+          return _this.empty();
         };
       })(this));
     };
 
     ConvList.prototype.displayName = function(id, name, email) {
-      if (name !== "undefined") {
+      if (name) {
         return name;
-      } else if (email !== "undefined") {
+      } else if (email) {
         return email;
       } else {
         return id;

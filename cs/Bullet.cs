@@ -134,9 +134,8 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @rt.append "dialog/error", text: m.join(" ")
 
    event: (e,args) =>
-      @debug "EVENT", e, args
+      @debug "EVENT", e, args # [].concat args...
       super e, args
-
       
    # methods
 

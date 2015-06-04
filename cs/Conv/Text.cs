@@ -23,13 +23,14 @@ define ["pi/Pi"], (Pi) -> class ConvText extends Pi
 
       @wait_ajax_done () =>
          @debug "AJAX DONE"
+   
+   displayName: (id,name,email) -> if name then name else if email then email else id
  
    append: (user, msg) ->
       [id,name,email] = user
       [stamp,text] = msg
-      display = if name != "undefined" then name else if email != "undefined" then email else id
       text_div = $("<div>").addClass(@a.text).html(text)
-      stamp_div = $("<div>").addClass(@a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":")
+      stamp_div = $("<div>").addClass(@a.stamp).html(stamp + "&nbsp;&nbsp;" + @displayName(id,name,email) + ":")
       holder = $("<div>").addClass("row")
       holder.prepend text_div
       holder.prepend stamp_div

@@ -56,13 +56,22 @@ define(["pi/Pi"], function(Pi) {
       })(this));
     };
 
+    ConvText.prototype.displayName = function(id, name, email) {
+      if (name) {
+        return name;
+      } else if (email) {
+        return email;
+      } else {
+        return id;
+      }
+    };
+
     ConvText.prototype.append = function(user, msg) {
-      var display, email, holder, id, name, stamp, stamp_div, text, text_div;
+      var email, holder, id, name, stamp, stamp_div, text, text_div;
       id = user[0], name = user[1], email = user[2];
       stamp = msg[0], text = msg[1];
-      display = name !== "undefined" ? name : email !== "undefined" ? email : id;
       text_div = $("<div>").addClass(this.a.text).html(text);
-      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":");
+      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + this.displayName(id, name, email) + ":");
       holder = $("<div>").addClass("row");
       holder.prepend(text_div);
       holder.prepend(stamp_div);
