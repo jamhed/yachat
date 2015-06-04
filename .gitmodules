@@ -1,0 +1,3 @@
+[submodule "pi"]
+	path = pi
+	url = git@github.com:jamhed/pi-redux-js.git
