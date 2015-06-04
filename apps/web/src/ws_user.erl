@@ -78,8 +78,7 @@ msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
             []  -> dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}), [M, ok, Uid];
             _   -> [M, fail, exists]
          end;
-      _ ->
-         [M, fail, no_user_id]
+      _ -> [M, fail, no_user_id]
    end;
 
 % this comes from facebook auth

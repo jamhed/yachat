@@ -6,7 +6,16 @@
 <button type="button" class="btn" pi="pi/Button" target="#bullet@leave_conv">Leave</button>
 </script>
 
+<script pi="pi/Source" name="conv/view" type="text/x-dot">
+<button class="btn btn-default" style="margin-right: 10px" pi="pi/Button" target="#bullet@join_conv" data-conv="{{!it.id}}">{{!it.id}}</button>
+</script>
+
+
 <div class="container">
+
+  <div class="row" style="margin-bottom:10px">
+     <div class="col-md-12" pi="Conv/List" view="conv/view"></div>
+  </div>
 
   <div class="row">
      <div class="col-md-12">

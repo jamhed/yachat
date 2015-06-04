@@ -159,8 +159,8 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       userId = parseInt @localGet "user_id"
       @send "user/conv_list", userId
         
-   join_conv: ->
-      chatId = parseInt $("#chatId").val()
+   join_conv: (conv) ->
+      chatId = if conv.conv then conv.conv else parseInt $("#chatId").val()
       if chatId
          @send "conv/join", @user_id, chatId
       else

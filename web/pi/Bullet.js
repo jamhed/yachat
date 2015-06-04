@@ -230,9 +230,9 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       return this.send("user/conv_list", userId);
     };
 
-    Bullet.prototype.join_conv = function() {
+    Bullet.prototype.join_conv = function(conv) {
       var chatId;
-      chatId = parseInt($("#chatId").val());
+      chatId = conv.conv ? conv.conv : parseInt($("#chatId").val());
       if (chatId) {
         return this.send("conv/join", this.user_id, chatId);
       } else {
