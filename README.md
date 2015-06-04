@@ -6,7 +6,7 @@ Yet another Erlang-based WebSockets Chat.
 INSTALL
 =======
 
-$ git clone git@github.com:jamhed/pi-redux-js.git ./pi
+$ git submodule update
 $ bower install
 $ make
 $ make console
@@ -15,7 +15,6 @@ TODO
 ====
 
 1. On online list conv where we are in
-2. Check database arguments for correctness (existance)
 4. Online status (connection on/off)
 5. List Conv users
 6. Update profile
@@ -38,4 +37,5 @@ DONE
 11. On register auto-login
 12. Refactor message/db to modules
 13. User offline/online events
+14. Check database arguments for correctness (existance) - Guards
 
