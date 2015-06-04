@@ -8,4 +8,4 @@ msg(M = <<"ping">>, []) -> M;
 % catch-all
 msg(Stub, Args) ->
 	?INFO("stub msg:~s args:~p", [Stub, Args]),
-	[stub, ok, Stub].
+	[stub, ok, Stub, Args].

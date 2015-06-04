@@ -4,7 +4,7 @@
 -include_lib("web/include/db.hrl").
 
 % check user existance by id
-msg(M = <<"user">>, [Uid]) ->
+msg(M = <<"user">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    case db_user:get(Uid) of
       {ok, User} ->
@@ -34,7 +34,8 @@ msg(M = <<"user/email">>, [Email]) ->
       Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
-msg(M = <<"user/info">>, [Uid]) -> % [UserId, Name, Email]
+% [UserId, Name, Email]
+msg(M = <<"user/info">>, [Uid]) when is_number(Uid) ->
    [M, ok, db_user:detail(Uid)];
 
 msg(M = <<"user/info">>, L) -> 
@@ -70,7 +71,7 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 % update personal information
-msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
+msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) when is_number(Uid) ->
    ?INFO("~p uid:~p email:~p name:~p", [M, Uid, Email, Name]),
    case db_user:get(Uid) of
       {ok, User}  ->
@@ -83,7 +84,7 @@ msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) ->
 
 % this comes from facebook auth
 %  r.id, r.email, r.first_name, r.last_name, r.name, r.gender
-msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
+msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) when is_number(Uid) ->
    ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
@@ -93,7 +94,7 @@ msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) ->
          [M, fail, uid]
    end;
 
-msg(M = <<"user/conv_list">>, [Uid]) ->
+msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    Convs = db_user:conv(Uid),
    [M, ok, Convs];

@@ -6,7 +6,7 @@ Yet another Erlang-based WebSockets Chat.
 INSTALL
 =======
 
-$ git clone git@github.com:jamhed/pi-redux-js.git ./pi
+$ git submodule update
 $ bower install
 $ make
 $ make console
@@ -37,4 +37,4 @@ DONE
 12. Refactor message/db to modules
 13. User offline/online events
 14. On online list all conv where we are in
-
+15. Check database arguments for correctness (existance) - Guards
