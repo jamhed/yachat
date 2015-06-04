@@ -3,19 +3,19 @@ var extend = function(child, parent) { for (var key in parent) { if (hasProp.cal
   hasProp = {}.hasOwnProperty;
 
 define(["pi/Pi"], function(Pi) {
-  var Dumper;
-  return Dumper = (function(superClass) {
-    extend(Dumper, superClass);
+  var ConvText;
+  return ConvText = (function(superClass) {
+    extend(ConvText, superClass);
 
-    function Dumper() {
-      return Dumper.__super__.constructor.apply(this, arguments);
+    function ConvText() {
+      return ConvText.__super__.constructor.apply(this, arguments);
     }
 
-    Dumper.prototype.attr = function() {
-      return Dumper.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
+    ConvText.prototype.attr = function() {
+      return ConvText.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
     };
 
-    Dumper.prototype.init = function() {
+    ConvText.prototype.init = function() {
       this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
           var convId, msg, user;
@@ -56,7 +56,7 @@ define(["pi/Pi"], function(Pi) {
       })(this));
     };
 
-    Dumper.prototype.append = function(user, msg) {
+    ConvText.prototype.append = function(user, msg) {
       var display, email, holder, id, name, stamp, stamp_div, text, text_div;
       id = user[0], name = user[1], email = user[2];
       stamp = msg[0], text = msg[1];
@@ -69,7 +69,7 @@ define(["pi/Pi"], function(Pi) {
       return this.e.prepend(holder);
     };
 
-    return Dumper;
+    return ConvText;
 
   })(Pi);
 });

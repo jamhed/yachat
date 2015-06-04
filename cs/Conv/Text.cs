@@ -1,4 +1,4 @@
-define ["pi/Pi"], (Pi) -> class Dumper extends Pi
+define ["pi/Pi"], (Pi) -> class ConvText extends Pi
 
    attr: -> super.concat ["stamp", "text"]
 
@@ -8,17 +8,18 @@ define ["pi/Pi"], (Pi) -> class Dumper extends Pi
          @append user, msg
 
       @sub "#bullet@conv/history", (e,args) =>
+         @empty()
          [status, rows] = args
          for row in rows.reverse()
             [user, msg] = row
             @append user, msg
 
       @sub "#bullet@conv/status/part", (e,args) =>
-         @e.empty()
+         @empty()
 
       @sub "#bullet@conv/status/join", (e, args) =>
          @rpc "#bullet@conv_history"
-         @e.empty()
+         @empty()
 
       @wait_ajax_done () =>
          @debug "AJAX DONE"

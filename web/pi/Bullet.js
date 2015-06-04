@@ -2,8 +2,7 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
-  slice = [].slice,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  slice = [].slice;
 
 define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
   return Bullet = (function(superClass) {
@@ -122,13 +121,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, convList, status;
           status = args[0], convList = args[1];
-          convId = parseInt(_this.localGet("conv_id"));
-          if (indexOf.call(convList, convId) >= 0) {
-            _this.set_conv_id(convId);
-            return _this.conv_status("join", convId);
-          } else {
-            return _this.conv_status("part");
-          }
+          return convId = parseInt(_this.localGet("conv_id"));
         };
       })(this));
       this.handler("conv/new", (function(_this) {
@@ -202,7 +195,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       var m;
       m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       return this.rt.append("dialog/error", {
-        text: m
+        text: m.join(" ")
       });
     };
 
@@ -228,6 +221,13 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       var userId;
       userId = parseInt(this.localGet("user_id"));
       return this.send("user/conv_list", userId);
+    };
+
+    Bullet.prototype.query_conv_users = function() {
+      var convId, userId;
+      userId = parseInt(this.localGet("user_id"));
+      convId = parseInt(this.localGet("conv_id"));
+      return this.send("conv/users", userId, convId);
     };
 
     Bullet.prototype.join_conv = function(conv) {

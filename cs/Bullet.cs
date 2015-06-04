@@ -79,11 +79,6 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @handler "user/conv_list", (e, args) =>
          [ status, convList ] = args
          convId = parseInt @localGet "conv_id"
-         if convId in convList
-            @set_conv_id convId
-            @conv_status "join", convId
-         else
-            @conv_status "part"
   
       # conversation events (join, part)
 
@@ -136,7 +131,7 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @user_id = userId
 
    error: (m...) -> 
-      @rt.append "dialog/error", text: m 
+      @rt.append "dialog/error", text: m.join(" ")
 
    event: (e,args) =>
       @debug "EVENT", e, args
@@ -158,7 +153,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    query_convs: ->
       userId = parseInt @localGet "user_id"
       @send "user/conv_list", userId
-        
+
+   query_conv_users: ->
+      userId = parseInt @localGet "user_id"
+      convId = parseInt @localGet "conv_id"
+      @send "conv/users", userId, convId
+         
    join_conv: (conv) ->
       chatId = if conv.conv then conv.conv else parseInt $("#chatId").val()
       if chatId

@@ -16,16 +16,18 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
     };
 
     ConvList.prototype.init = function() {
-      this.sub("#bullet@user/conv_list", (function(_this) {
+      this.sub("#bullet@conv/users", (function(_this) {
         return function(ev, args) {
-          var List, conv, i, len, status, tmpl;
+          var List, email, i, id, len, name, ref, status, tmpl;
+          _this.debug("USERS", args);
           _this.empty();
           status = args[0], List = args[1];
           tmpl = _this.rt.source(_this.a.view);
           for (i = 0, len = List.length; i < len; i++) {
-            conv = List[i];
+            ref = List[i], id = ref[0], name = ref[1], email = ref[2];
             _this.e.append(tmpl({
-              id: conv
+              id: id,
+              display: _this.displayName(id, name, email)
             }));
           }
           return _this.rt.pi(_this.e);
@@ -33,14 +35,24 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
       })(this));
       this.sub("#bullet@conv/status/join", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
+          return _this.rpc("#bullet@query_conv_users");
         };
       })(this));
       return this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
+          return _this.rpc("#bullet@query_conv_users");
         };
       })(this));
+    };
+
+    ConvList.prototype.displayName = function(id, name, email) {
+      if (name !== "undefined") {
+        return name;
+      } else if (email !== "undefined") {
+        return email;
+      } else {
+        return id;
+      }
     };
 
     return ConvList;
