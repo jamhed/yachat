@@ -1,4 +1,4 @@
-define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvList extends aPi
+define ["pi/Pi", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList extends aPi
 
    attr: -> super.concat ["view"]
 
@@ -7,7 +7,7 @@ define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvList extends aPi
          @empty()
          [status, List] = args
          tmpl = @rt.source @a.view
-         @e.append tmpl {id: id, display: @displayName(id,name,email) } for [id,name,email] in List
+         @e.append tmpl {id: id, display: Cmon.displayName(id,name,email) } for [id,name,email] in List
          @rt.pi @e
 
       @sub "#bullet@conv/status/join", (ev, args) =>
@@ -16,4 +16,3 @@ define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvList extends aPi
       @sub "#bullet@conv/status/part", (ev, args) =>
          @empty()
 
-   displayName: (id,name,email) -> if name then name else if email then email else id

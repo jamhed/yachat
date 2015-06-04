@@ -14,12 +14,13 @@ $ make console
 TODO
 ====
 
-4. Online status (connection on/off)
-5. List Conv users
-6. Update profile
-7. Facebook auth
-9. Separate config file (not sys.options)
-10. Load profile data
+1. Online status (connection on/off)
+2. Load/Update profile
+3. Facebook auth
+4. Separate config file (not sys.options)
+5. P2P Chats
+6. Count messages for diff. convs
+7. Filter messages for current Dumper
 
 DONE
 ====
@@ -38,3 +39,6 @@ DONE
 13. User offline/online events
 14. On online list all conv where we are in
 15. Check database arguments for correctness (existance) - Guards
+16. Common module for convId, userId, and displayName
+17. List Conv users
+

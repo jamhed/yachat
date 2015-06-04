@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
+define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
   var ConvList;
   return ConvList = (function(superClass) {
     extend(ConvList, superClass);
@@ -26,7 +26,7 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
             ref = List[i], id = ref[0], name = ref[1], email = ref[2];
             _this.e.append(tmpl({
               id: id,
-              display: _this.displayName(id, name, email)
+              display: Cmon.displayName(id, name, email)
             }));
           }
           return _this.rt.pi(_this.e);
@@ -42,16 +42,6 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
           return _this.empty();
         };
       })(this));
-    };
-
-    ConvList.prototype.displayName = function(id, name, email) {
-      if (name) {
-        return name;
-      } else if (email) {
-        return email;
-      } else {
-        return id;
-      }
     };
 
     return ConvList;

@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi"], function(Pi) {
+define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
   var ConvText;
   return ConvText = (function(superClass) {
     extend(ConvText, superClass);
@@ -56,22 +56,11 @@ define(["pi/Pi"], function(Pi) {
       })(this));
     };
 
-    ConvText.prototype.displayName = function(id, name, email) {
-      if (name) {
-        return name;
-      } else if (email) {
-        return email;
-      } else {
-        return id;
-      }
-    };
-
     ConvText.prototype.append = function(user, msg) {
-      var email, holder, id, name, stamp, stamp_div, text, text_div;
-      id = user[0], name = user[1], email = user[2];
+      var holder, stamp, stamp_div, text, text_div;
       stamp = msg[0], text = msg[1];
       text_div = $("<div>").addClass(this.a.text).html(text);
-      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + this.displayName(id, name, email) + ":");
+      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + Cmon.displayNameA(user) + ":");
       holder = $("<div>").addClass("row");
       holder.prepend(text_div);
       holder.prepend(stamp_div);

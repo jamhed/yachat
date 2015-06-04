@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
+define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
   var ConvList;
   return ConvList = (function(superClass) {
     extend(ConvList, superClass);
@@ -16,17 +16,25 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
     };
 
     ConvList.prototype.init = function() {
+      this.skip = 1;
       this.sub("#bullet@user/conv_list", (function(_this) {
         return function(ev, args) {
-          var List, conv, i, len, status, tmpl;
+          var List, convId, i, len, status, storedConvId, tmpl;
+          storedConvId = Cmon.conv_id();
           _this.empty();
           status = args[0], List = args[1];
           tmpl = _this.rt.source(_this.a.view);
           for (i = 0, len = List.length; i < len; i++) {
-            conv = List[i];
+            convId = List[i];
             _this.e.append(tmpl({
-              id: conv
+              id: convId
             }));
+            if (_this.skip) {
+              _this.skip = 0;
+              if (convId === storedConvId) {
+                _this.rpc("#bullet@conv_status", ["join", convId]);
+              }
+            }
           }
           return _this.rt.pi(_this.e);
         };

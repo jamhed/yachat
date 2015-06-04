@@ -4,7 +4,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
+define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -63,7 +63,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           var status, userId;
           status = args[0], userId = args[1];
           if (status === "new") {
-            _this.set_user_id(userId);
+            Cmon.set_user_id(userId);
             return _this.user_status("anonymous");
           } else {
             _this.user_status = "not_logged";
@@ -86,11 +86,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          _this.set_user_id(userId);
-          if (email === "undefined") {
-            return _this.user_status("anonymous", [userId]);
-          } else {
+          Cmon.set_user_id(userId);
+          if (email) {
             return _this.user_status("registered", [userId, name, email]);
+          } else {
+            return _this.user_status("anonymous", [userId]);
           }
         };
       })(this));
@@ -117,22 +117,15 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.handler("user/conv_list", (function(_this) {
-        return function(e, args) {
-          var convId, convList, status;
-          status = args[0], convList = args[1];
-          return convId = parseInt(_this.localGet("conv_id"));
-        };
-      })(this));
       this.handler("conv/new", (function(_this) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
           if (status === "ok") {
-            _this.set_conv_id(convId);
+            Cmon.set_conv_id(convId);
             return _this.conv_status("join", convId);
           } else {
-            _this.set_conv_id(null);
+            Cmon.set_conv_id(null);
             return _this.conv_status("part");
           }
         };
@@ -141,7 +134,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          _this.set_conv_id(convId);
+          Cmon.set_conv_id(convId);
           return _this.conv_status("join", convId);
         };
       })(this));
@@ -150,20 +143,20 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           var convId, status;
           status = args[0], convId = args[1];
           _this.conv_status("part", convId);
-          return _this.set_conv_id(null);
+          return Cmon.set_conv_id(null);
         };
       })(this));
       return this.handler("user/logout", (function(_this) {
         return function(e, args) {
           _this.conv_status("part", null);
-          return _this.set_conv_id(null);
+          return Cmon.set_conv_id(null);
         };
       })(this));
     };
 
     Bullet.prototype.check_user_id = function() {
       var userId;
-      userId = parseInt(this.localGet("user_id"));
+      userId = Cmon.user_id();
       if (userId) {
         return this.send("user", userId);
       }
@@ -179,16 +172,6 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       this._conv_status = status;
       this.debug("conv status:", status, convId);
       return this.event("conv/status/" + status, convId);
-    };
-
-    Bullet.prototype.set_conv_id = function(convId) {
-      this.localSet("conv_id", convId);
-      return this.conv_id = convId;
-    };
-
-    Bullet.prototype.set_user_id = function(userId) {
-      this.localSet("user_id", userId);
-      return this.user_id = userId;
     };
 
     Bullet.prototype.error = function() {
@@ -212,42 +195,35 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.user_info = function() {
-      var userId;
-      userId = parseInt(this.localGet("user_id"));
-      return this.send("user/info", userId);
+      return this.send("user/info", Cmon.user_id());
     };
 
     Bullet.prototype.query_convs = function() {
-      var userId;
-      userId = parseInt(this.localGet("user_id"));
-      return this.send("user/conv_list", userId);
+      return this.send("user/conv_list", Cmon.user_id());
     };
 
     Bullet.prototype.query_conv_users = function() {
-      var convId, userId;
-      userId = parseInt(this.localGet("user_id"));
-      convId = parseInt(this.localGet("conv_id"));
-      return this.send("conv/users", userId, convId);
+      return this.send("conv/users", Cmon.user_id(), Cmon.conv_id());
     };
 
     Bullet.prototype.join_conv = function(conv) {
       var chatId;
       chatId = conv.conv ? conv.conv : parseInt($("#chatId").val());
       if (chatId) {
-        return this.send("conv/join", this.user_id, chatId);
+        return this.send("conv/join", Cmon.user_id(), chatId);
       } else {
-        if (this.user_id) {
-          return this.send("conv/new", this.user_id);
+        if (Cmon.user_id()) {
+          return this.send("conv/new", Cmon.user_id());
         }
       }
     };
 
     Bullet.prototype.leave_conv = function() {
-      return this.send("conv/leave", this.user_id, this.conv_id);
+      return this.send("conv/leave", Cmon.user_id(), Cmon.conv_id());
     };
 
     Bullet.prototype.conv_history = function() {
-      return this.send("conv/history", this.conv_id);
+      return this.send("conv/history", Cmon.conv_id());
     };
 
     Bullet.prototype.login = function() {
@@ -263,7 +239,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
 
     Bullet.prototype.logout = function() {
       this.send("user/logout");
-      this.set_user_id(null);
+      Cmon.set_user_id(null);
       return this.user_status("not_logged");
     };
 
@@ -271,11 +247,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = (new Util()).list2hash(a);
-      return this.send("user/register", this.user_id, h.email, h.password, h.username, h.gender);
+      return this.send("user/register", Cmon.user_id(), h.email, h.password, h.username, h.gender);
     };
 
     Bullet.prototype.send_msg = function(msg) {
-      return this.send("msg/conv", this.user_id, this.conv_id, msg);
+      return this.send("msg/conv", Cmon.user_id(), Cmon.conv_id(), msg);
     };
 
     return Bullet;

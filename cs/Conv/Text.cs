@@ -1,4 +1,4 @@
-define ["pi/Pi"], (Pi) -> class ConvText extends Pi
+define ["pi/Pi", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
    attr: -> super.concat ["stamp", "text"]
 
@@ -24,13 +24,10 @@ define ["pi/Pi"], (Pi) -> class ConvText extends Pi
       @wait_ajax_done () =>
          @debug "AJAX DONE"
    
-   displayName: (id,name,email) -> if name then name else if email then email else id
- 
    append: (user, msg) ->
-      [id,name,email] = user
       [stamp,text] = msg
       text_div = $("<div>").addClass(@a.text).html(text)
-      stamp_div = $("<div>").addClass(@a.stamp).html(stamp + "&nbsp;&nbsp;" + @displayName(id,name,email) + ":")
+      stamp_div = $("<div>").addClass(@a.stamp).html(stamp + "&nbsp;&nbsp;" + Cmon.displayNameA(user) + ":")
       holder = $("<div>").addClass("row")
       holder.prepend text_div
       holder.prepend stamp_div
