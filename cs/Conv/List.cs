@@ -30,3 +30,5 @@ define ["pi/Pi", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
       @sub "#bullet@conv/status/part", (ev, args) =>
          @rpc "#bullet@query_convs"
 
+      @wait_ajax_done =>
+         @rpc "#bullet@query_convs"

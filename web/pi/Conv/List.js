@@ -52,8 +52,13 @@ define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
           return _this.rpc("#bullet@query_convs");
         };
       })(this));
-      return this.sub("#bullet@conv/status/part", (function(_this) {
+      this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
+          return _this.rpc("#bullet@query_convs");
+        };
+      })(this));
+      return this.wait_ajax_done((function(_this) {
+        return function() {
           return _this.rpc("#bullet@query_convs");
         };
       })(this));

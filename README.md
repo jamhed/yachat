@@ -14,14 +14,16 @@ $ make console
 TODO
 ====
 
+0. Events with ID to filter replies
 1. Online status (connection on/off)
 2. Load/Edit/Update profile
 3. Facebook auth
 4. Separate config file (not sys.options)
 5. P2P Chats
 6. Count messages for diff. convs
-7. Filter messages for current Dumper
+7. Filter messages for current conv in Dumper
 8. Inite user by name/email
+9. Double load conv by query_convs in Conv/List
 
 DONE
 ====
