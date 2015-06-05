@@ -34,19 +34,20 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       # events handlers
 
-      @handler "nmsg", (e, args) =>
+      @handler "nmsg", (e, data) =>
          [seq, [msg, args...]] = data
          @debug "NMSG:", seq, msg, args
          if @cb_nsend[seq]
-            @cb_nsend[seq] msg, args
+            if @cb_nsend[seq].msg == msg
+               @cb_nsend[seq].fn args...
+            else
+               @debug "NMSG:", "unmatched message for seq", seq, msg, @cb_nsend[seq].msg, args
             delete @cb_nsend[seq]
          else
             @error "no callback for seq", seq
       
       @handler "sys_msg", (e, args) =>
          [cid,user,[stamp,ev]] = args 
-         @debug "CONV SYS", cid, user, stamp, ev
-         @query_conv_users()
 
       # user events (logged, registered, not_logged)
 
@@ -149,23 +150,15 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @debug "MSG", msg
       @bullet.send JSON.stringify msg  
 
+   # [msg, arg1, ..]
    nsend: (msg, callback) ->
       @seq = @seq + 1
       @debug "N-MSG", @seq, msg
-      @cb_nsend[@seq] = callback
+      @cb_nsend[@seq] = fn: callback, msg: msg[0]
       @bullet.send JSON.stringify ["nmsg", @seq, msg]
 
    # public methods, called as @rpc
 
-   user_info: ->
-      @send "user/info", Cmon.user_id()
-    
-   query_convs: ->
-      @send "user/conv_list", Cmon.user_id()
-
-   query_conv_users: ->
-      @send "conv/users", Cmon.user_id(), Cmon.conv_id()
-         
    join_conv: (conv) ->
       chatId = if conv.conv then conv.conv else parseInt $("#chatId").val()
       if chatId
@@ -177,16 +170,14 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    leave_conv: ->
       @send "conv/leave", Cmon.user_id(), Cmon.conv_id()
 
-   conv_history: ->
-      @send "conv/history", Cmon.conv_id()
-
-   login: (a...) ->
-      h = Cmon.list2hash a
-      @nsend ["user/login", h.email, h.password], () =>
-         @debug "REPLY!"
+   pub_event: (ev, args...) -> @event ev, args
 
    anonymous: ->
       @send "user/new"
+
+   login: (a...) ->
+      h = Cmon.list2hash a
+      @send "user/login", h.email, h.password
 
    logout: ->
       @send "user/logout"

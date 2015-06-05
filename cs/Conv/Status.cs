@@ -16,11 +16,3 @@ define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class ConvStatus extends aPi
       @sub "#bullet@user/status/not_logged", (ev, args) =>
          @e.html mSource.get(@a.join)
          @rt.pi @e
-
-      @sub "#bullet@user/status/registered", (ev, args) =>
-         @rpc "#bullet@query_convs"
-
-      @sub "#bullet@user/status/anonymous", (ev, args) =>
-         @rpc "#bullet@query_convs"
-
-

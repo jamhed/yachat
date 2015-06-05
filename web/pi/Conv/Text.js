@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
+define(["Nsend", "Cmon"], function(Pi, Cmon) {
   var ConvText;
   return ConvText = (function(superClass) {
     extend(ConvText, superClass);
@@ -15,6 +15,27 @@ define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
       return ConvText.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
     };
 
+    ConvText.prototype.draw = function(rows) {
+      var i, len, msg, ref, results, row, user;
+      this.empty();
+      ref = rows.reverse();
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        row = ref[i];
+        user = row[0], msg = row[1];
+        results.push(this.append(user, msg));
+      }
+      return results;
+    };
+
+    ConvText.prototype.query = function() {
+      return this.nsend(["conv/history", Cmon.conv_id()], (function(_this) {
+        return function(status, rows) {
+          return _this.draw(rows);
+        };
+      })(this));
+    };
+
     ConvText.prototype.init = function() {
       this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
@@ -23,19 +44,11 @@ define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
           return _this.append(user, msg);
         };
       })(this));
-      this.sub("#bullet@conv/history", (function(_this) {
+      this.sub("#bullet@sys_msg", (function(_this) {
         return function(e, args) {
-          var i, len, msg, ref, results, row, rows, status, user;
-          _this.empty();
-          status = args[0], rows = args[1];
-          ref = rows.reverse();
-          results = [];
-          for (i = 0, len = ref.length; i < len; i++) {
-            row = ref[i];
-            user = row[0], msg = row[1];
-            results.push(_this.append(user, msg));
-          }
-          return results;
+          var convId, msg, user;
+          convId = args[0], user = args[1], msg = args[2];
+          return _this.append(user, msg);
         };
       })(this));
       this.sub("#bullet@conv/status/part", (function(_this) {
@@ -45,13 +58,22 @@ define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
       })(this));
       this.sub("#bullet@conv/status/join", (function(_this) {
         return function(e, args) {
-          _this.rpc("#bullet@conv_history");
-          return _this.empty();
+          return _this.query();
         };
       })(this));
-      return this.wait_ajax_done((function(_this) {
-        return function() {
-          return _this.debug("AJAX DONE");
+      this.sub("#bullet@user/status/registered", (function(_this) {
+        return function(ev, args) {
+          return _this.query();
+        };
+      })(this));
+      this.sub("#bullet@user/status/anonymous", (function(_this) {
+        return function(ev, args) {
+          return _this.query();
+        };
+      })(this));
+      return this.sub("#bullet@user/status/not_logged", (function(_this) {
+        return function(ev, args) {
+          return _this.empty();
         };
       })(this));
     };

@@ -15,13 +15,13 @@ init(_Transport, Req, Opts, _Active) ->
    {ok, Req, #state{}}.
 
 stream(JSON, Req, State) ->
-   % ?INFO("RAW: ~p", [JSON]),
+   ?INFO("RAW: ~p", [JSON]),
    case JSON of
       <<"ping">> -> {reply, JSON, Req, State};
       _ ->
          case jiffy:decode(JSON) of
             % numbered messages
-            [ <<"nmsg">>, Seq, Msg, Args ] ->
+            [ <<"nmsg">>, Seq, [Msg | Args] ] ->
                ?INFO("N-MSG: ~p MSG: ~p ARGS: ~p", [Seq, Msg, Args]),
                Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, Args),
                Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),

@@ -30,20 +30,10 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
           return _this.rt.pi(_this.e);
         };
       })(this));
-      this.sub("#bullet@user/status/not_logged", (function(_this) {
+      return this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev, args) {
           _this.e.html(mSource.get(_this.a.join));
           return _this.rt.pi(_this.e);
-        };
-      })(this));
-      this.sub("#bullet@user/status/registered", (function(_this) {
-        return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
-        };
-      })(this));
-      return this.sub("#bullet@user/status/anonymous", (function(_this) {
-        return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
         };
       })(this));
     };

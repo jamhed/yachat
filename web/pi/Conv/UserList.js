@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
+define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
   var ConvList;
   return ConvList = (function(superClass) {
     extend(ConvList, superClass);
@@ -15,29 +15,50 @@ define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       return ConvList.__super__.attr.apply(this, arguments).concat(["view"]);
     };
 
-    ConvList.prototype.init = function() {
-      this.sub("#bullet@conv/users", (function(_this) {
-        return function(ev, args) {
-          var List, email, i, id, len, name, ref, status, tmpl;
-          _this.empty();
-          status = args[0], List = args[1];
-          tmpl = _this.rt.source(_this.a.view);
-          for (i = 0, len = List.length; i < len; i++) {
-            ref = List[i], id = ref[0], name = ref[1], email = ref[2];
-            _this.e.append(tmpl({
-              id: id,
-              display: Cmon.displayName(id, name, email)
-            }));
-          }
-          return _this.rt.pi(_this.e);
+    ConvList.prototype.draw = function(List) {
+      var email, i, id, len, name, ref, tmpl;
+      this.empty();
+      tmpl = this.rt.source(this.a.view);
+      for (i = 0, len = List.length; i < len; i++) {
+        ref = List[i], id = ref[0], name = ref[1], email = ref[2];
+        this.e.append(tmpl({
+          id: id,
+          display: Cmon.displayName(id, name, email)
+        }));
+      }
+      return this.rt.pi(this.e);
+    };
+
+    ConvList.prototype.query = function() {
+      return this.nsend(["conv/users", Cmon.user_id(), Cmon.conv_id()], (function(_this) {
+        return function(status, List) {
+          return _this.draw(List);
         };
       })(this));
+    };
+
+    ConvList.prototype.init = function() {
       this.sub("#bullet@conv/status/join", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_conv_users");
+          return _this.query();
         };
       })(this));
-      return this.sub("#bullet@conv/status/part", (function(_this) {
+      this.sub("#bullet@conv/status/part", (function(_this) {
+        return function(ev, args) {
+          return _this.empty();
+        };
+      })(this));
+      this.sub("#bullet@user/status/registered", (function(_this) {
+        return function(ev, args) {
+          return _this.query();
+        };
+      })(this));
+      this.sub("#bullet@user/status/anonymous", (function(_this) {
+        return function(ev, args) {
+          return _this.query();
+        };
+      })(this));
+      return this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev, args) {
           return _this.empty();
         };

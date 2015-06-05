@@ -64,12 +64,16 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
         };
       })(this);
       this.handler("nmsg", (function(_this) {
-        return function(e, args) {
-          var msg, ref, seq;
+        return function(e, data) {
+          var args, msg, ref, ref1, seq;
           seq = data[0], (ref = data[1], msg = ref[0], args = 2 <= ref.length ? slice.call(ref, 1) : []);
           _this.debug("NMSG:", seq, msg, args);
           if (_this.cb_nsend[seq]) {
-            _this.cb_nsend[seq](msg, args);
+            if (_this.cb_nsend[seq].msg === msg) {
+              (ref1 = _this.cb_nsend[seq]).fn.apply(ref1, args);
+            } else {
+              _this.debug("NMSG:", "unmatched message for seq", seq, msg, _this.cb_nsend[seq].msg, args);
+            }
             return delete _this.cb_nsend[seq];
           } else {
             return _this.error("no callback for seq", seq);
@@ -79,9 +83,7 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       this.handler("sys_msg", (function(_this) {
         return function(e, args) {
           var cid, ev, ref, stamp, user;
-          cid = args[0], user = args[1], (ref = args[2], stamp = ref[0], ev = ref[1]);
-          _this.debug("CONV SYS", cid, user, stamp, ev);
-          return _this.query_conv_users();
+          return cid = args[0], user = args[1], (ref = args[2], stamp = ref[0], ev = ref[1]), args;
         };
       })(this));
       this.handler("user/new", (function(_this) {
@@ -223,20 +225,11 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.nsend = function(msg, callback) {
       this.seq = this.seq + 1;
       this.debug("N-MSG", this.seq, msg);
-      this.cb_nsend[this.seq] = callback;
+      this.cb_nsend[this.seq] = {
+        fn: callback,
+        msg: msg[0]
+      };
       return this.bullet.send(JSON.stringify(["nmsg", this.seq, msg]));
-    };
-
-    Bullet.prototype.user_info = function() {
-      return this.send("user/info", Cmon.user_id());
-    };
-
-    Bullet.prototype.query_convs = function() {
-      return this.send("user/conv_list", Cmon.user_id());
-    };
-
-    Bullet.prototype.query_conv_users = function() {
-      return this.send("conv/users", Cmon.user_id(), Cmon.conv_id());
     };
 
     Bullet.prototype.join_conv = function(conv) {
@@ -255,23 +248,21 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       return this.send("conv/leave", Cmon.user_id(), Cmon.conv_id());
     };
 
-    Bullet.prototype.conv_history = function() {
-      return this.send("conv/history", Cmon.conv_id());
+    Bullet.prototype.pub_event = function() {
+      var args, ev;
+      ev = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      return this.event(ev, args);
+    };
+
+    Bullet.prototype.anonymous = function() {
+      return this.send("user/new");
     };
 
     Bullet.prototype.login = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(a);
-      return this.nsend(["user/login", h.email, h.password], (function(_this) {
-        return function() {
-          return _this.debug("REPLY!");
-        };
-      })(this));
-    };
-
-    Bullet.prototype.anonymous = function() {
-      return this.send("user/new");
+      return this.send("user/login", h.email, h.password);
     };
 
     Bullet.prototype.logout = function() {

@@ -1,29 +1,36 @@
-define ["pi/Pi", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
+define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
    attr: -> super.concat ["stamp", "text"]
+
+   draw: (rows) ->
+      @empty()
+      for row in rows.reverse()
+         [user, msg] = row
+         @append user, msg
+
+   query: -> @nsend ["conv/history", Cmon.conv_id()], (status, rows) => @draw rows
 
    init: ->
       @sub "#bullet@new_msg", (e, args) =>
          [convId, user, msg] = args
          @append user, msg
 
-      @sub "#bullet@conv/history", (e,args) =>
-         @empty()
-         [status, rows] = args
-         for row in rows.reverse()
-            [user, msg] = row
-            @append user, msg
+      @sub "#bullet@sys_msg", (e, args) =>
+         [convId,user,msg] = args 
+         @append user, msg
 
-      @sub "#bullet@conv/status/part", (e,args) =>
-         @empty()
 
-      @sub "#bullet@conv/status/join", (e, args) =>
-         @rpc "#bullet@conv_history"
-         @empty()
+      @sub "#bullet@conv/status/part", (e,args) => @empty()
 
-      @wait_ajax_done () =>
-         @debug "AJAX DONE"
-   
+      @sub "#bullet@conv/status/join", (e, args) => @query()
+
+      @sub "#bullet@user/status/registered", (ev, args) => @query()
+
+      @sub "#bullet@user/status/anonymous", (ev, args) => @query()
+
+      @sub "#bullet@user/status/not_logged", (ev, args) => @empty()
+
+
    append: (user, msg) ->
       [stamp,text] = msg
       text_div = $("<div>").addClass(@a.text).html(text)
