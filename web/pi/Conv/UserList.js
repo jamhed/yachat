@@ -15,33 +15,31 @@ define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       return ConvList.__super__.attr.apply(this, arguments).concat(["view"]);
     };
 
-    ConvList.prototype.draw = function() {
-      var convId, i, len, tmpl;
-      tmpl = this.rt.source(this.a.view);
-      this.empty();
-      for (i = 0, len = List.length; i < len; i++) {
-        convId = List[i];
-        this.e.append(tmpl({
-          id: convId
-        }));
-      }
-      return this.rt.pi(this.e);
-    };
-
     ConvList.prototype.init = function() {
+      this.sub("#bullet@conv/users", (function(_this) {
+        return function(ev, args) {
+          var List, email, i, id, len, name, ref, status, tmpl;
+          _this.empty();
+          status = args[0], List = args[1];
+          tmpl = _this.rt.source(_this.a.view);
+          for (i = 0, len = List.length; i < len; i++) {
+            ref = List[i], id = ref[0], name = ref[1], email = ref[2];
+            _this.e.append(tmpl({
+              id: id,
+              display: Cmon.displayName(id, name, email)
+            }));
+          }
+          return _this.rt.pi(_this.e);
+        };
+      })(this));
       this.sub("#bullet@conv/status/join", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
+          return _this.rpc("#bullet@query_conv_users");
         };
       })(this));
-      this.sub("#bullet@conv/status/part", (function(_this) {
+      return this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
-          return _this.rpc("#bullet@query_convs");
-        };
-      })(this));
-      return this.wait_ajax_done((function(_this) {
-        return function() {
-          return _this.rpc("#bullet@query_convs");
+          return _this.empty();
         };
       })(this));
     };
