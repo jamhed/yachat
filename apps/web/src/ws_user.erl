@@ -3,7 +3,7 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
-% check user existance by id
+%msg check user existance by id
 msg(M = <<"user">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    case db_user:get(Uid) of
@@ -15,7 +15,7 @@ msg(M = <<"user">>, [Uid]) when is_number(Uid) ->
          [M, fail]
    end;
 
-% find user by facebook_id
+%msg find user by facebook_id
 msg(M = <<"user/fb">>, [FbId]) ->
    ?INFO("~s uid:~s", [M, FbId]),
    case db_user:get_by_fb(FbId) of
@@ -24,7 +24,7 @@ msg(M = <<"user/fb">>, [FbId]) ->
       Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol, Err] 
    end;
 
-% find user by email
+%msg find user by email
 msg(M = <<"user/email">>, [Email]) ->
    ?INFO("~s email:~s", [M, Email]),
    case db_user:get_by_email(Email) of
@@ -33,14 +33,15 @@ msg(M = <<"user/email">>, [Email]) ->
       Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
-% [UserId, Name, Email]
+%msg get user info [UserId, Name, Email]
 msg(M = <<"user/info">>, [Uid]) when is_number(Uid) ->
    [M, ok, db_user:detail(Uid)];
 
+%msg get users info [[UserId, Name, Email], ..., ]
 msg(M = <<"user/info">>, L) -> 
    [M, ok, db_user:detail(L)];
 
-% create new user
+%msg create new user
 msg(M = <<"user/new">>, []) ->
    ?INFO("~s new", [M]),
    NewUID = dbd:make_uid(),
@@ -51,7 +52,7 @@ msg(M = <<"user/new">>, []) ->
       Err   -> ?ERR("~p err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
-% login by email and password
+%msg login by email and password
 msg(M = <<"user/login">>, [Email, Password]) ->
    ?INFO("~s email:~s password:~s", [M, Email, Password]),
    case dbd:index(user, email, Email) of
@@ -59,30 +60,37 @@ msg(M = <<"user/login">>, [Email, Password]) ->
          db_user:offline(self()),
          db_user:online(#user{id=Uid}, self()),
          [M, ok, Uid];
-      []                                        -> [M, fail, match];
-      [_]                                       -> [M, fail, match]; % password
-      _                                         -> [M, fail, protocol]
+      [] ->
+         [M, fail, match];
+      [_] ->
+         [M, fail, match]; % password
+      _ ->
+         [M, fail, protocol]
    end;
 
+%msg logout
 msg(M = <<"user/logout">>, []) ->
    ?INFO("~s", [M]),
    db_user:offline(self()),
    [M, ok];
 
-% update personal information
+%msg update profile information
 msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
    ?INFO("~p uid:~p email:~p username:~p", [M, Uid, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
          case dbd:index(user, email, Email) of
-            []  -> dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}), [M, ok, Uid];
-            _   -> [M, fail, exists]
+            []  ->
+               dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}),
+               [M, ok, Uid];
+            _   ->
+               [M, fail, exists]
          end;
-      _ -> [M, fail, no_user_id]
+      _ ->
+         [M, fail, no_user_id]
    end;
 
-% this comes from facebook auth
-%  r.id, r.email, r.first_name, r.last_name, r.name, r.gender
+%msg update profile with facebook
 msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
    ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case db_user:get(Uid) of
@@ -93,11 +101,11 @@ msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gen
          [M, fail, uid]
    end;
 
+%msg get user's convs 
 msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    Convs = db_user:conv(Uid),
    [M, ok, Convs];
 
 % no match in this module
-
 msg(_, _) -> skip.
