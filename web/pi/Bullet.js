@@ -58,6 +58,14 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           return _this.bullet.send("ping");
         };
       })(this);
+      this.handler("sys_msg", (function(_this) {
+        return function(e, args) {
+          var cid, ev, ref, stamp, user;
+          cid = args[0], user = args[1], (ref = args[2], stamp = ref[0], ev = ref[1]);
+          _this.debug("CONV SYS", cid, user, stamp, ev);
+          return _this.query_conv_users();
+        };
+      })(this));
       this.handler("user/new", (function(_this) {
         return function(e, args) {
           var status, userId;

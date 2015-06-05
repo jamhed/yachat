@@ -32,6 +32,11 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       # user events (logged, registered, not_logged)
 
+      @handler "sys_msg", (e, args) =>
+         [cid,user,[stamp,ev]] = args 
+         @debug "CONV SYS", cid, user, stamp, ev
+         @query_conv_users()
+
       @handler "user/new", (e, args) =>
          
          [ status, userId ] = args

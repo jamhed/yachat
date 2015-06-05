@@ -41,4 +41,5 @@ DONE
 15. Check database arguments for correctness (existance) - Guards
 16. Common module for convId, userId, and displayName
 17. List Conv users
+18. Broadcast message user joining chat
 
