@@ -48,7 +48,7 @@ msg(M = <<"user/new">>, []) ->
       ok    ->
          db_user:online(U, self()),
          [M, new, NewUID];
-      Err   -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
+      Err   -> ?ERR("~p err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 % login by email and password

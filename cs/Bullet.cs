@@ -1,8 +1,12 @@
 define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
+   seq: 0
+   cb_nsend: null
+
    attr: -> super.concat ["uri"]
 
    init: ->
+      @cb_nsend = {}
 
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
       
@@ -30,12 +34,21 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       # events handlers
 
-      # user events (logged, registered, not_logged)
-
+      @handler "nmsg", (e, args) =>
+         [seq, [msg, args...]] = data
+         @debug "NMSG:", seq, msg, args
+         if @cb_nsend[seq]
+            @cb_nsend[seq] msg, args
+            delete @cb_nsend[seq]
+         else
+            @error "no callback for seq", seq
+      
       @handler "sys_msg", (e, args) =>
          [cid,user,[stamp,ev]] = args 
          @debug "CONV SYS", cid, user, stamp, ev
          @query_conv_users()
+
+      # user events (logged, registered, not_logged)
 
       @handler "user/new", (e, args) =>
          
@@ -136,6 +149,12 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @debug "MSG", msg
       @bullet.send JSON.stringify msg  
 
+   nsend: (msg, callback) ->
+      @seq = @seq + 1
+      @debug "N-MSG", @seq, msg
+      @cb_nsend[@seq] = callback
+      @bullet.send JSON.stringify ["nmsg", @seq, msg]
+
    # public methods, called as @rpc
 
    user_info: ->
@@ -163,7 +182,8 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
    login: (a...) ->
       h = Cmon.list2hash a
-      @send "user/login", h.email, h.password
+      @nsend ["user/login", h.email, h.password], () =>
+         @debug "REPLY!"
 
    anonymous: ->
       @send "user/new"

@@ -19,12 +19,22 @@ stream(JSON, Req, State) ->
    case JSON of
       <<"ping">> -> {reply, JSON, Req, State};
       _ ->
-         [ Msg | Args ] = jiffy:decode(JSON),
-         ?INFO("JSON MSG: ~p ARGS: ~p", [Msg, Args]),
-         Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, Args),
-         Reply = case Raw of <<"ping">> -> Raw; _ -> jiffy:encode(Raw) end,
-         ?INFO("JSON REPLY: ~p", [Reply]),
-         {reply, Reply, Req, State}
+         case jiffy:decode(JSON) of
+            % numbered messages
+            [ <<"nmsg">>, Seq, Msg, Args ] ->
+               ?INFO("N-MSG: ~p MSG: ~p ARGS: ~p", [Seq, Msg, Args]),
+               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, Args),
+               Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
+               ?INFO("N-MSG REPLY: ~p", [Reply]),
+               {reply, Reply, Req, State};
+            % messages
+            [ Msg | Args ] ->
+               ?INFO("MSG: ~p ARGS: ~p", [Msg, Args]),
+               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, Args),
+               Reply = jiffy:encode(Raw),
+               ?INFO("MSG REPLY: ~p", [Reply]),
+               {reply, Reply, Req, State}
+         end
    end.
 
 info({msg, _Sender, Data}, Req, State) ->
@@ -32,17 +42,16 @@ info({msg, _Sender, Data}, Req, State) ->
    {reply, Data, Req, State};
 
 info({new_msg, ConvId, SenderId, Text}, Req, State) ->
-   ?INFO("TEXT MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
+   ?INFO("IN-MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
    Reply = jiffy:encode([new_msg, ConvId, db_user:detail(SenderId), Text]),
-   ?INFO("JSON MSG: ~p", [Reply]),
+   ?INFO("IN-MSG OUT: ~p", [Reply]),
    {reply, Reply, Req, State};
 
 info({sys_msg, ConvId, Uid, Status}, Req, State) ->
-   ?INFO("SYS MSG: ~p ~p ~p", [ConvId, Uid, Status]),
+   ?INFO("SYS-MSG: ~p ~p ~p", [ConvId, Uid, Status]),
    Reply = jiffy:encode([sys_msg, ConvId, db_user:detail(Uid), Status]),
-   ?INFO("JSON MSG: ~p", [Reply]),
+   ?INFO("SYS OUT: ~p", [Reply]),
    {reply, Reply, Req, State}.
-
 
 terminate(_Req, State) ->
    ?INFO("terminate: pid:~p state: ~p", [self(), State]),
