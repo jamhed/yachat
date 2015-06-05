@@ -162,7 +162,7 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @send "conv/history", Cmon.conv_id()
 
    login: (a...) ->
-      h = (new Util()).list2hash a
+      h = Cmon.list2hash a
       @send "user/login", h.email, h.password
 
    anonymous: ->
@@ -174,8 +174,8 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @user_status "not_logged"
 
    register_email: (a...) ->
-      h = (new Util()).list2hash a
-      @send "user/register", Cmon.user_id(), h.email, h.password, h.username, h.gender
+      h = Cmon.list2hash a
+      @send "user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender
 
    send_msg: (msg) -> @send "msg/conv", Cmon.user_id(), Cmon.conv_id(), msg
 

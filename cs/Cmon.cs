@@ -25,3 +25,9 @@ define [], () -> class Cmon
    @displayNameA: (user) ->
       [id,name,email] = user
       @displayName id,name,email
+
+   @list2hash: (list) ->
+      ret = {}
+      for elem in list
+         ret[elem.name] = elem.value
+      return ret

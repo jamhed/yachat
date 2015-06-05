@@ -237,7 +237,7 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.login = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      h = (new Util()).list2hash(a);
+      h = Cmon.list2hash(a);
       return this.send("user/login", h.email, h.password);
     };
 
@@ -254,8 +254,8 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.register_email = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      h = (new Util()).list2hash(a);
-      return this.send("user/register", Cmon.user_id(), h.email, h.password, h.username, h.gender);
+      h = Cmon.list2hash(a);
+      return this.send("user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender);
     };
 
     Bullet.prototype.send_msg = function(msg) {

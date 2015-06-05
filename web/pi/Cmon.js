@@ -56,6 +56,16 @@ define([], function() {
       return this.displayName(id, name, email);
     };
 
+    Cmon.list2hash = function(list) {
+      var elem, i, len, ret;
+      ret = {};
+      for (i = 0, len = list.length; i < len; i++) {
+        elem = list[i];
+        ret[elem.name] = elem.value;
+      }
+      return ret;
+    };
+
     return Cmon;
 
   })();
