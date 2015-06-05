@@ -51,11 +51,15 @@ generic(Uid) ->
 
 join(Uid, Cid) ->
    case is_user_in(Uid, Cid) of
-      []  -> dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()});
+      []  ->
+         sys_notify(Cid,Uid,<<"join">>),
+         dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()});
       Err -> Err
    end.
 
-leave(Uid, Cid) -> [ dbd:delete(user_conv, Id) || Id <- is_user_in(Uid, Cid) ].
+leave(Uid, Cid) ->
+   sys_notify(Cid,Uid,<<"part">>),
+   [ dbd:delete(user_conv, Id) || Id <- is_user_in(Uid, Cid) ].
 
 history(Cid) -> history(Cid, 10).
 

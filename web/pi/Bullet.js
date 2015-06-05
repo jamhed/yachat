@@ -2,10 +2,9 @@
 var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
-  slice = [].slice,
-  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  slice = [].slice;
 
-define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
+define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -59,12 +58,20 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           return _this.bullet.send("ping");
         };
       })(this);
+      this.handler("sys_msg", (function(_this) {
+        return function(e, args) {
+          var cid, ev, ref, stamp, user;
+          cid = args[0], user = args[1], (ref = args[2], stamp = ref[0], ev = ref[1]);
+          _this.debug("CONV SYS", cid, user, stamp, ev);
+          return _this.query_conv_users();
+        };
+      })(this));
       this.handler("user/new", (function(_this) {
         return function(e, args) {
           var status, userId;
           status = args[0], userId = args[1];
           if (status === "new") {
-            _this.set_user_id(userId);
+            Cmon.set_user_id(userId);
             return _this.user_status("anonymous");
           } else {
             _this.user_status = "not_logged";
@@ -87,11 +94,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          _this.set_user_id(userId);
-          if (email === "undefined") {
-            return _this.user_status("anonymous", [userId]);
-          } else {
+          Cmon.set_user_id(userId);
+          if (email) {
             return _this.user_status("registered", [userId, name, email]);
+          } else {
+            return _this.user_status("anonymous", [userId]);
           }
         };
       })(this));
@@ -118,28 +125,15 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           }
         };
       })(this));
-      this.handler("user/conv_list", (function(_this) {
-        return function(e, args) {
-          var convId, convList, status;
-          status = args[0], convList = args[1];
-          convId = parseInt(_this.localGet("conv_id"));
-          if (indexOf.call(convList, convId) >= 0) {
-            _this.set_conv_id(convId);
-            return _this.conv_status("join", convId);
-          } else {
-            return _this.conv_status("part");
-          }
-        };
-      })(this));
       this.handler("conv/new", (function(_this) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
           if (status === "ok") {
-            _this.set_conv_id(convId);
+            Cmon.set_conv_id(convId);
             return _this.conv_status("join", convId);
           } else {
-            _this.set_conv_id(null);
+            Cmon.set_conv_id(null);
             return _this.conv_status("part");
           }
         };
@@ -148,7 +142,7 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          _this.set_conv_id(convId);
+          Cmon.set_conv_id(convId);
           return _this.conv_status("join", convId);
         };
       })(this));
@@ -157,20 +151,20 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
           var convId, status;
           status = args[0], convId = args[1];
           _this.conv_status("part", convId);
-          return _this.set_conv_id(null);
+          return Cmon.set_conv_id(null);
         };
       })(this));
       return this.handler("user/logout", (function(_this) {
         return function(e, args) {
           _this.conv_status("part", null);
-          return _this.set_conv_id(null);
+          return Cmon.set_conv_id(null);
         };
       })(this));
     };
 
     Bullet.prototype.check_user_id = function() {
       var userId;
-      userId = parseInt(this.localGet("user_id"));
+      userId = Cmon.user_id();
       if (userId) {
         return this.send("user", userId);
       }
@@ -188,21 +182,11 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
       return this.event("conv/status/" + status, convId);
     };
 
-    Bullet.prototype.set_conv_id = function(convId) {
-      this.localSet("conv_id", convId);
-      return this.conv_id = convId;
-    };
-
-    Bullet.prototype.set_user_id = function(userId) {
-      this.localSet("user_id", userId);
-      return this.user_id = userId;
-    };
-
     Bullet.prototype.error = function() {
       var m;
       m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       return this.rt.append("dialog/error", {
-        text: m
+        text: m.join(" ")
       });
     };
 
@@ -219,41 +203,41 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
     };
 
     Bullet.prototype.user_info = function() {
-      var userId;
-      userId = parseInt(this.localGet("user_id"));
-      return this.send("user/info", userId);
+      return this.send("user/info", Cmon.user_id());
     };
 
     Bullet.prototype.query_convs = function() {
-      var userId;
-      userId = parseInt(this.localGet("user_id"));
-      return this.send("user/conv_list", userId);
+      return this.send("user/conv_list", Cmon.user_id());
     };
 
-    Bullet.prototype.join_conv = function() {
+    Bullet.prototype.query_conv_users = function() {
+      return this.send("conv/users", Cmon.user_id(), Cmon.conv_id());
+    };
+
+    Bullet.prototype.join_conv = function(conv) {
       var chatId;
-      chatId = parseInt($("#chatId").val());
+      chatId = conv.conv ? conv.conv : parseInt($("#chatId").val());
       if (chatId) {
-        return this.send("conv/join", this.user_id, chatId);
+        return this.send("conv/join", Cmon.user_id(), chatId);
       } else {
-        if (this.user_id) {
-          return this.send("conv/new", this.user_id);
+        if (Cmon.user_id()) {
+          return this.send("conv/new", Cmon.user_id());
         }
       }
     };
 
     Bullet.prototype.leave_conv = function() {
-      return this.send("conv/leave", this.user_id, this.conv_id);
+      return this.send("conv/leave", Cmon.user_id(), Cmon.conv_id());
     };
 
     Bullet.prototype.conv_history = function() {
-      return this.send("conv/history", this.conv_id);
+      return this.send("conv/history", Cmon.conv_id());
     };
 
     Bullet.prototype.login = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      h = (new Util()).list2hash(a);
+      h = Cmon.list2hash(a);
       return this.send("user/login", h.email, h.password);
     };
 
@@ -263,19 +247,19 @@ define(["pi/Pi", "/js/bullet.js", "Util"], function(Pi, Bullet, Util) {
 
     Bullet.prototype.logout = function() {
       this.send("user/logout");
-      this.set_user_id(null);
+      Cmon.set_user_id(null);
       return this.user_status("not_logged");
     };
 
     Bullet.prototype.register_email = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      h = (new Util()).list2hash(a);
-      return this.send("user/register", this.user_id, h.email, h.password, h.username, h.gender);
+      h = Cmon.list2hash(a);
+      return this.send("user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender);
     };
 
     Bullet.prototype.send_msg = function(msg) {
-      return this.send("msg/conv", this.user_id, this.conv_id, msg);
+      return this.send("msg/conv", Cmon.user_id(), Cmon.conv_id(), msg);
     };
 
     return Bullet;

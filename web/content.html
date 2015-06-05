@@ -6,7 +6,21 @@
 <button type="button" class="btn" pi="pi/Button" target="#bullet@leave_conv">Leave</button>
 </script>
 
+<script pi="pi/Source" name="conv/view" type="text/x-dot">
+<button class="btn btn-default" style="margin-right: 10px" pi="pi/Button" target="#bullet@join_conv" data-conv="{{!it.id}}">{{!it.id}}</button>
+</script>
+
+<script pi="pi/Source" name="user/view" type="text/x-dot">
+<div>
+<a href="#" pi="pi/Button" target="#bullet@msg_user" data-conv="{{!it.id}}">{{!it.display}}</a>
+</div>
+</script>
+
 <div class="container">
+
+  <div class="row" style="margin-bottom:10px">
+     <div class="col-md-12" pi="Conv/List" view="conv/view"></div>
+  </div>
 
   <div class="row">
      <div class="col-md-12">
@@ -29,11 +43,19 @@
      </div>
   </div>
 
-  <div class="container-fluid">
-     <div pi="Dumper"
-        text="col-md-9 col-sm-8 col-xs-8"
-        stamp="col-md-3 col-sm-4 col-xs-4"
-        style="margin-top: 10px"></div>
-  </div>
+   <div class="row" style="margin-top: 10px">
+      <div class="col-md-2 col-sm-3 col-xs-4">Users</div><!-- col-md-3 -->
+      <div class="col-md-10 col-sm-9 col-xs-8">Chat</div><!-- col-md-9 -->
+   </div><!-- row -->
 
+   <div class="row">
+      <div class="col-md-2 col-sm-3 col-xs-4" pi="Conv/UserList" view="user/view"></div><!-- col-md-3 -->
+      <div class="col-md-10 col-sm-9 col-xs-8">
+         <div pi="Conv/Text"
+            class="row"
+            text="col-md-9 col-sm-8 col-xs-8"
+            stamp="col-md-3 col-sm-4 col-xs-4">
+         </div>
+      </div><!-- col-md-9 -->
+   </div><!-- row -->
 </div><!-- /.container -->

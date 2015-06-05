@@ -4,7 +4,7 @@
 -include_lib("web/include/db.hrl").
 
 % group list
-msg(M = <<"conv/list">>, [UserId, ConvId]) when is_number(UserId), is_number(ConvId) ->
+msg(M = <<"conv/users">>, [UserId, ConvId]) when is_number(UserId), is_number(ConvId) ->
    List = db_conv:users(ConvId),
    Full = db_user:detail(List),
    [M, ok, Full];

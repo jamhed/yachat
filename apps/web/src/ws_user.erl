@@ -70,25 +70,24 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 % update personal information
-msg(M = <<"user/register">>, [Uid, Email, Password, Name, Gender]) when is_number(Uid) ->
-   ?INFO("~p uid:~p email:~p name:~p", [M, Uid, Email, Name]),
+msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
+   ?INFO("~p uid:~p email:~p username:~p", [M, Uid, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
          case dbd:index(user, email, Email) of
-            []  -> dbd:put(User#user{email=Email, password=Password, username=Name, sex=Gender}), [M, ok, Uid];
+            []  -> dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}), [M, ok, Uid];
             _   -> [M, fail, exists]
          end;
-      _ ->
-         [M, fail, no_user_id]
+      _ -> [M, fail, no_user_id]
    end;
 
 % this comes from facebook auth
 %  r.id, r.email, r.first_name, r.last_name, r.name, r.gender
-msg(M = <<"user/facebook">>, [Uid, Id, Email, _, _, UserName, Gender]) when is_number(Uid) ->
+msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
    ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
-         dbd:put(User#user{email=Email, username=UserName, sex=Gender, facebook_id=Id}),
+         dbd:put(User#user{email=Email, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender, facebook_id=Id}),
          [M, ok];
       _ ->
          [M, fail, uid]

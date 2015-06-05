@@ -1,4 +1,4 @@
-define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet extends Pi
+define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
    attr: -> super.concat ["uri"]
 
@@ -32,12 +32,17 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
       # user events (logged, registered, not_logged)
 
+      @handler "sys_msg", (e, args) =>
+         [cid,user,[stamp,ev]] = args 
+         @debug "CONV SYS", cid, user, stamp, ev
+         @query_conv_users()
+
       @handler "user/new", (e, args) =>
          
          [ status, userId ] = args
 
          if status == "new"
-            @set_user_id userId
+            Cmon.set_user_id userId
             @user_status "anonymous"
          else
             @user_status ="not_logged"
@@ -54,12 +59,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @handler "user/info", (e, args) =>
          [ status, [userId, name, email] ] = args
          
-         @set_user_id userId
+         Cmon.set_user_id userId
         
-         if email == "undefined"
-            @user_status "anonymous", [userId]
-         else
+         if email
             @user_status "registered", [userId, name, email]
+         else
+            @user_status "anonymous", [userId]
          
       @handler "user/register", (e, args) =>
          [status, userId] = args
@@ -76,44 +81,35 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
          else
             @error "Login or password error: " + userId 
 
-      @handler "user/conv_list", (e, args) =>
-         [ status, convList ] = args
-         convId = parseInt @localGet "conv_id"
-         if convId in convList
-            @set_conv_id convId
-            @conv_status "join", convId
-         else
-            @conv_status "part"
-  
       # conversation events (join, part)
 
       @handler "conv/new", (e, args) =>
          [ status, convId ] = args
          if status == "ok"
-            @set_conv_id convId
+            Cmon.set_conv_id convId
             @conv_status "join", convId
          else
-            @set_conv_id null
+            Cmon.set_conv_id null
             @conv_status "part"
          
       @handler "conv/join", (e, args) =>
          [ status, convId ] = args
-         @set_conv_id convId
+         Cmon.set_conv_id convId
          @conv_status "join", convId
 
       @handler "conv/leave", (e, args) =>
          [ status, convId ] = args
          @conv_status "part", convId
-         @set_conv_id null
+         Cmon.set_conv_id null
 
       @handler "user/logout", (e, args) =>
          @conv_status "part", null
-         @set_conv_id null
+         Cmon.set_conv_id null
 
    # utility functions
 
    check_user_id: ->
-      userId = parseInt @localGet "user_id"
+      userId = Cmon.user_id()
       if userId
          @send "user", userId,
  
@@ -127,21 +123,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
       @debug "conv status:", status, convId
       @event "conv/status/#{status}", convId
 
-   set_conv_id: (convId) ->
-      @localSet "conv_id", convId
-      @conv_id = convId
-
-   set_user_id: (userId) ->
-      @localSet "user_id", userId
-      @user_id = userId
-
    error: (m...) -> 
-      @rt.append "dialog/error", text: m 
+      @rt.append "dialog/error", text: m.join(" ")
 
    event: (e,args) =>
-      @debug "EVENT", e, args
+      @debug "EVENT", e, args # [].concat args...
       super e, args
-
       
    # methods
 
@@ -152,29 +139,30 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
    # public methods, called as @rpc
 
    user_info: ->
-      userId = parseInt @localGet "user_id"
-      @send "user/info", userId
+      @send "user/info", Cmon.user_id()
     
    query_convs: ->
-      userId = parseInt @localGet "user_id"
-      @send "user/conv_list", userId
-        
-   join_conv: ->
-      chatId = parseInt $("#chatId").val()
+      @send "user/conv_list", Cmon.user_id()
+
+   query_conv_users: ->
+      @send "conv/users", Cmon.user_id(), Cmon.conv_id()
+         
+   join_conv: (conv) ->
+      chatId = if conv.conv then conv.conv else parseInt $("#chatId").val()
       if chatId
-         @send "conv/join", @user_id, chatId
+         @send "conv/join", Cmon.user_id(), chatId
       else
-         if @user_id
-            @send "conv/new", @user_id
+         if Cmon.user_id()
+            @send "conv/new", Cmon.user_id()
 
    leave_conv: ->
-      @send "conv/leave", @user_id, @conv_id
+      @send "conv/leave", Cmon.user_id(), Cmon.conv_id()
 
    conv_history: ->
-      @send "conv/history", @conv_id
+      @send "conv/history", Cmon.conv_id()
 
    login: (a...) ->
-      h = (new Util()).list2hash a
+      h = Cmon.list2hash a
       @send "user/login", h.email, h.password
 
    anonymous: ->
@@ -182,12 +170,12 @@ define ["pi/Pi", "/js/bullet.js", "Util"], (Pi, Bullet, Util) -> class Bullet ex
 
    logout: ->
       @send "user/logout"
-      @set_user_id null
+      Cmon.set_user_id null
       @user_status "not_logged"
 
    register_email: (a...) ->
-      h = (new Util()).list2hash a
-      @send "user/register", @user_id, h.email, h.password, h.username, h.gender
+      h = Cmon.list2hash a
+      @send "user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender
 
-   send_msg: (msg) -> @send "msg/conv", @user_id, @conv_id, msg
+   send_msg: (msg) -> @send "msg/conv", Cmon.user_id(), Cmon.conv_id(), msg
 

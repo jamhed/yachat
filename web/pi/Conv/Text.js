@@ -2,20 +2,20 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi"], function(Pi) {
-  var Dumper;
-  return Dumper = (function(superClass) {
-    extend(Dumper, superClass);
+define(["pi/Pi", "Cmon"], function(Pi, Cmon) {
+  var ConvText;
+  return ConvText = (function(superClass) {
+    extend(ConvText, superClass);
 
-    function Dumper() {
-      return Dumper.__super__.constructor.apply(this, arguments);
+    function ConvText() {
+      return ConvText.__super__.constructor.apply(this, arguments);
     }
 
-    Dumper.prototype.attr = function() {
-      return Dumper.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
+    ConvText.prototype.attr = function() {
+      return ConvText.__super__.attr.apply(this, arguments).concat(["stamp", "text"]);
     };
 
-    Dumper.prototype.init = function() {
+    ConvText.prototype.init = function() {
       this.sub("#bullet@new_msg", (function(_this) {
         return function(e, args) {
           var convId, msg, user;
@@ -56,20 +56,18 @@ define(["pi/Pi"], function(Pi) {
       })(this));
     };
 
-    Dumper.prototype.append = function(user, msg) {
-      var display, email, holder, id, name, stamp, stamp_div, text, text_div;
-      id = user[0], name = user[1], email = user[2];
+    ConvText.prototype.append = function(user, msg) {
+      var holder, stamp, stamp_div, text, text_div;
       stamp = msg[0], text = msg[1];
-      display = name !== "undefined" ? name : email !== "undefined" ? email : id;
       text_div = $("<div>").addClass(this.a.text).html(text);
-      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + display + ":");
+      stamp_div = $("<div>").addClass(this.a.stamp).html(stamp + "&nbsp;&nbsp;" + Cmon.displayNameA(user) + ":");
       holder = $("<div>").addClass("row");
       holder.prepend(text_div);
       holder.prepend(stamp_div);
       return this.e.prepend(holder);
     };
 
-    return Dumper;
+    return ConvText;
 
   })(Pi);
 });
