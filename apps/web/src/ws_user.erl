@@ -15,23 +15,22 @@ msg(M = <<"user">>, [Uid]) when is_number(Uid) ->
          [M, fail]
    end;
 
-% check user existance by facebook id
+% find user by facebook_id
 msg(M = <<"user/fb">>, [FbId]) ->
    ?INFO("~s uid:~s", [M, FbId]),
    case db_user:get_by_fb(FbId) of
-      {ok, User} ->
-         [M, ok, User#user.id];
-      _ ->
-         [M, fail]
+      [#user{id=Uid}]   -> [M, ok, Uid];
+      []                -> [M, fail, not_found];
+      Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol, Err] 
    end;
 
-% check user email existance
+% find user by email
 msg(M = <<"user/email">>, [Email]) ->
    ?INFO("~s email:~s", [M, Email]),
    case db_user:get_by_email(Email) of
-      {ok, #user{id=Uid}}              -> [M, ok, Uid];
-      {error, not_found}               -> [M, fail];
-      Err                              -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
+      [#user{id=Uid}]   -> [M, ok, Uid];
+      []                -> [M, fail];
+      Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 % [UserId, Name, Email]
@@ -49,7 +48,7 @@ msg(M = <<"user/new">>, []) ->
       ok    ->
          db_user:online(U, self()),
          [M, new, NewUID];
-      Err   -> ?INFO("~s err: ~p", [M, Err]), [M, fail, protocol]
+      Err   -> ?ERR("~p err: ~p", [M, Err]), [M, fail, protocol]
    end;
 
 % login by email and password

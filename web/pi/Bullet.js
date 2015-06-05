@@ -13,11 +13,16 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       return Bullet.__super__.constructor.apply(this, arguments);
     }
 
+    Bullet.prototype.seq = 0;
+
+    Bullet.prototype.cb_nsend = null;
+
     Bullet.prototype.attr = function() {
       return Bullet.__super__.attr.apply(this, arguments).concat(["uri"]);
     };
 
     Bullet.prototype.init = function() {
+      this.cb_nsend = {};
       this.uri = this.a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/";
       this.bullet = $.bullet(this.uri, {
         disableWebSocket: false,
@@ -58,6 +63,19 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           return _this.bullet.send("ping");
         };
       })(this);
+      this.handler("nmsg", (function(_this) {
+        return function(e, args) {
+          var msg, ref, seq;
+          seq = data[0], (ref = data[1], msg = ref[0], args = 2 <= ref.length ? slice.call(ref, 1) : []);
+          _this.debug("NMSG:", seq, msg, args);
+          if (_this.cb_nsend[seq]) {
+            _this.cb_nsend[seq](msg, args);
+            return delete _this.cb_nsend[seq];
+          } else {
+            return _this.error("no callback for seq", seq);
+          }
+        };
+      })(this));
       this.handler("sys_msg", (function(_this) {
         return function(e, args) {
           var cid, ev, ref, stamp, user;
@@ -202,6 +220,13 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       return this.bullet.send(JSON.stringify(msg));
     };
 
+    Bullet.prototype.nsend = function(msg, callback) {
+      this.seq = this.seq + 1;
+      this.debug("N-MSG", this.seq, msg);
+      this.cb_nsend[this.seq] = callback;
+      return this.bullet.send(JSON.stringify(["nmsg", this.seq, msg]));
+    };
+
     Bullet.prototype.user_info = function() {
       return this.send("user/info", Cmon.user_id());
     };
@@ -238,7 +263,11 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(a);
-      return this.send("user/login", h.email, h.password);
+      return this.nsend(["user/login", h.email, h.password], (function(_this) {
+        return function() {
+          return _this.debug("REPLY!");
+        };
+      })(this));
     };
 
     Bullet.prototype.anonymous = function() {
