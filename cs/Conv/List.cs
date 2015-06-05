@@ -9,11 +9,19 @@ define ["pi/Pi", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
          @empty()
          [status, List] = args
          tmpl = @rt.source @a.view
+         @seen = 0
          for convId in List
             @e.append tmpl {id: convId}
-            if @skip
-               @skip = 0
-               @rpc "#bullet@conv_status", ["join", convId] if convId == storedConvId
+            if convId == storedConvId
+               @seen = 1
+         if @skip
+            @skip = 0
+            if @seen
+               @rpc "#bullet@conv_status", ["join", storedConvId]
+            else
+               @rpc "#bullet@conv_status", ["part"]
+         else
+            @skip = 1
          @rt.pi @e
 
       @sub "#bullet@conv/status/join", (ev, args) =>

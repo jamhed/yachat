@@ -24,17 +24,25 @@ define(["pi/Pi", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
           _this.empty();
           status = args[0], List = args[1];
           tmpl = _this.rt.source(_this.a.view);
+          _this.seen = 0;
           for (i = 0, len = List.length; i < len; i++) {
             convId = List[i];
             _this.e.append(tmpl({
               id: convId
             }));
-            if (_this.skip) {
-              _this.skip = 0;
-              if (convId === storedConvId) {
-                _this.rpc("#bullet@conv_status", ["join", convId]);
-              }
+            if (convId === storedConvId) {
+              _this.seen = 1;
             }
+          }
+          if (_this.skip) {
+            _this.skip = 0;
+            if (_this.seen) {
+              _this.rpc("#bullet@conv_status", ["join", storedConvId]);
+            } else {
+              _this.rpc("#bullet@conv_status", ["part"]);
+            }
+          } else {
+            _this.skip = 1;
           }
           return _this.rt.pi(_this.e);
         };
