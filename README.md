@@ -14,7 +14,6 @@ $ make console
 TODO
 ====
 
-0. Events with ID to filter replies
 1. Online status (connection on/off)
 2. Load/Edit/Update profile
 3. Facebook auth
@@ -23,7 +22,6 @@ TODO
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
 8. Inite user by name/email
-9. Double load conv by query_convs in Conv/List
 
 DONE
 ====
@@ -45,3 +43,6 @@ DONE
 16. Common module for convId, userId, and displayName
 17. List Conv users
 18. Broadcast message user joining chat
+19. Events with ID to filter replies
+20. Double load conv by query_convs in Conv/List
+
