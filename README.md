@@ -6,10 +6,12 @@ Yet another Erlang-based WebSockets Chat.
 INSTALL
 =======
 
+```
 $ git submodule update
 $ bower install
 $ make
 $ make console
+```
 
 TODO
 ====
