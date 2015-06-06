@@ -17,7 +17,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
 
     ConvList.prototype.draw = function(List) {
       var email, i, id, len, name, ref, tmpl;
-      this.empty();
+      this.clear();
       tmpl = this.rt.source(this.a.view);
       for (i = 0, len = List.length; i < len; i++) {
         ref = List[i], id = ref[0], name = ref[1], email = ref[2];
@@ -45,7 +45,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       })(this));
       this.sub("#bullet@conv/status/part", (function(_this) {
         return function(ev, args) {
-          return _this.empty();
+          return _this.clear();
         };
       })(this));
       this.sub("#bullet@user/status/registered", (function(_this) {
@@ -60,7 +60,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       })(this));
       return this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev, args) {
-          return _this.empty();
+          return _this.clear();
         };
       })(this));
     };

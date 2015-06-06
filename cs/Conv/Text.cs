@@ -3,7 +3,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
    attr: -> super.concat ["stamp", "text"]
 
    draw: (rows) ->
-      @empty()
+      @clear()
       for row in rows.reverse()
          [user, msg] = row
          @append user, msg
@@ -20,7 +20,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
          @append user, msg
 
 
-      @sub "#bullet@conv/status/part", (e,args) => @empty()
+      @sub "#bullet@conv/status/part", (e,args) => @clear()
 
       @sub "#bullet@conv/status/join", (e, args) => @query()
 
@@ -28,7 +28,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
       @sub "#bullet@user/status/anonymous", (ev, args) => @query()
 
-      @sub "#bullet@user/status/not_logged", (ev, args) => @empty()
+      @sub "#bullet@user/status/not_logged", (ev, args) => @clear()
 
 
    append: (user, msg) ->

@@ -57,7 +57,7 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
          if status == "new"
             Cmon.set_user_id userId
-            @user_status "anonymous"
+            @user_status "anonymous", [userId]
          else
             @user_status ="not_logged"
             @error "Server protocol"

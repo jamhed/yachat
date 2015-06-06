@@ -3,7 +3,7 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
    attr: -> super.concat ["view"]
 
    draw: (List) ->
-      @empty()
+      @clear()
       tmpl = @rt.source @a.view
       @e.append tmpl {id: id, display: Cmon.displayName(id,name,email) } for [id,name,email] in List
       @rt.pi @e
@@ -14,12 +14,12 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
    init: ->
       @sub "#bullet@conv/status/join", (ev, args) => @query()
 
-      @sub "#bullet@conv/status/part", (ev, args) => @empty()
+      @sub "#bullet@conv/status/part", (ev, args) => @clear()
 
       @sub "#bullet@user/status/registered", (ev, args) => @query()
 
       @sub "#bullet@user/status/anonymous", (ev, args) => @query()
 
-      @sub "#bullet@user/status/not_logged", (ev, args) => @empty()
+      @sub "#bullet@user/status/not_logged", (ev, args) => @clear()
 
 

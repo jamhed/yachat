@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
+define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
   var LoginStatus;
   return LoginStatus = (function(superClass) {
     extend(LoginStatus, superClass);
@@ -15,29 +15,35 @@ define(["pi/Pi", "pi/m/Source"], function(aPi, mSource) {
       return LoginStatus.__super__.attr.apply(this, arguments).concat(["login", "logout"]);
     };
 
+    LoginStatus.prototype.logged = function(user) {
+      var tmpl;
+      this.clear();
+      tmpl = mSource.get(this.a.logout);
+      this.e.html(tmpl({
+        display: Cmon.displayNameA(user)
+      }));
+      return this.rt.pi(this.e);
+    };
+
+    LoginStatus.prototype.not_logged = function() {
+      this.e.html(mSource.get(this.a.login));
+      return this.rt.pi(this.e);
+    };
+
     LoginStatus.prototype.init = function() {
       this.sub("#bullet@user/status/registered", (function(_this) {
-        return function(ev, args) {
-          var displayName, email, name, tmpl, userId;
-          userId = args[0], name = args[1], email = args[2];
-          displayName = name ? name : email;
-          tmpl = mSource.get(_this.a.logout);
-          _this.e.html(tmpl({
-            display: displayName
-          }));
-          return _this.rt.pi(_this.e);
+        return function(ev, user) {
+          return _this.logged(user);
         };
       })(this));
       this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev) {
-          _this.e.html(mSource.get(_this.a.login));
-          return _this.rt.pi(_this.e);
+          return _this.not_logged();
         };
       })(this));
       return this.sub("#bullet@user/status/anonymous", (function(_this) {
-        return function(ev) {
-          _this.e.html(mSource.get(_this.a.login));
-          return _this.rt.pi(_this.e);
+        return function(ev, user) {
+          return _this.logged(user);
         };
       })(this));
     };

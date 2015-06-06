@@ -92,7 +92,7 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           status = args[0], userId = args[1];
           if (status === "new") {
             Cmon.set_user_id(userId);
-            return _this.user_status("anonymous");
+            return _this.user_status("anonymous", [userId]);
           } else {
             _this.user_status = "not_logged";
             return _this.error("Server protocol");

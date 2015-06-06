@@ -18,7 +18,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     ConvList.prototype.draw = function(List) {
       var convId, i, len, tmpl;
       tmpl = this.rt.source(this.a.view);
-      this.empty();
+      this.clear();
       for (i = 0, len = List.length; i < len; i++) {
         convId = List[i];
         this.e.append(tmpl({
@@ -38,7 +38,6 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
 
     ConvList.prototype.autojoin = function(List) {
       var convId, i, len, results, storedConvId;
-      this.debug("AUTOLOGIN");
       storedConvId = Cmon.conv_id();
       results = [];
       for (i = 0, len = List.length; i < len; i++) {
@@ -75,7 +74,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       })(this));
       this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev, args) {
-          return _this.empty();
+          return _this.clear();
         };
       })(this));
       return this.wait_ajax_done((function(_this) {

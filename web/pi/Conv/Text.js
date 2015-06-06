@@ -17,7 +17,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
 
     ConvText.prototype.draw = function(rows) {
       var i, len, msg, ref, results, row, user;
-      this.empty();
+      this.clear();
       ref = rows.reverse();
       results = [];
       for (i = 0, len = ref.length; i < len; i++) {
@@ -53,7 +53,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       })(this));
       this.sub("#bullet@conv/status/part", (function(_this) {
         return function(e, args) {
-          return _this.empty();
+          return _this.clear();
         };
       })(this));
       this.sub("#bullet@conv/status/join", (function(_this) {
@@ -73,7 +73,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       })(this));
       return this.sub("#bullet@user/status/not_logged", (function(_this) {
         return function(ev, args) {
-          return _this.empty();
+          return _this.clear();
         };
       })(this));
     };

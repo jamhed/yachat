@@ -1,19 +1,20 @@
-define ["pi/Pi", "pi/m/Source"], (aPi, mSource) -> class LoginStatus extends aPi
+define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStatus extends aPi
 
    attr: -> super.concat ["login", "logout"]
 
-   init: ->
-      @sub "#bullet@user/status/registered", (ev, args) =>
-         [userId, name, email] = args
-         displayName = if name then name else email
-         tmpl = mSource.get(@a.logout)
-         @e.html tmpl(display: displayName)
-         @rt.pi @e
+   logged: (user) ->
+      @clear()
+      tmpl = mSource.get(@a.logout)
+      @e.html tmpl display: Cmon.displayNameA user
+      @rt.pi @e
 
-      @sub "#bullet@user/status/not_logged", (ev) =>
-         @e.html mSource.get(@a.login)
-         @rt.pi @e
-      
-      @sub "#bullet@user/status/anonymous", (ev) =>
-         @e.html mSource.get(@a.login)
-         @rt.pi @e
+   not_logged: ->
+      @e.html mSource.get(@a.login)
+      @rt.pi @e
+ 
+   init: ->
+      @sub "#bullet@user/status/registered", (ev, user) => @logged user
+
+      @sub "#bullet@user/status/not_logged", (ev) => @not_logged()
+     
+      @sub "#bullet@user/status/anonymous", (ev, user) => @logged user
