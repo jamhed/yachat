@@ -15,7 +15,7 @@ init(_Transport, Req, Opts, _Active) ->
    {ok, Req, #state{}}.
 
 stream(JSON, Req, State) ->
-   ?INFO("RAW: ~p", [JSON]),
+   % ?INFO("RAW: ~p", [JSON]),
    case JSON of
       <<"ping">> -> {reply, JSON, Req, State};
       _ ->

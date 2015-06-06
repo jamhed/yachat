@@ -15,9 +15,13 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
 
    autojoin: (List) ->
       storedConvId = Cmon.conv_id()
+      seen = 0
       for convId in List
          if storedConvId == convId
             @rpc "#bullet@pub_event", ["conv/status/join", convId]
+            seen = 1
+      if ! seen
+         @rpc "#bullet@pub_event", ["conv/status/part"]
  
    init: ->
 

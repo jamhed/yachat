@@ -183,6 +183,7 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @send "user/logout"
       Cmon.set_user_id null
       @user_status "not_logged"
+      window.location="#"
 
    register_email: (a...) ->
       h = Cmon.list2hash a

@@ -4,6 +4,7 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
 
    logged: (user) ->
       @clear()
+      console.log "XXX", user
       tmpl = mSource.get(@a.logout)
       @e.html tmpl display: Cmon.displayNameA user
       @rt.pi @e

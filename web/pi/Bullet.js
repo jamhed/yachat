@@ -268,7 +268,8 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.logout = function() {
       this.send("user/logout");
       Cmon.set_user_id(null);
-      return this.user_status("not_logged");
+      this.user_status("not_logged");
+      return window.location = "#";
     };
 
     Bullet.prototype.register_email = function() {

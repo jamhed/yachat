@@ -37,18 +37,19 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.autojoin = function(List) {
-      var convId, i, len, results, storedConvId;
+      var convId, i, len, seen, storedConvId;
       storedConvId = Cmon.conv_id();
-      results = [];
+      seen = 0;
       for (i = 0, len = List.length; i < len; i++) {
         convId = List[i];
         if (storedConvId === convId) {
-          results.push(this.rpc("#bullet@pub_event", ["conv/status/join", convId]));
-        } else {
-          results.push(void 0);
+          this.rpc("#bullet@pub_event", ["conv/status/join", convId]);
+          seen = 1;
         }
       }
-      return results;
+      if (!seen) {
+        return this.rpc("#bullet@pub_event", ["conv/status/part"]);
+      }
     };
 
     ConvList.prototype.init = function() {

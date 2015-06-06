@@ -19,7 +19,6 @@ TODO
 ====
 
 1. Online status (connection on/off)
-2. Load/Edit/Update profile
 3. Facebook auth
 4. Separate config file (not sys.options)
 5. P2P Chats
@@ -49,4 +48,5 @@ DONE
 18. Broadcast message user joining chat
 19. Events with ID to filter replies
 20. Double load conv by query_convs in Conv/List
+21. Load/Edit/Update profile
 

@@ -83,6 +83,9 @@ msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserNam
             []  ->
                dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}),
                [M, ok, Uid];
+            [#user{id=Uid}] ->
+               dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}),
+               [M, ok, Uid];
             _   ->
                [M, fail, exists]
          end;

@@ -18,6 +18,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     LoginStatus.prototype.logged = function(user) {
       var tmpl;
       this.clear();
+      console.log("XXX", user);
       tmpl = mSource.get(this.a.logout);
       this.e.html(tmpl({
         display: Cmon.displayNameA(user)
