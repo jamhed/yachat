@@ -3,6 +3,8 @@ YChat
 
 Yet another Erlang-based WebSockets Chat.
 
+http://chat.jamhed.tk
+
 INSTALL
 =======
 
