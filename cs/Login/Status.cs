@@ -14,8 +14,6 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
       @rt.pi @e
  
    init: ->
-      @wait_ajax_done =>
-         @rpc "#bullet@check_user_id"
 
       @sub "#bullet@user/status/registered", (ev, user) => @logged user
 

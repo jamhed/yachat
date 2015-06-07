@@ -74,6 +74,17 @@ body {
 <script pi="pi/Source" name="menu/login" type="text/x-dot">
 </script>
 
+<script pi="pi/Source" name="dialog/invite" type="text/x-dot">
+<div pi="Dialog/Simple" title="Invite">
+   <div>
+      <input type="text" id="email" class="form-control invite" placeholder="Invite user by email">
+   </div>
+   <div style="margin-top: 20px">
+      <input type="button" class="btn" value="Invite" pi="Form" el=".invite" target="#bullet@invite parent@close">
+      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+   </div>
+</div>
+</script>
 
 <!-- END TEMPLATES -->
 

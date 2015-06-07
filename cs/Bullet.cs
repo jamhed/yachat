@@ -1,4 +1,4 @@
-define ["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
    seq: 0
    cb_nsend: null
@@ -28,8 +28,6 @@ define ["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
       @bullet.onopen = () =>
          @debug "conn()"
-         @wait_ajax_done =>
-            @check_user_id()
      
       @bullet.ondisconnect = =>
          @user_status "not_logged"
@@ -212,6 +210,19 @@ define ["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       @send "user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender
 
    send_msg: (msg) -> @send "msg/conv", Cmon.user_id(), Cmon.conv_id(), msg
+
+   invite: (a...) ->
+      h = Cmon.list2hash a
+      @nsend ["user/email", h.email], (status, user) =>
+         if status == "ok"
+            [id,name,email] = user
+            @nsend ["conv/join", id, Cmon.conv_id()], (status, convId) =>
+               @event "conv/status/invite"
+         else
+            @error "Can't find user by email."
+
+   dialog_invite: ->
+      @rt.append "dialog/invite"
 
    register_facebook: ->
       if @fb_status != "connected"

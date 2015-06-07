@@ -4,6 +4,7 @@
 
 <script pi="pi/Source" name="button/leave" type="text/x-dot">
 <button type="button" class="btn" pi="pi/Button" target="#bullet@leave_conv">Leave</button>
+<button type="button" class="btn" pi="pi/Button" target="#bullet@dialog_invite" style="margin-left: 20px">Invite</button>
 </script>
 
 <script pi="pi/Source" name="conv/view" type="text/x-dot">
@@ -63,5 +64,7 @@
 <h1>Please login</h1>
 You can login anonymously.
 </script>
+
+<div pi="Login/Init"></div>
 
 <div class="container" pi="Login/Status" login="content/login" logout="content/logout"></div>

@@ -4,7 +4,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Bullet, Cmon) {
+define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Bullet, Cmon) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -49,10 +49,7 @@ define(["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       });
       this.bullet.onopen = (function(_this) {
         return function() {
-          _this.debug("conn()");
-          return _this.wait_ajax_done(function() {
-            return _this.check_user_id();
-          });
+          return _this.debug("conn()");
         };
       })(this);
       this.bullet.ondisconnect = (function(_this) {
@@ -310,6 +307,29 @@ define(["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
     Bullet.prototype.send_msg = function(msg) {
       return this.send("msg/conv", Cmon.user_id(), Cmon.conv_id(), msg);
+    };
+
+    Bullet.prototype.invite = function() {
+      var a, h;
+      a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      h = Cmon.list2hash(a);
+      return this.nsend(["user/email", h.email], (function(_this) {
+        return function(status, user) {
+          var email, id, name;
+          if (status === "ok") {
+            id = user[0], name = user[1], email = user[2];
+            return _this.nsend(["conv/join", id, Cmon.conv_id()], function(status, convId) {
+              return _this.event("conv/status/invite");
+            });
+          } else {
+            return _this.error("Can't find user by email.");
+          }
+        };
+      })(this));
+    };
+
+    Bullet.prototype.dialog_invite = function() {
+      return this.rt.append("dialog/invite");
     };
 
     Bullet.prototype.register_facebook = function() {
