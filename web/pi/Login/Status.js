@@ -32,11 +32,6 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     LoginStatus.prototype.init = function() {
-      this.wait_ajax_done((function(_this) {
-        return function() {
-          return _this.rpc("#bullet@check_user_id");
-        };
-      })(this));
       this.sub("#bullet@user/status/registered", (function(_this) {
         return function(ev, user) {
           return _this.logged(user);
