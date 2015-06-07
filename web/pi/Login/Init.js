@@ -14,6 +14,9 @@ define(["Nsend"], function(Pi) {
     LoginInit.prototype.init = function() {
       return this.wait_ajax_done((function(_this) {
         return function() {
+          if (_this.e.attr("processed") === "2") {
+            return;
+          }
           return _this.rpc("#bullet@check_user_id");
         };
       })(this));
