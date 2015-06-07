@@ -23,7 +23,6 @@ TODO
 5. P2P Chats
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
-8. Inite user by name/email
 
 DONE
 ====
@@ -49,4 +48,4 @@ DONE
 20. Double load conv by query_convs in Conv/List
 21. Load/Edit/Update profile
 22. Facebook register/login
-
+23. Invite user to conv by name/email
