@@ -18,8 +18,16 @@ define(["pi/Pi"], function(aPi) {
     Login.prototype.init = function() {
       return this.e.click((function(_this) {
         return function(ev) {
-          _this.rt.append(_this.a.dialog, {});
-          return _this.rt.pi(_this.e);
+          return _this.rpc("#bullet@self", [], function(bullet) {
+            var h;
+            h = bullet.fb_status === "connected" ? {
+              fb_connect: 1
+            } : {
+              fb_connect: 0
+            };
+            _this.rt.append(_this.a.dialog, h);
+            return _this.rt.pi(_this.e);
+          });
         };
       })(this));
     };

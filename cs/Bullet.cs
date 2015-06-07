@@ -1,11 +1,25 @@
-define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
    seq: 0
    cb_nsend: null
 
-   attr: -> super.concat ["uri"]
+   fb_status: null
+   fb_token: null
+   fb_fbid: null
+
+   _user_status: null
+
+   attr: -> super.concat ["uri", "fb_app"]
 
    init: ->
+
+      FB.init
+         appId: @a.fb_app
+         xfbml: true
+         version: "v2.3"
+      
+      FB.getLoginStatus (r) => @handle_fb_auth r
+
       @cb_nsend = {}
 
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
@@ -15,7 +29,6 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @bullet.onopen = () =>
          @debug "conn()"
          @wait_ajax_done =>
-            @user_status "not_logged"
             @check_user_id()
      
       @bullet.ondisconnect = =>
@@ -79,7 +92,14 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             @user_status "registered", [userId, name, email]
          else
             @user_status "anonymous", [userId]
+
+      @handler "user/fb", (e, args) =>
+         [ status, [userId, name, email] ] = args
          
+         if userId
+            Cmon.set_user_id userId
+            @user_status "registered", [userId, name, email]
+      
       @handler "user/register", (e, args) =>
          [status, userId] = args
          if status == "ok"
@@ -126,6 +146,8 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       userId = Cmon.user_id()
       if userId
          @send "user", userId,
+      else
+         @user_status "not_logged"
  
    user_status: (status, userRec) ->
       @debug "user status:", status
@@ -191,3 +213,27 @@ define ["pi/Pi", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
    send_msg: (msg) -> @send "msg/conv", Cmon.user_id(), Cmon.conv_id(), msg
 
+   register_facebook: ->
+      if @fb_status != "connected"
+         FB.login ((r) => @handle_fb_register r), scope: "public_profile,email"
+
+   fb_login: ->
+      if @fb_status == "connected"
+         @send "user/fb", @fb_id
+      else
+         @error "Connect profile to facebook first!"
+
+   handle_fb_auth: (r) ->
+      if r.status == "connected"
+         @fb_status = "connected"
+         @fb_token = r.authResponse.accessToken
+         @fb_id = r.authResponse.userID
+
+   handle_fb_regsiter: (r) ->
+      if r.status == "connected"
+         @handle_fb_auth r
+         FB.api "/me", (r) =>
+            @nsend ["user/facebook",  Cmon.user_id(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]
+      else
+         @error "Facebook status #{r.status}"
+ 

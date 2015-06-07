@@ -16,8 +16,7 @@
 </div>
 </script>
 
-<div class="container">
-
+<script pi="pi/Source" name="content/logout" type="text/x-dot">
   <div class="row" style="margin-bottom:10px">
      <div class="col-md-12" pi="Conv/List" view="conv/view"></div>
   </div>
@@ -58,4 +57,11 @@
          </div>
       </div><!-- col-md-9 -->
    </div><!-- row -->
-</div><!-- /.container -->
+</script>
+
+<script pi="pi/Source" name="content/login" type="text/x-dot">
+<h1>Please login</h1>
+You can login anonymously.
+</script>
+
+<div class="container" pi="Login/Status" login="content/login" logout="content/logout"></div>

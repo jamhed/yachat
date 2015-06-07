@@ -4,5 +4,8 @@ define ["pi/Pi"], (aPi) -> class Login extends aPi
 
    init: ->
       @e.click (ev) =>
-         @rt.append @a.dialog, {}
-         @rt.pi @e
+         @rpc "#bullet@self", [], (bullet) =>
+            h = if bullet.fb_status == "connected" then fb_connect: 1 else fb_connect: 0
+
+            @rt.append @a.dialog, h
+            @rt.pi @e

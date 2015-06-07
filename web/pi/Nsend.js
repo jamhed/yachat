@@ -20,6 +20,12 @@ define(["pi/Pi"], function(aPi) {
       })(this));
     };
 
+    Nsend.prototype.ncall = function(callback) {
+      return this.rpc("#bullet@self", [], function(bulletObj) {
+        return callback(bulletObj);
+      });
+    };
+
     Nsend.prototype.error = function() {
       var m;
       m = 1 <= arguments.length ? slice.call(arguments, 0) : [];

@@ -2,13 +2,19 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["Nsend", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Facebook) {
+define(["Nsend", "Cmon", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Cmon, Facebook) {
   return Facebook = (function(superClass) {
     extend(Facebook, superClass);
 
     function Facebook() {
       return Facebook.__super__.constructor.apply(this, arguments);
     }
+
+    Facebook.prototype.status = null;
+
+    Facebook.prototype.token = null;
+
+    Facebook.prototype.fbid = null;
 
     Facebook.prototype.attr = function() {
       return Facebook.__super__.attr.apply(this, arguments).concat(["fbid"]);
@@ -20,13 +26,35 @@ define(["Nsend", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Facebook) 
         xfbml: true,
         version: "v2.3"
       });
-      return FB.getLoginStatus((function(_this) {
-        return function() {
-          return function(response) {
-            return console.log("FACEBOOK", response);
-          };
+      FB.getLoginStatus((function(_this) {
+        return function(r) {
+          return _this.handle_auth(r);
         };
       })(this));
+      return this.e.click((function(_this) {
+        return function() {
+          if (status !== "connected") {
+            return FB.login((function(r) {
+              return _this.handle_auth(r);
+            }), {
+              scope: "public_profile,email"
+            });
+          }
+        };
+      })(this));
+    };
+
+    Facebook.prototype.handle_auth = function(r) {
+      if (r.status === "connected") {
+        this.status = "connected";
+        this.token = r.authResponse.accessToken;
+        this.fbid = r.authResponse.userID;
+        return FB.api("/me", (function(_this) {
+          return function(r) {
+            return _this.nsend(["user/facebook", Cmon.user_id(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender], function(status, a) {});
+          };
+        })(this));
+      }
     };
 
     return Facebook;

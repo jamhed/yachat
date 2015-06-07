@@ -19,18 +19,25 @@ msg(M = <<"user">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/fb">>, [FbId]) ->
    ?INFO("~s uid:~s", [M, FbId]),
    case db_user:get_by_fb(FbId) of
-      [#user{id=Uid}]   -> [M, ok, Uid];
-      []                -> [M, fail, not_found];
-      Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol, Err] 
+      [#user{id=Uid}]   ->
+         [M, ok, db_user:detail(Uid)];
+      []                ->
+         [M, fail, not_found];
+      Err               -> 
+         ?ERR("~s err: ~p", [M, Err]),
+         [M, fail, protocol] 
    end;
 
 %msg find user by email
 msg(M = <<"user/email">>, [Email]) ->
    ?INFO("~s email:~s", [M, Email]),
    case db_user:get_by_email(Email) of
-      [#user{id=Uid}]   -> [M, ok, Uid];
-      []                -> [M, fail];
-      Err               -> ?ERR("~s err: ~p", [M, Err]), [M, fail, protocol]
+      [#user{id=Uid}]   ->
+         [M, ok, db_user:detail(Uid)];
+      []                ->
+         [M, fail];
+      Err               -> ?ERR("~s err: ~p", [M, Err]),
+         [M, fail, protocol]
    end;
 
 %msg get user info [UserId, Name, Email]
@@ -49,7 +56,8 @@ msg(M = <<"user/new">>, []) ->
       ok    ->
          db_user:online(U, self()),
          [M, new, NewUID];
-      Err   -> ?ERR("~p err: ~p", [M, Err]), [M, fail, protocol]
+      Err   -> ?ERR("~p err: ~p", [M, Err]),
+         [M, fail, protocol]
    end;
 
 %msg login by email and password
@@ -98,10 +106,18 @@ msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gen
    ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
-         dbd:put(User#user{email=Email, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender, facebook_id=Id}),
-         [M, ok];
+         case db_user:get_by_fb(Id) of
+            [] ->
+               dbd:put(User#user{email=Email, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender, facebook_id=Id}),
+               [M, ok];
+            [User] ->
+               [M, fail, facebook_id_exists];
+            Err ->
+               ?INFO("~s err: ~p", [M, Err]),
+               [M, fail, protocol]
+         end;
       _ ->
-         [M, fail, uid]
+         [M, fail, no_user_id]
    end;
 
 %msg get user's convs 

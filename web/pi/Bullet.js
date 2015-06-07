@@ -4,7 +4,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
+define(["pi/Pi", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Bullet, Cmon) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -17,11 +17,29 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
 
     Bullet.prototype.cb_nsend = null;
 
+    Bullet.prototype.fb_status = null;
+
+    Bullet.prototype.fb_token = null;
+
+    Bullet.prototype.fb_fbid = null;
+
+    Bullet.prototype._user_status = null;
+
     Bullet.prototype.attr = function() {
-      return Bullet.__super__.attr.apply(this, arguments).concat(["uri"]);
+      return Bullet.__super__.attr.apply(this, arguments).concat(["uri", "fb_app"]);
     };
 
     Bullet.prototype.init = function() {
+      FB.init({
+        appId: this.a.fb_app,
+        xfbml: true,
+        version: "v2.3"
+      });
+      FB.getLoginStatus((function(_this) {
+        return function(r) {
+          return _this.handle_fb_auth(r);
+        };
+      })(this));
       this.cb_nsend = {};
       this.uri = this.a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/";
       this.bullet = $.bullet(this.uri, {
@@ -33,7 +51,6 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
         return function() {
           _this.debug("conn()");
           return _this.wait_ajax_done(function() {
-            _this.user_status("not_logged");
             return _this.check_user_id();
           });
         };
@@ -122,6 +139,16 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           }
         };
       })(this));
+      this.handler("user/fb", (function(_this) {
+        return function(e, args) {
+          var email, name, ref, status, userId;
+          status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
+          if (userId) {
+            Cmon.set_user_id(userId);
+            return _this.user_status("registered", [userId, name, email]);
+          }
+        };
+      })(this));
       this.handler("user/register", (function(_this) {
         return function(e, args) {
           var status, userId;
@@ -187,6 +214,8 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       userId = Cmon.user_id();
       if (userId) {
         return this.send("user", userId);
+      } else {
+        return this.user_status("not_logged");
       }
     };
 
@@ -281,6 +310,47 @@ define(["pi/Pi", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
 
     Bullet.prototype.send_msg = function(msg) {
       return this.send("msg/conv", Cmon.user_id(), Cmon.conv_id(), msg);
+    };
+
+    Bullet.prototype.register_facebook = function() {
+      if (this.fb_status !== "connected") {
+        return FB.login(((function(_this) {
+          return function(r) {
+            return _this.handle_fb_register(r);
+          };
+        })(this)), {
+          scope: "public_profile,email"
+        });
+      }
+    };
+
+    Bullet.prototype.fb_login = function() {
+      if (this.fb_status === "connected") {
+        return this.send("user/fb", this.fb_id);
+      } else {
+        return this.error("Connect profile to facebook first!");
+      }
+    };
+
+    Bullet.prototype.handle_fb_auth = function(r) {
+      if (r.status === "connected") {
+        this.fb_status = "connected";
+        this.fb_token = r.authResponse.accessToken;
+        return this.fb_id = r.authResponse.userID;
+      }
+    };
+
+    Bullet.prototype.handle_fb_regsiter = function(r) {
+      if (r.status === "connected") {
+        this.handle_fb_auth(r);
+        return FB.api("/me", (function(_this) {
+          return function(r) {
+            return _this.nsend(["user/facebook", Cmon.user_id(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]);
+          };
+        })(this));
+      } else {
+        return this.error("Facebook status " + r.status);
+      }
     };
 
     return Bullet;

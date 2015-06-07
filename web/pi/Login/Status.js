@@ -26,11 +26,17 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     LoginStatus.prototype.not_logged = function() {
+      this.clear();
       this.e.html(mSource.get(this.a.login));
       return this.rt.pi(this.e);
     };
 
     LoginStatus.prototype.init = function() {
+      this.wait_ajax_done((function(_this) {
+        return function() {
+          return _this.rpc("#bullet@check_user_id");
+        };
+      })(this));
       this.sub("#bullet@user/status/registered", (function(_this) {
         return function(ev, user) {
           return _this.logged(user);
