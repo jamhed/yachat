@@ -7,5 +7,5 @@ msg(M = <<"ping">>, []) -> M;
 
 % catch-all
 msg(Stub, Args) ->
-	?INFO("stub msg:~s args:~p", [Stub, Args]),
+	?INFO("stub msg:~s args:~p", [<<"no_match_for_message">>, Stub, Args]),
 	[stub, ok, Stub, Args].
