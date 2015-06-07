@@ -28,12 +28,15 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
       @bullet.onopen = () =>
          @debug "conn()"
+         @event "conn/open"
      
       @bullet.ondisconnect = =>
          @user_status "not_logged"
+         @event "conn/close"
       
       @bullet.onclose = =>
          @user_status "not_logged"
+         @event "conn/close"
 
       @bullet.onmessage = (e) =>
          if e.data != "ping"

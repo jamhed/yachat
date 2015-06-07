@@ -18,7 +18,6 @@ $ make console
 TODO
 ====
 
-1. Online status (connection on/off)
 4. Separate config file (not sys.options)
 5. P2P Chats
 6. Count messages for diff. convs
@@ -49,3 +48,5 @@ DONE
 21. Load/Edit/Update profile
 22. Facebook register/login
 23. Invite user to conv by name/email
+24. Online status (connection on/off)
+

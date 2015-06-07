@@ -49,17 +49,20 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       });
       this.bullet.onopen = (function(_this) {
         return function() {
-          return _this.debug("conn()");
+          _this.debug("conn()");
+          return _this.event("conn/open");
         };
       })(this);
       this.bullet.ondisconnect = (function(_this) {
         return function() {
-          return _this.user_status("not_logged");
+          _this.user_status("not_logged");
+          return _this.event("conn/close");
         };
       })(this);
       this.bullet.onclose = (function(_this) {
         return function() {
-          return _this.user_status("not_logged");
+          _this.user_status("not_logged");
+          return _this.event("conn/close");
         };
       })(this);
       this.bullet.onmessage = (function(_this) {
