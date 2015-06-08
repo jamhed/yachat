@@ -40,7 +40,7 @@ msg(M = <<"user/email">>, [Email]) ->
          [M, fail, protocol]
    end;
 
-%msg get user info [UserId, Name, Email]
+%msg get user info [Id, Name, Email, FirstName, LastName, Gender, Avatar]
 msg(M = <<"user/info">>, [Uid]) when is_number(Uid) ->
    [M, ok, db_user:detail(Uid)];
 
@@ -83,16 +83,30 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 %msg update profile information
-msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
+msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserName, Gender, Avatar]) when is_number(Uid) ->
    ?INFO("~p uid:~p email:~p username:~p", [M, Uid, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
          case dbd:index(user, email, Email) of
             []  ->
-               dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}),
+               dbd:put(User#user{
+                  email=Email,
+                  password=Password,
+                  firstname=FirstName,
+                  lastname=LastName,
+                  username=UserName,
+                  gender=Gender,
+                  avatar=Avatar}),
                [M, ok, Uid];
             [#user{id=Uid}] ->
-               dbd:put(User#user{email=Email, password=Password, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender}),
+               dbd:put(User#user{
+                  email=Email,
+                  password=Password,
+                  firstname=FirstName,
+                  lastname=LastName,
+                  username=UserName,
+                  gender=Gender,
+                  avatar=Avatar}),
                [M, ok, Uid];
             _   ->
                [M, fail, exists]
@@ -102,13 +116,20 @@ msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserNam
    end;
 
 %msg update profile with facebook
-msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gender]) when is_number(Uid) ->
+msg(M = <<"user/facebook">>, [Uid, Id, Email, FirstName, LastName, UserName, Gender, Avatar]) when is_number(Uid) ->
    ?INFO("~s uid:~p fb_id:~p email:~p name:~p", [M, Uid, Id, Email, UserName]),
    case db_user:get(Uid) of
       {ok, User}  ->
          case db_user:get_by_fb(Id) of
             [] ->
-               dbd:put(User#user{email=Email, firstname=FirstName, lastname=LastName, username=UserName, sex=Gender, facebook_id=Id}),
+               dbd:put(User#user{
+                  email=Email,
+                  firstname=FirstName,
+                  lastname=LastName,
+                  username=UserName,
+                  gender=Gender,
+                  facebook_id=Id,
+                  avatar=Avatar}),
                [M, ok];
             [User] ->
                [M, fail, facebook_id_exists];

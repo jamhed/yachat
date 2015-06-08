@@ -8,12 +8,12 @@ use strict;
 my $fun;
 
 while(<>) {
-    if (s/^%msg\s+//) {
-        print "\nh3. ", ucfirst $_;
-        print "\n";
+    if (s/%msg\s+(.*)//) {
+        print "\nh3. ", ucfirst $1;
+        print "\n\n";
         next;
     }
-    if (/^msg.*\<\"(.*)\"\>.*\[(.*)\]/ or /^msg.*\<\"(.*)\"\>\>\,\s+(.*)\)/) {
+    if (/msg.*\<\"(.*?)\"\>.*\[(.*)\]/ or /msg.*\<\"(.*?)\"\>\>\,\s+(.*)\)/) {
         print "MSG: ";
         $fun = $1;
         if ($2) {

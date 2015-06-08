@@ -8,13 +8,15 @@
 -define(SYSTEM,1).
 
 to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
+to_list(U) -> tl(tuple_to_list(U)).
 
 detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
 detail(Uid) ->
 	case dbd:get(user, Uid) of
-		{ok, #user{ id=Id, username=undefined, email=undefined }} -> [Id, null, null];
-		{ok, #user{ id=Id, username=Name, email=undefined }} -> [Id, Name, null];
-		{ok, #user{ id=Id, username=Name, email=Email }} -> [Id, Name, Email];
+		{ok, U} ->
+         [Id, Stamp, Name, FirstName, LastName, Gender, Email, Password, FbId, Avatar] 
+            = [ case Prop of undefined -> null; Ret -> Ret end || Prop <- to_list(U) ],
+         [Id, Name, Email, FirstName, LastName, Gender, Avatar];
 		_ -> []
 	end.
 

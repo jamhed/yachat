@@ -16,9 +16,6 @@ msg(M = <<"conv/history">>, [ConvId]) when is_number(ConvId) ->
    [M, ok, History];
 
 %msg create group
-msg(M = <<"conv/new">>, [null]) ->
-   [M, fail, null_id];
-
 msg(M = <<"conv/new">>, [UserId]) when is_number(UserId) ->
    ConvId = db_conv:generic(UserId),
    [M, ok, ConvId];

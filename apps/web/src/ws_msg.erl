@@ -8,7 +8,7 @@ send_msg(ConvId, UserId, Message) ->
    db_conv:notify(ConvId, UserId, MsgId),
    MsgId.
 
-% p2p message, create conv if not exists
+%msg p2p message, create conv if not exists
 msg(M = <<"msg/p2p">>, [UserId, PeerId, Message]) when is_number(UserId), is_number(PeerId) ->
    case db_conv:find(UserId, PeerId, "p2p") of
       {ok, #conv{id=Cid}} ->
@@ -20,7 +20,7 @@ msg(M = <<"msg/p2p">>, [UserId, PeerId, Message]) when is_number(UserId), is_num
          [M, ok, Cid, MsgId]
    end;
 
-% conv message
+%msg conv message
 msg(M = <<"msg/conv">>, [UserId, ConvId, Message]) when is_number(UserId), is_number(ConvId)  ->
    MsgId = send_msg(ConvId, UserId, Message),
    [M, ok, ConvId, MsgId];
