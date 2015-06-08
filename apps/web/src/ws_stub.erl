@@ -9,4 +9,4 @@ msg(M = <<"ping">>, []) -> M;
 %msg error catch-all
 msg(Stub, Args) ->
 	?INFO("stub msg:~s args:~p", [<<"no_match_for_message">>, Stub, Args]),
-	[stub, ok, Stub, Args].
+	[<<"no match_for_message">>, fail, Stub, Args].

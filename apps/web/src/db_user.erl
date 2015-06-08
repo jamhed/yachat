@@ -10,6 +10,25 @@
 to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
 to_list(U) -> tl(tuple_to_list(U)).
 
+enum_f() -> 
+   Fields = record_info(fields, user),
+   FNums  = lists:zip(Fields, lists:seq(2,length(Fields)+1)),
+   FNums.
+
+set_by_name(U, Name, Value) -> 
+   PList = enum_f(),
+   case proplists:get_value(Name, PList) of
+      X when is_number(X) -> UX = setelement(X, U, Value);
+      _ -> UX = U
+   end,
+   UX.
+
+set_by_name(U, []) -> U;
+set_by_name(U, [Name, Value | Rest ]) ->
+   NameAtom = erlang:binary_to_atom(Name, utf8),
+   set_by_name( set_by_name(U, NameAtom, Value), Rest ).
+   
+
 detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
 detail(Uid) ->
 	case dbd:get(user, Uid) of

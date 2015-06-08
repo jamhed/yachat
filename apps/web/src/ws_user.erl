@@ -82,6 +82,17 @@ msg(M = <<"user/logout">>, []) ->
    db_user:offline(self()),
    [M, ok];
 
+%msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
+msg(M = <<"user/update">>, [Uid | List]) ->
+   case db_user:get(Uid) of
+      {ok, User}  ->
+         Ux = db_user:set_by_name(User, List),
+         dbd:put(Ux),
+         [M, ok];
+      _ ->
+         [M, fail, no_user_uid]
+   end;
+
 %msg update profile information
 msg(M = <<"user/register">>, [Uid, Email, Password, FirstName, LastName, UserName, Gender, Avatar]) when is_number(Uid) ->
    ?INFO("~p uid:~p email:~p username:~p", [M, Uid, Email, UserName]),

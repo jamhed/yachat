@@ -39,7 +39,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       var h, l;
       l = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(l);
-      return this.nsend(["user/register", Cmon.user_id(), h.email, h.password, null, null, h.username, null], (function(_this) {
+      return this.nsend(["user/update", Cmon.user_id(), "email", h.email, "username", h.username], (function(_this) {
         return function(status, a) {
           if (status === "ok") {
             _this.info("Profile was updated.");
