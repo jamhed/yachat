@@ -29,7 +29,11 @@ user_get(Uid) when is_number(Uid) ->
 user_get(_) -> [fail, db, []].
 
 % find user by facebook id
-user_fb(FbId) when is_binary(FbId) -> get_user_info(db_user:get_by_fb(FbId));
+user_fb(FbId) when is_binary(FbId) ->
+   [U] = db_user:get_by_fb(FbId),
+   Sid = db_user:online(U, self()),
+   [ok, User] = get_user_info([U]),
+   [ok, Sid, User];
 user_fb(_) -> [fail, protocol, sid].
 
 
@@ -43,7 +47,8 @@ user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail]
 user_login(Password, [#user{id=Uid, password=Password}]) ->
    db_user:offline(self()),
    Sid = db_user:online(#user{id=Uid}, self()),
-   [ok, Sid];
+   [ok, User] = get_user_info(db_user:get(Uid)),
+   [ok, Sid, User];
 user_login(_, []) -> [fail, match];
 user_login(_, _) -> [fail, protocol].
   
@@ -115,8 +120,8 @@ msg(M = <<"user/new">>, []) ->
 
 %msg login by email and password
 msg(M = <<"user/login">>, [Email, Password]) ->
-   ?INFO("~s email:~s password:~s", [M, Email, Password]),
-   [M] ++ user_login(Password, dbd:index(user, email, Email));
+   ?INFO("~s email:~p password:~p", [M, Email, Password]),
+   [M] ++ user_login(Password, db_user:get_by_email(Email));
 
 %msg logout
 msg(M = <<"user/logout">>, []) ->

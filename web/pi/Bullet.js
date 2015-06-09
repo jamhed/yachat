@@ -118,52 +118,45 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       })(this));
       this.handler("user/get", (function(_this) {
         return function(e, args) {
-          var email, name, ref, sessionId, status, userId;
-          status = args[0], sessionId = args[1], (ref = args[2], userId = ref[0], name = ref[1], email = ref[2]);
+          var sessionId, status, userInfo;
+          status = args[0], sessionId = args[1], userInfo = args[2];
           if (status === "fail") {
             Cmon.set_sid(null);
             return _this.user_status("not_logged");
           }
           Cmon.set_sid(sessionId);
-          if (email) {
-            return _this.user_status("registered", [userId, name, email]);
+          if (userInfo[1]) {
+            return _this.user_status("registered", userInfo);
           } else {
-            return _this.user_status("anonymous", [userId]);
+            return _this.user_status("anonymous", userInfo);
           }
         };
       })(this));
       this.handler("user/fb", (function(_this) {
         return function(e, args) {
-          var email, name, ref, sessionId, status, userId;
-          status = args[0], sessionId = args[1], (ref = args[2], userId = ref[0], name = ref[1], email = ref[2]);
+          var sessionId, status, userInfo;
+          status = args[0], sessionId = args[1], userInfo = args[2];
           if (status === "ok") {
             Cmon.set_sid(sessionId);
-            return _this.user_status("registered", [userId, name, email]);
+            return _this.user_status("registered", userInfo);
           } else {
-            return _this.error("Account is not found, please re-register");
-          }
-        };
-      })(this));
-      this.handler("user/register", (function(_this) {
-        return function(e, args) {
-          var status, userId;
-          status = args[0], userId = args[1];
-          if (status === "ok") {
-            _this.send("user/info", userId);
-            return window.location = "#";
-          } else {
-            return _this.error("Register Error", userId);
+            Cmon.set_sid(null);
+            _this.error("Account is not found, please re-register");
+            return _this.user_status("not_logged");
           }
         };
       })(this));
       this.handler("user/login", (function(_this) {
         return function(e, args) {
-          var status, userId;
-          status = args[0], userId = args[1];
+          var sessionId, status, userInfo;
+          status = args[0], sessionId = args[1], userInfo = args[2];
           if (status === "ok") {
-            return _this.send("user/info", userId);
+            Cmon.set_sid(sessionId);
+            return _this.user_status("registered", userInfo);
           } else {
-            return _this.error("Login or password error: " + userId);
+            Cmon.set_sid(null);
+            _this.error("Login or password error: " + userId);
+            return _this.user_status("not_logged");
           }
         };
       })(this));

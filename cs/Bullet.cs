@@ -77,40 +77,37 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
             @error "Server protocol"
 
       @handler "user/get", (e, args) =>
-         [ status, sessionId, [userId, name, email] ] = args
+         [ status, sessionId, userInfo ] = args
          
          if status == "fail"
             Cmon.set_sid null
             return @user_status "not_logged"
 
          Cmon.set_sid sessionId
-         if email
-            @user_status "registered", [userId, name, email]
+         if userInfo[1]
+            @user_status "registered", userInfo
          else
-            @user_status "anonymous", [userId]
+            @user_status "anonymous", userInfo
 
       @handler "user/fb", (e, args) =>
-         [ status, sessionId, [userId, name, email] ] = args
+         [ status, sessionId, userInfo ] = args
          if status == "ok"
             Cmon.set_sid sessionId
-            @user_status "registered", [userId, name, email]
+            @user_status "registered", userInfo
          else
+            Cmon.set_sid null
             @error "Account is not found, please re-register"
+            return @user_status "not_logged"
       
-      @handler "user/register", (e, args) =>
-         [status, userId] = args
-         if status == "ok"
-            @send "user/info", userId
-            window.location = "#"
-         else
-            @error "Register Error", userId
-
       @handler "user/login", (e, args) =>
-         [ status, userId ] = args
+         [ status, sessionId, userInfo ] = args
          if status == "ok"
-            @send "user/info", userId
+            Cmon.set_sid sessionId
+            @user_status "registered", userInfo
          else
+            Cmon.set_sid null
             @error "Login or password error: " + userId 
+            return @user_status "not_logged"
 
       # conversation events (join, part)
 

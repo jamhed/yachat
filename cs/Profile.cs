@@ -15,7 +15,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 
    update: (l...)  ->
       h = Cmon.list2hash l
-      @nsend ["user/update", Cmon.sid(), "email", h.email, "username", h.username], (status, a) =>
+      @nsend ["user/update", Cmon.sid(), "email", h.email, "username", h.username, "password", h.password], (status, a) =>
          if status == "ok"
             @info "Profile was updated."
             @rpc "#bullet@pub_event", ["user/status/registered", Cmon.sid(), h.username, h.email]
