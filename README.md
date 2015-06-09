@@ -24,6 +24,9 @@ TODO
 5. P2P Chats
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
+8. Different user profiles -- full, short
+9. Date of birth/City fields
+10. File upload
 
 DONE
 ====
@@ -51,4 +54,4 @@ DONE
 22. Facebook register/login
 23. Invite user to conv by name/email
 24. Online status (connection on/off)
-
+25. Session ids
