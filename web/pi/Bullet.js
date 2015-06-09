@@ -118,8 +118,13 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       })(this));
       this.handler("user/get", (function(_this) {
         return function(e, args) {
-          var email, name, ref, status, userId;
-          status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
+          var email, name, ref, sessionId, status, userId;
+          status = args[0], sessionId = args[1], (ref = args[2], userId = ref[0], name = ref[1], email = ref[2]);
+          if (status === "fail") {
+            Cmon.set_sid(null);
+            return _this.user_status("not_logged");
+          }
+          Cmon.set_sid(sessionId);
           if (email) {
             return _this.user_status("registered", [userId, name, email]);
           } else {
@@ -129,11 +134,13 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       })(this));
       this.handler("user/fb", (function(_this) {
         return function(e, args) {
-          var email, name, ref, status, userId;
-          status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          if (sessionId) {
+          var email, name, ref, sessionId, status, userId;
+          status = args[0], sessionId = args[1], (ref = args[2], userId = ref[0], name = ref[1], email = ref[2]);
+          if (status === "ok") {
             Cmon.set_sid(sessionId);
             return _this.user_status("registered", [userId, name, email]);
+          } else {
+            return _this.error("Account is not found, please re-register");
           }
         };
       })(this));
@@ -284,7 +291,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(a);
-      return this.send("user/login", h.email, h.password);
+      return this.send("user/login", [h.email, h.password]);
     };
 
     Bullet.prototype.logout = function() {
@@ -322,20 +329,18 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
     };
 
     Bullet.prototype.register_facebook = function() {
-      if (this.fb_status !== "connected") {
-        return FB.login(((function(_this) {
-          return function(r) {
-            return _this.handle_fb_register(r);
-          };
-        })(this)), {
-          scope: "public_profile,email"
-        });
-      }
+      return FB.login(((function(_this) {
+        return function(r) {
+          return _this.handle_fb_register(r);
+        };
+      })(this)), {
+        scope: "public_profile,email"
+      });
     };
 
     Bullet.prototype.fb_login = function() {
       if (this.fb_status === "connected") {
-        return this.send("user/fb", this.fb_id);
+        return this.send("user/fb", [this.fb_id]);
       } else {
         return this.error("Connect profile to facebook first!");
       }
@@ -349,16 +354,26 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       }
     };
 
-    Bullet.prototype.handle_fb_regsiter = function(r) {
+    Bullet.prototype.handle_fb_register = function(r) {
       if (r.status === "connected") {
         this.handle_fb_auth(r);
         return FB.api("/me", (function(_this) {
           return function(r) {
-            return _this.nsend(["user/facebook", Cmon.sid(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]);
+            return _this.nsend(["user/update", Cmon.sid(), "facebook_id", r.id, "email", r.email, "firstname", r.first_name, "lastname", r.last_name, "username", r.name, "gender", r.gender], function(r) {
+              return _this.handle_fb_register_ok(r);
+            });
           };
         })(this));
       } else {
         return this.error("Facebook status " + r.status);
+      }
+    };
+
+    Bullet.prototype.handle_fb_register_ok = function(status) {
+      if (status === "ok") {
+        return this.send("user/profile", Cmon.sid());
+      } else {
+        return this.error("Error updating profile.");
       }
     };
 

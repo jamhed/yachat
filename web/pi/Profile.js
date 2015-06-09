@@ -13,6 +13,13 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     }
 
     Profile.prototype.init = function() {
+      this.sub("#bullet@user/profile", (function(_this) {
+        return function(ev, arg) {
+          var status, userInfo;
+          status = arg[0], userInfo = arg[1];
+          return _this.draw(userInfo);
+        };
+      })(this));
       return this.wait_ajax_done((function(_this) {
         return function() {
           return _this.query();
@@ -29,7 +36,8 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
 
     Profile.prototype.query = function() {
       return this.nsend(["user/get", Cmon.sid()], (function(_this) {
-        return function(status, userInfo) {
+        return function(status, sessionId, userInfo) {
+          _this.debug(status, userInfo);
           return _this.draw(userInfo);
         };
       })(this));

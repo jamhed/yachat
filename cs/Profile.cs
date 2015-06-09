@@ -1,6 +1,7 @@
 define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 
    init: ->
+      @sub "#bullet@user/profile", (ev, [status, userInfo]) => @draw userInfo
       @wait_ajax_done () => @query()
    
    draw: ([userId, userName, email]) ->
@@ -8,9 +9,10 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
       $("#email", @e).val(email)
 
    query: ->
-      @nsend ["user/get", Cmon.sid()], (status, userInfo) => @draw userInfo
+      @nsend ["user/get", Cmon.sid()], (status, sessionId, userInfo) =>
+         @debug status, userInfo
+         @draw userInfo
 
-   # Uid, Email, Password, FirstName, LastName, UserName, Gender]
    update: (l...)  ->
       h = Cmon.list2hash l
       @nsend ["user/update", Cmon.sid(), "email", h.email, "username", h.username], (status, a) =>

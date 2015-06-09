@@ -60,8 +60,10 @@ get(Id) when is_number(Id) -> get(dbd:get(user, Id));
 get({ok,U}) -> [U];
 get(_) -> [].
 
-get_by_fb(Id) -> dbd:index(user, facebook_id, Id).
-get_by_email(Id) -> dbd:index(user, email, Id).
+get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
+get_by_fb(_) -> [].
+get_by_email(Id) when is_binary(Id) -> dbd:index(user, email, Id);
+get_by_email(_) -> [].
 
 clear_online([]) -> ok;
 clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online(T).
@@ -70,12 +72,24 @@ drop_online_status([]) -> ok;
 drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
    notify_conv(Uid, <<"offline">>, conv(Uid)),
-   % dbd:delete(user_online, Id),
+   dbd:delete(user_online, Id),
    drop_online_status(R).
+
+drop_online_status_k([]) -> ok;
+drop_online_status_k([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
+   ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
+   notify_conv(Uid, <<"offline">>, conv(Uid)),
+   drop_online_status(R).
+
 
 offline(Pid) ->
    R = dbd:index(user_online, pid, Pid),
+   drop_online_status_k(R).
+
+logout(Pid) ->
+   R = dbd:index(user_online, pid, Pid),
    drop_online_status(R).
+
 
 notify_conv(_,_,[]) -> ok;
 notify_conv(Uid, Text, [H | T]) ->

@@ -77,19 +77,25 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
             @error "Server protocol"
 
       @handler "user/get", (e, args) =>
-         [ status, [userId, name, email] ] = args
+         [ status, sessionId, [userId, name, email] ] = args
          
+         if status == "fail"
+            Cmon.set_sid null
+            return @user_status "not_logged"
+
+         Cmon.set_sid sessionId
          if email
             @user_status "registered", [userId, name, email]
          else
             @user_status "anonymous", [userId]
 
       @handler "user/fb", (e, args) =>
-         [ status, [userId, name, email] ] = args
-         
-         if sessionId
+         [ status, sessionId, [userId, name, email] ] = args
+         if status == "ok"
             Cmon.set_sid sessionId
             @user_status "registered", [userId, name, email]
+         else
+            @error "Account is not found, please re-register"
       
       @handler "user/register", (e, args) =>
          [status, userId] = args
@@ -194,7 +200,7 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
    login: (a...) ->
       h = Cmon.list2hash a
-      @send "user/login", h.email, h.password
+      @send "user/login", [h.email, h.password]
 
    logout: ->
       @send "user/logout", []
@@ -218,12 +224,11 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       @rt.append "dialog/invite"
 
    register_facebook: ->
-      if @fb_status != "connected"
-         FB.login ((r) => @handle_fb_register r), scope: "public_profile,email"
+      FB.login ((r) => @handle_fb_register(r)), scope: "public_profile,email"
 
    fb_login: ->
       if @fb_status == "connected"
-         @send "user/fb", @fb_id
+         @send "user/fb", [@fb_id]
       else
          @error "Connect profile to facebook first!"
 
@@ -233,11 +238,22 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
          @fb_token = r.authResponse.accessToken
          @fb_id = r.authResponse.userID
 
-   handle_fb_regsiter: (r) ->
+   handle_fb_register: (r) ->
       if r.status == "connected"
          @handle_fb_auth r
          FB.api "/me", (r) =>
-            @nsend ["user/facebook",  Cmon.sid(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]
+            @nsend ["user/update", Cmon.sid(),
+               "facebook_id", r.id,
+               "email", r.email,
+               "firstname", r.first_name,
+               "lastname", r.last_name,
+               "username", r.name,
+               "gender", r.gender], (r) => @handle_fb_register_ok(r)
       else
          @error "Facebook status #{r.status}"
  
+   handle_fb_register_ok: (status) ->
+      if status == "ok"
+         @send "user/profile", Cmon.sid()
+      else
+         @error "Error updating profile."

@@ -15,12 +15,10 @@ define(["Nsend"], function(aPi) {
       return this.wait_ajax_done((function(_this) {
         return function() {
           return _this.ncall(function(bo) {
-            if (bo.fb_status === "connected") {
-              return _this.e.css({
-                display: "inline-block",
-                "white-space": "nowrap"
-              });
-            }
+            return _this.e.css({
+              display: "inline-block",
+              "white-space": "nowrap"
+            });
           });
         };
       })(this));

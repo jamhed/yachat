@@ -4,13 +4,9 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
-get_user_info([]) -> [fail, not_found];
+get_user_info([]) -> [fail, not_found, []];
 get_user_info([#user{id=Uid}]) -> [ok, db_user:detail(Uid)];
 get_user_info(Err) -> ?ERR("get_user_info(): ~p", Err), [fail, protocol].
-
-% find user by facebook id
-user_fb(Uid, FbId) when is_number(Uid), is_number(FbId) -> get_user_info(db_user:get_by_fb(FbId));
-user_fb(_,_) -> [fail, protocol, sid].
 
 % find user by email
 user_email(Uid, Email) when is_number(Uid), is_binary(Email) -> get_user_info(db_user:get_by_email(Email));
@@ -27,9 +23,15 @@ user_info_list(_,_) -> [fail, protocol, sid].
 % get user
 user_get(Uid) when is_number(Uid) ->
    [U] = db_user:get(Uid),
-   db_user:online(U, self()),
-   get_user_info([U]);
-user_get(_) -> [fail].
+   Sid = db_user:online(U, self()),
+   [ok, User] = get_user_info([U]),
+   [ok, Sid, User];
+user_get(_) -> [fail, db, []].
+
+% find user by facebook id
+user_fb(FbId) when is_binary(FbId) -> get_user_info(db_user:get_by_fb(FbId));
+user_fb(_) -> [fail, protocol, sid].
+
 
 % create user and session
 user_new(NewUid, ok) when is_number(NewUid) ->
@@ -45,13 +47,30 @@ user_login(Password, [#user{id=Uid, password=Password}]) ->
 user_login(_, []) -> [fail, match];
 user_login(_, _) -> [fail, protocol].
   
+to_proplist([K,V | T]) -> [{K,V} | to_proplist(T)]; 
+to_proplist([]) -> [].
+
+check_keys([]) -> ne; 
+check_keys(_) -> e.
+
+check_user_keys(U, List) ->
+   P = to_proplist(List),
+   E = proplists:get_value(<<"email">>, P),
+   Fb = proplists:get_value(<<"facebook_id">>, P),
+   [check_keys(db_user:get_by_email(E)), check_keys(db_user:get_by_fb(Fb))].
+
 % update user
 user_update(Uid, List) when is_number(Uid), is_list(List) -> user_update(db_user:get(Uid), List);
 user_update([User], List) when is_record(User, user) ->
-   Ux = db_user:set_by_name(User, List),
-   dbd:put(Ux),
-   [ok];
-user_update(_,_) -> [fail].
+   case check_user_keys(User, List) of
+      [ne,ne] ->
+         Ux = db_user:set_by_name(User, List),
+         dbd:put(Ux),
+         [ok];
+      _ ->
+         [fail, exists]
+   end;
+user_update(_,_) -> [fail, args].
 
 user_conv_list(Uid) when is_number(Uid) ->
    Convs = db_user:conv(Uid),
@@ -67,16 +86,20 @@ msg(M = <<"user/get">>, [Uid]) ->
    [M] ++ user_get(Uid);
 
 %msg find user by facebook_id
-msg(M = <<"user/fb">>, [Uid, FbId]) when is_number(Uid) ->
-   ?INFO("~s uid:~p fbid:~p", [M, Uid, FbId]),
-   [M] ++ user_fb(Uid, FbId);
+msg(M = <<"user/fb">>, [FbId]) ->
+   ?INFO("~s fbid:~p", [M, FbId]),
+   [M] ++ user_fb(FbId);
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
    ?INFO("~s sid:~p email:~p", [M, Uid, Email]),
    [M] ++ user_email(Uid, Email);
 
-%msg get user info [Id, Name, Email, FirstName, LastName, Gender, Avatar]
+%msg get user profile 
+msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
+   [M] ++ get_user_info(db_user:get(Uid));
+
+%msg get user info 
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);
 
@@ -98,7 +121,7 @@ msg(M = <<"user/login">>, [Email, Password]) ->
 %msg logout
 msg(M = <<"user/logout">>, []) ->
    ?INFO("~s", [M]),
-   db_user:offline(self()),
+   db_user:logout(self()),
    [M, ok];
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
