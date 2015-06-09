@@ -8,14 +8,14 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
       $("#email", @e).val(email)
 
    query: ->
-      @nsend ["user/info", Cmon.user_id()], (status, userInfo) => @draw userInfo
+      @nsend ["user/get", Cmon.sid()], (status, userInfo) => @draw userInfo
 
    # Uid, Email, Password, FirstName, LastName, UserName, Gender]
    update: (l...)  ->
       h = Cmon.list2hash l
-      @nsend ["user/update",  Cmon.user_id(), "email", h.email, "username", h.username], (status, a) =>
+      @nsend ["user/update", Cmon.sid(), "email", h.email, "username", h.username], (status, a) =>
          if status == "ok"
             @info "Profile was updated."
-            @rpc "#bullet@pub_event", ["user/status/registered", Cmon.user_id(), h.username, h.email]
+            @rpc "#bullet@pub_event", ["user/status/registered", Cmon.sid(), h.username, h.email]
          else
             @error "Profile wasn't updated."

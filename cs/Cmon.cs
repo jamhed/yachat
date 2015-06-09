@@ -12,11 +12,11 @@ define [], () -> class Cmon
       catch e
          console.log "localstorage fail set."
 
-   @set_user_id: (user_id) -> @set("user_id", user_id)
+   @set_sid: (sid) -> @set("session_id", sid)
 
    @set_conv_id: (conv_id) -> @set("conv_id", conv_id)
 
-   @user_id: -> parseInt @get("user_id")
+   @sid: -> parseInt @get("session_id")
 
    @conv_id: -> parseInt @get("conv_id")
 

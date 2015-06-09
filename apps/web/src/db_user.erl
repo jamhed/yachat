@@ -49,8 +49,17 @@ pids(Uid) ->
 	Q = qlc:q([ U#user_online.pid || U <- mnesia:table(user_online), U#user_online.user_id == Uid ]),
 	dbd:do(Q).
 
+sid_to_uid(Sid) ->
+   case dbd:index(user_online, session_id, Sid) of
+      [UO] -> UO#user_online.user_id;
+      _    -> fail
+   end.
 
-get(Id) -> dbd:get(user, Id).
+% compat to index
+get(Id) when is_number(Id) -> get(dbd:get(user, Id));
+get({ok,U}) -> [U];
+get(_) -> [].
+
 get_by_fb(Id) -> dbd:index(user, facebook_id, Id).
 get_by_email(Id) -> dbd:index(user, email, Id).
 
@@ -61,7 +70,7 @@ drop_online_status([]) -> ok;
 drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
    notify_conv(Uid, <<"offline">>, conv(Uid)),
-   dbd:delete(user_online, Id),
+   % dbd:delete(user_online, Id),
    drop_online_status(R).
 
 offline(Pid) ->
@@ -77,8 +86,16 @@ online(#user{id=Uid}, Pid) ->
    case dbd:index(user_online, pid, Pid) of
       [] ->
          ?INFO("user_online: user_id=~p pid=~p", [Uid, Pid]),
-         dbd:put(#user_online{id=dbd:next_id(user_online,1), stamp=now(), pid=Pid, user_id=Uid}),
-         notify_conv(Uid, <<"online">>, conv(Uid));
-      [_ | _] ->
-         ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid])
+         Sid = dbd:make_uid(),
+         dbd:put(#user_online{
+            id=dbd:next_id(user_online),
+            stamp=now(),
+            pid=Pid,
+            user_id=Uid,
+            session_id=Sid}),
+         notify_conv(Uid, <<"online">>, conv(Uid)),
+         Sid;
+      [UO] ->
+         ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),
+         UO#user_online.session_id
    end.

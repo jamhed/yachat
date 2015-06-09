@@ -29,7 +29,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.query = function() {
-      return this.nsend(["user/conv_list", Cmon.user_id()], (function(_this) {
+      return this.nsend(["user/conv_list", Cmon.sid()], (function(_this) {
         return function(status, List) {
           return _this.draw(List);
         };
@@ -80,7 +80,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
       })(this));
       return this.wait_ajax_done((function(_this) {
         return function() {
-          return _this.nsend(["user/conv_list", Cmon.user_id()], function(status, List) {
+          return _this.nsend(["user/conv_list", Cmon.sid()], function(status, List) {
             return _this.autojoin(List);
           });
         };

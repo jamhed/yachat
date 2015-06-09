@@ -30,7 +30,7 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.query = function() {
-      return this.nsend(["conv/users", Cmon.user_id(), Cmon.conv_id()], (function(_this) {
+      return this.nsend(["conv/users", Cmon.sid(), Cmon.conv_id()], (function(_this) {
         return function(status, List) {
           return _this.draw(List);
         };

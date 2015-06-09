@@ -28,7 +28,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     };
 
     Profile.prototype.query = function() {
-      return this.nsend(["user/info", Cmon.user_id()], (function(_this) {
+      return this.nsend(["user/get", Cmon.sid()], (function(_this) {
         return function(status, userInfo) {
           return _this.draw(userInfo);
         };
@@ -39,11 +39,11 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       var h, l;
       l = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(l);
-      return this.nsend(["user/update", Cmon.user_id(), "email", h.email, "username", h.username], (function(_this) {
+      return this.nsend(["user/update", Cmon.sid(), "email", h.email, "username", h.username], (function(_this) {
         return function(status, a) {
           if (status === "ok") {
             _this.info("Profile was updated.");
-            return _this.rpc("#bullet@pub_event", ["user/status/registered", Cmon.user_id(), h.username, h.email]);
+            return _this.rpc("#bullet@pub_event", ["user/status/registered", Cmon.sid(), h.username, h.email]);
           } else {
             return _this.error("Profile wasn't updated.");
           }

@@ -10,12 +10,6 @@ metainfo() ->
         #table{name=user,fields=record_info(fields,user), keys=[facebook_id, email]},
         #table{name=conv,fields=record_info(fields,conv), keys=[]},
         #table{name=user_conv, fields=record_info(fields, user_conv), keys=[user_id, conv_id]},
-        #table{name=conv_msg, fields=record_info(fields, conv_msg), keys=[]},
-        #table{name=user_msg, fields=record_info(fields, user_msg), keys=[]},
         #table{name=message, fields=record_info(fields, message), keys=[user_id]},
-        #table{name=user_online, fields=record_info(fields, user_online), keys=[user_id, pid]}
+        #table{name=user_online, fields=record_info(fields, user_online), keys=[user_id, pid, session_id]}
     ]}.
-
-
-
-

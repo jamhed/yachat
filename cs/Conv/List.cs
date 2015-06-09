@@ -11,7 +11,7 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
      
       @rt.pi @e
 
-   query: -> @nsend ["user/conv_list", Cmon.user_id()], (status, List) => @draw List
+   query: -> @nsend ["user/conv_list", Cmon.sid()], (status, List) => @draw List
 
    autojoin: (List) ->
       storedConvId = Cmon.conv_id()
@@ -36,4 +36,4 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
       @sub "#bullet@user/status/not_logged", (ev, args) => @clear()
 
       @wait_ajax_done =>
-         @nsend ["user/conv_list", Cmon.user_id()], (status, List) => @autojoin List
+         @nsend ["user/conv_list", Cmon.sid()], (status, List) => @autojoin List

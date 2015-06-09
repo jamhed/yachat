@@ -24,16 +24,16 @@ define([], function() {
       }
     };
 
-    Cmon.set_user_id = function(user_id) {
-      return this.set("user_id", user_id);
+    Cmon.set_sid = function(sid) {
+      return this.set("session_id", sid);
     };
 
     Cmon.set_conv_id = function(conv_id) {
       return this.set("conv_id", conv_id);
     };
 
-    Cmon.user_id = function() {
-      return parseInt(this.get("user_id"));
+    Cmon.sid = function() {
+      return parseInt(this.get("session_id"));
     };
 
     Cmon.conv_id = function() {

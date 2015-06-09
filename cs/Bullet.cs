@@ -67,28 +67,18 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
       @handler "user/new", (e, args) =>
          
-         [ status, userId ] = args
+         [ status, sessionId, userId ] = args
 
-         if status == "new"
-            Cmon.set_user_id userId
+         if status == "ok"
+            Cmon.set_sid sessionId
             @user_status "anonymous", [userId]
          else
             @user_status ="not_logged"
             @error "Server protocol"
 
-      @handler "user", (e, args) =>
-         [ status, userId ] = args
-         
-         if status == "fail"
-            @send "user/new"
-         else
-            @send "user/info", userId
-
-      @handler "user/info", (e, args) =>
+      @handler "user/get", (e, args) =>
          [ status, [userId, name, email] ] = args
          
-         Cmon.set_user_id userId
-        
          if email
             @user_status "registered", [userId, name, email]
          else
@@ -97,8 +87,8 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       @handler "user/fb", (e, args) =>
          [ status, [userId, name, email] ] = args
          
-         if userId
-            Cmon.set_user_id userId
+         if sessionId
+            Cmon.set_sid sessionId
             @user_status "registered", [userId, name, email]
       
       @handler "user/register", (e, args) =>
@@ -144,9 +134,9 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
    # utility functions
 
    check_user_id: ->
-      userId = Cmon.user_id()
-      if userId
-         @send "user", userId,
+      sessionId = Cmon.sid()
+      if sessionId
+         @send "user/get", sessionId,
       else
          @user_status "not_logged"
  
@@ -185,13 +175,13 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
    join_conv: (conv) ->
       chatId = if conv.conv then conv.conv else parseInt $("#chatId").val()
       if chatId
-         @send "conv/join", Cmon.user_id(), chatId
+         @send "conv/join", Cmon.sid(), chatId
       else
          if Cmon.user_id()
-            @send "conv/new", Cmon.user_id()
+            @send "conv/new", Cmon.sid()
 
    leave_conv: ->
-      @send "conv/leave", Cmon.user_id(), Cmon.conv_id()
+      @send "conv/leave", Cmon.sid(), Cmon.conv_id()
 
    pub_event: (ev, args...) -> @event ev, args
 
@@ -204,15 +194,11 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
    logout: ->
       @send "user/logout"
-      Cmon.set_user_id null
+      Cmon.set_sid null
       @user_status "not_logged"
       window.location="#"
 
-   register_email: (a...) ->
-      h = Cmon.list2hash a
-      @send "user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender
-
-   send_msg: (msg) -> @send "msg/conv", Cmon.user_id(), Cmon.conv_id(), msg
+   send_msg: (msg) -> @send "msg/conv", Cmon.sid(), Cmon.conv_id(), msg
 
    invite: (a...) ->
       h = Cmon.list2hash a
@@ -247,7 +233,7 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       if r.status == "connected"
          @handle_fb_auth r
          FB.api "/me", (r) =>
-            @nsend ["user/facebook",  Cmon.user_id(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]
+            @nsend ["user/facebook",  Cmon.sid(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]
       else
          @error "Facebook status #{r.status}"
  

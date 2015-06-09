@@ -105,10 +105,10 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       })(this));
       this.handler("user/new", (function(_this) {
         return function(e, args) {
-          var status, userId;
-          status = args[0], userId = args[1];
-          if (status === "new") {
-            Cmon.set_user_id(userId);
+          var sessionId, status, userId;
+          status = args[0], sessionId = args[1], userId = args[2];
+          if (status === "ok") {
+            Cmon.set_sid(sessionId);
             return _this.user_status("anonymous", [userId]);
           } else {
             _this.user_status = "not_logged";
@@ -116,22 +116,10 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
           }
         };
       })(this));
-      this.handler("user", (function(_this) {
-        return function(e, args) {
-          var status, userId;
-          status = args[0], userId = args[1];
-          if (status === "fail") {
-            return _this.send("user/new");
-          } else {
-            return _this.send("user/info", userId);
-          }
-        };
-      })(this));
-      this.handler("user/info", (function(_this) {
+      this.handler("user/get", (function(_this) {
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          Cmon.set_user_id(userId);
           if (email) {
             return _this.user_status("registered", [userId, name, email]);
           } else {
@@ -143,8 +131,8 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
         return function(e, args) {
           var email, name, ref, status, userId;
           status = args[0], (ref = args[1], userId = ref[0], name = ref[1], email = ref[2]);
-          if (userId) {
-            Cmon.set_user_id(userId);
+          if (sessionId) {
+            Cmon.set_sid(sessionId);
             return _this.user_status("registered", [userId, name, email]);
           }
         };
@@ -210,10 +198,10 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
     };
 
     Bullet.prototype.check_user_id = function() {
-      var userId;
-      userId = Cmon.user_id();
-      if (userId) {
-        return this.send("user", userId);
+      var sessionId;
+      sessionId = Cmon.sid();
+      if (sessionId) {
+        return this.send("user/get", sessionId);
       } else {
         return this.user_status("not_logged");
       }
@@ -265,16 +253,16 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       var chatId;
       chatId = conv.conv ? conv.conv : parseInt($("#chatId").val());
       if (chatId) {
-        return this.send("conv/join", Cmon.user_id(), chatId);
+        return this.send("conv/join", Cmon.sid(), chatId);
       } else {
         if (Cmon.user_id()) {
-          return this.send("conv/new", Cmon.user_id());
+          return this.send("conv/new", Cmon.sid());
         }
       }
     };
 
     Bullet.prototype.leave_conv = function() {
-      return this.send("conv/leave", Cmon.user_id(), Cmon.conv_id());
+      return this.send("conv/leave", Cmon.sid(), Cmon.conv_id());
     };
 
     Bullet.prototype.pub_event = function() {
@@ -296,20 +284,13 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
     Bullet.prototype.logout = function() {
       this.send("user/logout");
-      Cmon.set_user_id(null);
+      Cmon.set_sid(null);
       this.user_status("not_logged");
       return window.location = "#";
     };
 
-    Bullet.prototype.register_email = function() {
-      var a, h;
-      a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      h = Cmon.list2hash(a);
-      return this.send("user/register", Cmon.user_id(), h.email, h.password, h.firstname, h.lastname, h.username, h.gender);
-    };
-
     Bullet.prototype.send_msg = function(msg) {
-      return this.send("msg/conv", Cmon.user_id(), Cmon.conv_id(), msg);
+      return this.send("msg/conv", Cmon.sid(), Cmon.conv_id(), msg);
     };
 
     Bullet.prototype.invite = function() {
@@ -368,7 +349,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
         this.handle_fb_auth(r);
         return FB.api("/me", (function(_this) {
           return function(r) {
-            return _this.nsend(["user/facebook", Cmon.user_id(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]);
+            return _this.nsend(["user/facebook", Cmon.sid(), r.id, r.email, r.first_name, r.last_name, r.name, r.gender]);
           };
         })(this));
       } else {

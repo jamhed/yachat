@@ -9,7 +9,7 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
       @rt.pi @e
 
    query: ->
-      @nsend ["conv/users", Cmon.user_id(), Cmon.conv_id()], (status, List) => @draw List
+      @nsend ["conv/users", Cmon.sid(), Cmon.conv_id()], (status, List) => @draw List
 
    init: ->
       @sub "#bullet@conv/status/invite", (ev, args) => @query()
