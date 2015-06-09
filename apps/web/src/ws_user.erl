@@ -59,8 +59,7 @@ user_conv_list(_) -> [fail, protocol].
 % MESSAGES
 %
 
-%msg check online status by sid
-msg(M = <<"user/get">>, [Sid]) when is_number(Sid) ->
+msg(M = <<"user/get">>, []) when is_number(Sid) ->
    ?INFO("~s sid:~p", [M, Sid]),
    [M] ++ user_get(db_user:sid_to_uid(Sid));
 

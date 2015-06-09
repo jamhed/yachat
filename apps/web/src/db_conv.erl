@@ -16,14 +16,14 @@ get_by_users(Uid1, Uid2) ->
 get_by_type(Id, Type) ->
 	Q = qlc:q([C || C <- mnesia:table(conv), C#conv.id == Id, C#conv.type == Type]),
 	case dbd:do(Q) of
-		[C] -> {ok, C};
-		_   -> {err, not_found}
+		[C] -> [C];
+		_   -> []
 	end.
 
 find(Uid1, Uid2, Type) ->
 	case [ get_by_type(Id,Type) || Id <- get_by_users(Uid1, Uid2) ] of
-		[{ok, C}]  -> {ok, C};
-		_          -> {err, not_found}
+		[{ok, C}]  -> [C];
+		_          -> []
 	end.
 
 users(Cid) ->
