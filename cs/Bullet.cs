@@ -137,6 +137,7 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       @handler "user/logout", (e, args) =>
          @conv_status "part", null
          Cmon.set_conv_id null
+         window.location = "/"
 
    # utility functions
 
