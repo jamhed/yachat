@@ -18,6 +18,8 @@ $ make console
 TODO
 ====
 
+1. Check convId for validity
+2. Split to proper modules
 4. Separate config file (not sys.options)
 5. P2P Chats
 6. Count messages for diff. convs
