@@ -4,6 +4,9 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
+to_proplist([K,V | T]) -> [{K,V} | to_proplist(T)]; 
+to_proplist([]) -> [].
+
 get_user_info([]) -> [fail, not_found, []];
 get_user_info([#user{id=Uid}]) -> [ok, db_user:detail(Uid)];
 get_user_info(Err) -> ?ERR("get_user_info(): ~p", Err), [fail, protocol].
@@ -36,13 +39,6 @@ user_fb(FbId) when is_binary(FbId) ->
    [ok, Sid, User];
 user_fb(_) -> [fail, protocol, sid].
 
-
-% create user and session
-user_new(NewUid, ok) when is_number(NewUid) ->
-   Sid = db_user:online(#user{id=NewUid}, self()),
-   [ok, Sid, NewUid];
-user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail].
-
 % login user
 user_login(Password, [#user{id=Uid, password=Password}]) ->
    db_user:offline(self()),
@@ -51,18 +47,22 @@ user_login(Password, [#user{id=Uid, password=Password}]) ->
    [ok, Sid, User];
 user_login(_, []) -> [fail, match];
 user_login(_, _) -> [fail, protocol].
-  
-to_proplist([K,V | T]) -> [{K,V} | to_proplist(T)]; 
-to_proplist([]) -> [].
+ 
+% create user and session
+user_new(NewUid, ok) when is_number(NewUid) ->
+   Sid = db_user:online(#user{id=NewUid}, self()),
+   [ok, Sid, NewUid];
+user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail].
 
-check_keys([]) -> ne; 
-check_keys(_) -> e.
+check_keys(Uid, [#user{id=Uid}]) -> ne;
+check_keys(_, []) -> ne; 
+check_keys(_, _) -> e.
 
 check_user_keys(U, List) ->
    P = to_proplist(List),
    E = proplists:get_value(<<"email">>, P),
    Fb = proplists:get_value(<<"facebook_id">>, P),
-   [check_keys(db_user:get_by_email(E)), check_keys(db_user:get_by_fb(Fb))].
+   [check_keys(U#user.id, db_user:get_by_email(E)), check_keys(U#user.id, db_user:get_by_fb(Fb))].
 
 % update user
 user_update(Uid, List) when is_number(Uid), is_list(List) -> user_update(db_user:get(Uid), List);
