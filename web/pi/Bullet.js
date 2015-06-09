@@ -198,7 +198,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
         return function(e, args) {
           _this.conv_status("part", null);
           Cmon.set_conv_id(null);
-          return window.location = "/";
+          return window.location = "#";
         };
       })(this));
     };

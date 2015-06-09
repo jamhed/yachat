@@ -27,6 +27,7 @@ TODO
 8. Different user profiles -- full, short
 9. Date of birth/City fields
 10. File upload
+11. Stale session (logout/reconnect)
 
 DONE
 ====
