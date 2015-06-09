@@ -70,6 +70,7 @@ history(Cid, Limit) ->
 pids(Cid) -> lists:flatten( db_user:pids( users(Cid) ) ).
 
 notify(Cid, UserId, MsgId) ->
+   ?INFO("notify() ~p ~p ~p", [Cid, UserId, MsgId]),
    {ok, #message{text=Text,stamp=Stamp}} = db_msg:get(MsgId),
    notify(Cid, UserId, Stamp, Text).
 

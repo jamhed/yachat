@@ -25,14 +25,17 @@ user_info_list(Uid, List) when is_number(Uid), is_list(List) -> db_user:get(List
 user_info_list(_,_) -> [fail, protocol, sid].
 
 % get user
-user_get(Uid) when is_number(Uid) -> get_user_info(db_user:get(Uid));
+user_get(Uid) when is_number(Uid) ->
+   [U] = db_user:get(Uid),
+   db_user:online(U, self()),
+   get_user_info([U]);
 user_get(_) -> [fail].
 
 % create user and session
 user_new(NewUid, ok) when is_number(NewUid) ->
    Sid = db_user:online(#user{id=NewUid}, self()),
    [ok, Sid, NewUid];
-user_new(_, _) -> [fail].
+user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail].
 
 % login user
 user_login(Password, [#user{id=Uid, password=Password}]) ->
@@ -59,27 +62,27 @@ user_conv_list(_) -> [fail, protocol].
 % MESSAGES
 %
 
-msg(M = <<"user/get">>, []) when is_number(Sid) ->
-   ?INFO("~s sid:~p", [M, Sid]),
-   [M] ++ user_get(db_user:sid_to_uid(Sid));
+msg(M = <<"user/get">>, [Uid]) ->
+   ?INFO("~s uid: ~p", [M, Uid]),
+   [M] ++ user_get(Uid);
 
 %msg find user by facebook_id
-msg(M = <<"user/fb">>, [Sid, FbId]) when is_number(Sid) ->
-   ?INFO("~s sid:~p fbid:~p", [M, Sid, FbId]),
-   [M] ++ user_fb(db_user:sid_to_uid(Sid), FbId);
+msg(M = <<"user/fb">>, [Uid, FbId]) when is_number(Uid) ->
+   ?INFO("~s uid:~p fbid:~p", [M, Uid, FbId]),
+   [M] ++ user_fb(Uid, FbId);
 
 %msg find user by email
-msg(M = <<"user/email">>, [Sid, Email]) ->
-   ?INFO("~s sid:~p email:~p", [M, Sid, Email]),
-   [M] ++ user_email(db_user:sid_to_uid(Sid), Email);
+msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
+   ?INFO("~s sid:~p email:~p", [M, Uid, Email]),
+   [M] ++ user_email(Uid, Email);
 
 %msg get user info [Id, Name, Email, FirstName, LastName, Gender, Avatar]
-msg(M = <<"user/info">>, [Sid, Uid]) when is_number(Sid), is_number(Uid) ->
-   [M] ++ user_info(db_user:sid_to_uid(Sid), Uid);
+msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
+   [M] ++ user_info(Uid, PeerId);
 
 %msg get users info [[UserId, Name, Email], ..., ]
-msg(M = <<"user/info">>, [Sid, L]) when is_number(Sid), is_list(L) ->
-   [M] ++ user_info_list(db_user:sid_to_uid(Sid), L);
+msg(M = <<"user/info">>, [Uid, L]) when is_number(Uid), is_list(L) ->
+   [M] ++ user_info_list(Uid, L);
 
 %msg create new user
 msg(M = <<"user/new">>, []) ->
@@ -99,13 +102,14 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
-msg(M = <<"user/update">>, [Sid | List]) when is_number(Sid) ->
-   [M] ++ user_update(db_user:sid_to_uid(Sid), List);
+msg(M = <<"user/update">>, [Uid | List]) when is_number(Uid) ->
+   ?INFO("~s uid:~p List:~p", [M, Uid, List]),
+   [M] ++ user_update(Uid, List);
 
 %msg get user's convs 
-msg(M = <<"user/conv_list">>, [Sid]) when is_number(Sid) ->
-   ?INFO("~s uid:~p", [M, Sid]),
-   [M] ++ user_conv_list(db_user:sid_to_uid(Sid));
+msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ user_conv_list(Uid);
 
 % no match in this module
 msg(_, _) -> skip.

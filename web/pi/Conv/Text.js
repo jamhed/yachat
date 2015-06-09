@@ -29,7 +29,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     };
 
     ConvText.prototype.query = function() {
-      return this.nsend(["conv/history", Cmon.conv_id()], (function(_this) {
+      return this.nsend(["conv/history", Cmon.sid(), Cmon.conv_id()], (function(_this) {
         return function(status, rows) {
           return _this.draw(rows);
         };

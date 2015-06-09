@@ -11,7 +11,7 @@ conv_users(Uid, ConvId) when is_number(Uid) ->
 conv_users(_,_) -> [fail, args].
 
 % message history
-conv_history(Uid, ConvId) when is_number(Uid), is_number(ConvId) ->
+conv_history(SelfId, ConvId) when is_number(SelfId), is_number(ConvId) ->
    History = [ [db_user:detail(Uid), [cvt:now_to_time_binary(Stamp), Text]]
       || #message{stamp=Stamp,text=Text,user_id=Uid} <- db_conv:history(ConvId) ],
    [ok, History];
@@ -24,31 +24,35 @@ conv_new(Uid) when is_number(Uid) ->
 conv_new(_) -> [fail, args].
 
 % join conversation
-conv_join(Uid, ConvId) when is_number(Uid) -> db_conv:join(Uid, ConvId), [ok];
+conv_join(Uid, ConvId) when is_number(Uid) -> db_conv:join(Uid, ConvId), [ok, ConvId];
 conv_join(_,_) -> [fail, args].
 
 % leave conversation
 conv_leave(Uid, ConvId) when is_number(Uid) -> db_conv:leave(Uid, ConvId), [ok];
 conv_leave(_,_) -> [fail, args].
 
+%
+% MESSAGES
+%
+
 %msg group list
-msg(M = <<"conv/users">>, [Sid, ConvId]) when is_number(Sid), is_number(ConvId) ->
-   [M] ++ conv_users(db_user:sid_to_pid(Sid), ConvId);
+msg(M = <<"conv/users">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
+   [M] ++ conv_users(Uid, ConvId);
 
 %msg message history
-msg(M = <<"conv/history">>, [Sid, ConvId]) when is_number(Sid), is_number(ConvId)  ->
-   [M] ++ conv_history(db_user:sid_to_pid(Sid), ConvId);
+msg(M = <<"conv/history">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId)  ->
+   [M] ++ conv_history(Uid, ConvId);
 
 %msg create group
-msg(M = <<"conv/new">>, [Sid]) when is_number(Sid) ->
-   [M] ++ conv_new(db_user:sid_to_pid(Sid));
+msg(M = <<"conv/new">>, [Uid]) when is_number(Uid) ->
+   [M] ++ conv_new(Uid);
 
 %msg join group
-msg(M = <<"conv/join">>, [Sid, ConvId]) when is_number(Sid), is_number(ConvId) ->
-   [M] ++ conv_join(db_user:sid_to_pid(Sid), ConvId);
+msg(M = <<"conv/join">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
+   [M] ++ conv_join(Uid, ConvId);
 
 %msg leave group
-msg(M = <<"conv/leave">>, [Sid, ConvId]) when is_number(Sid), is_number(ConvId)  ->
-   [M] ++ conv_leave(db_user:sid_to_pid(Sid), ConvId);
+msg(M = <<"conv/leave">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId)  ->
+   [M] ++ conv_leave(Uid, ConvId);
 
 msg(_,_) -> skip.

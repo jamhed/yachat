@@ -119,8 +119,12 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
          
       @handler "conv/join", (e, args) =>
          [ status, convId ] = args
-         Cmon.set_conv_id convId
-         @conv_status "join", convId
+         if status == "ok"
+            Cmon.set_conv_id convId
+            @conv_status "join", convId
+         else
+            @conv_status "part"
+            @error "Error join conversation!"
 
       @handler "conv/leave", (e, args) =>
          [ status, convId ] = args
@@ -177,7 +181,7 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       if chatId
          @send "conv/join", Cmon.sid(), chatId
       else
-         if Cmon.user_id()
+         if Cmon.sid()
             @send "conv/new", Cmon.sid()
 
    leave_conv: ->
@@ -186,14 +190,14 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
    pub_event: (ev, args...) -> @event ev, args
 
    anonymous: ->
-      @send "user/new"
+      @send "user/new", []
 
    login: (a...) ->
       h = Cmon.list2hash a
       @send "user/login", h.email, h.password
 
    logout: ->
-      @send "user/logout"
+      @send "user/logout", []
       Cmon.set_sid null
       @user_status "not_logged"
       window.location="#"

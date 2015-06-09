@@ -21,18 +21,20 @@ stream(JSON, Req, State) ->
       _ ->
          case jiffy:decode(JSON) of
             % numbered messages
-            [ <<"nmsg">>, Seq, [Msg | Args] ] when is_number(Seq) ->
-               ?INFO("N-MSG: ~p MSG: ~p ARGS: ~p", [Seq, Msg, Args]),
-               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, Args),
+            [ <<"nmsg">>, Seq, [Msg, Sid | Args] ] when is_number(Seq) ->
+               ?INFO("N-MSG: ~p MSG: ~p SID: ~p ARGS: ~p", [Seq, Msg, Sid, Args]),
+               Uid = db_user:sid_to_uid(Sid),
+               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, [Uid] ++ Args),
                Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
                ?INFO("N-MSG REPLY: ~p", [Reply]),
                {reply, Reply, Req, State};
             % authorized messages with Sid
             [ Msg, Sid | Args ] when is_number(Sid), is_list(Args) ->
                ?INFO("A-MSG: ~p SID: ~p ARGS: ~p", [Msg, Sid, Args]),
-               Uid = db_user:sid_to_pid(Sid),
-               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stup], Msg, Uid ++ Args),
+               Uid = db_user:sid_to_uid(Sid),
+               Raw = route_msg([ws_user, ws_msg, ws_conv, ws_stub], Msg, [Uid] ++ Args),
                Reply = jiffy:encode(Raw),
+               ?INFO("A-MSG REPLY: ~p", [Reply]),
                {reply, Reply, Req, State};
             % unauthorized messages
             [ Msg, Args ] when is_list(Args) ->

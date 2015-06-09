@@ -8,7 +8,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
          [user, msg] = row
          @append user, msg
 
-   query: -> @nsend ["conv/history", Cmon.conv_id()], (status, rows) => @draw rows
+   query: -> @nsend ["conv/history", Cmon.sid(), Cmon.conv_id()], (status, rows) => @draw rows
 
    init: ->
       @sub "#bullet@new_msg", (e, args) =>

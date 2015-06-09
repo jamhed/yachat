@@ -13,12 +13,14 @@ put(Cid, UserId, Message) ->
 	dbd:put(#message{id=MsgId, conv_id=Cid, user_id=UserId, text=Message, stamp=now()}),
 	MsgId.
 
-notify(_, _, _, []) -> ok;
 notify(Cid, SenderId, Message, [ H | T]) ->
+   ?INFO("notify() ~p ~p ~p ~p ~p", [Cid, SenderId, Message, H, self()]),
 	H ! {new_msg, Cid, SenderId, Message},
-	notify(Cid, SenderId, Message, T).
+	notify(Cid, SenderId, Message, T);
+notify(_, _, _, []) -> ok.
 
-sys_notify(_, _, _, []) -> ok;
 sys_notify(Cid, UserId, Message, [ H | T]) ->
 	H ! {sys_msg, Cid, UserId, Message},
-	sys_notify(Cid, UserId, Message, T).
+	sys_notify(Cid, UserId, Message, T);
+sys_notify(_, _, _, []) -> ok.
+

@@ -177,8 +177,13 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          Cmon.set_conv_id(convId);
-          return _this.conv_status("join", convId);
+          if (status === "ok") {
+            Cmon.set_conv_id(convId);
+            return _this.conv_status("join", convId);
+          } else {
+            _this.conv_status("part");
+            return _this.error("Error join conversation!");
+          }
         };
       })(this));
       this.handler("conv/leave", (function(_this) {
@@ -255,7 +260,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       if (chatId) {
         return this.send("conv/join", Cmon.sid(), chatId);
       } else {
-        if (Cmon.user_id()) {
+        if (Cmon.sid()) {
           return this.send("conv/new", Cmon.sid());
         }
       }
@@ -272,7 +277,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
     };
 
     Bullet.prototype.anonymous = function() {
-      return this.send("user/new");
+      return this.send("user/new", []);
     };
 
     Bullet.prototype.login = function() {
@@ -283,7 +288,7 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
     };
 
     Bullet.prototype.logout = function() {
-      this.send("user/logout");
+      this.send("user/logout", []);
       Cmon.set_sid(null);
       this.user_status("not_logged");
       return window.location = "#";

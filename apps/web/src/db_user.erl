@@ -97,5 +97,6 @@ online(#user{id=Uid}, Pid) ->
          Sid;
       [UO] ->
          ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),
+         dbd:put(UO#user_online{pid=Pid}),
          UO#user_online.session_id
    end.
