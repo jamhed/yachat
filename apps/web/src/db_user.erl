@@ -85,14 +85,14 @@ clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_on
 drop_online_status([]) -> ok;
 drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
-   notify_conv(Uid, <<"offline">>, conv(Uid)),
+   notify_conv(<<"offline">>, conv(Uid)),
    dbd:delete(user_online, Id),
    drop_online_status(R).
 
 drop_online_status_k([]) -> ok;
 drop_online_status_k([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
-   notify_conv(Uid, <<"offline">>, conv(Uid)),
+   notify_conv(<<"offline">>, conv(Uid)),
    drop_online_status(R).
 
 
@@ -104,10 +104,10 @@ logout(Pid) ->
    R = dbd:index(user_online, pid, Pid),
    drop_online_status(R).
 
-notify_conv(_,_,[]) -> ok;
-notify_conv(Uid, Text, [H | T]) ->
-   db_conv:sys_notify(H, Uid, Text),
-   notify_conv(Uid, Text, T).
+notify_conv(_,[]) -> ok;
+notify_conv(Text, [H | T]) ->
+   db_conv:sys_notify(H, Text),
+   notify_conv(Text, T).
 
 online(#user{id=Uid}, Pid) ->
    case dbd:index(user_online, pid, Pid) of
@@ -120,7 +120,7 @@ online(#user{id=Uid}, Pid) ->
             pid=Pid,
             user_id=Uid,
             session_id=Sid}),
-         notify_conv(Uid, <<"online">>, conv(Uid)),
+         notify_conv(<<"online">>, conv(Uid)),
          Sid;
       [UO] ->
          ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),

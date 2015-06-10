@@ -26,7 +26,7 @@ TODO
 7. Filter messages for current conv in Dumper
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
-13. notify peer on p2p
+13. proper sys_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
 
 DONE
 ====
@@ -58,4 +58,5 @@ DONE
 26. Date of birth/City fields
 27. Different user profiles -- full, short
 28. P2P Chats
+29. notify peer on p2p
 

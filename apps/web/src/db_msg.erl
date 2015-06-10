@@ -19,8 +19,8 @@ notify(Cid, SenderId, Message, [ H | T]) ->
 	notify(Cid, SenderId, Message, T);
 notify(_, _, _, []) -> ok.
 
-sys_notify(Cid, UserId, Message, [ H | T]) ->
-	H ! {sys_msg, Cid, UserId, Message},
-	sys_notify(Cid, UserId, Message, T);
-sys_notify(_, _, _, []) -> ok.
+sys_notify(Cid, Message, [ H | T]) ->
+	H ! {conv_msg, Cid, Message},
+	sys_notify(Cid, Message, T);
+sys_notify(_, _, []) -> ok.
 

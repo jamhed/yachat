@@ -62,8 +62,17 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          else
             @error "no callback for seq", seq
       
-      @handler "sys_msg", (e, args) =>
-         [cid,user,[stamp,ev]] = args 
+      @handler "conv_msg", (e, [convId, [stamp,msg]]) =>
+         # p2p chat
+         if msg == "p2p"
+            Cmon.set_conv_id convId
+            @conv_status "join", convId
+         if msg == "part"
+            @debug "PART", convId
+         if msg == "join"
+            @debug "JOIN", convId
+
+
 
       # user events (logged, registered, not_logged)
 
@@ -133,10 +142,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @handler "user/p2p", (e, args) =>
          [ status, convId ] = args
-         if status == "ok"
-            Cmon.set_conv_id convId
-            @conv_status "join", convId
-         else
+         if status != "ok"
             @error "Error making p2p!"
 
       @handler "conv/leave", (e, args) =>

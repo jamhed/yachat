@@ -58,10 +58,10 @@ info({new_msg, ConvId, SenderId, Text}, Req, State) ->
    ?INFO("IN-MSG OUT: ~p", [Reply]),
    {reply, Reply, Req, State};
 
-info({sys_msg, ConvId, Uid, Status}, Req, State) ->
-   ?INFO("SYS-MSG: ~p ~p ~p", [ConvId, Uid, Status]),
-   Reply = jiffy:encode([sys_msg, ConvId, db_user:detail_short(Uid), Status]),
-   ?INFO("SYS OUT: ~p", [Reply]),
+info({conv_msg, ConvId, Status}, Req, State) ->
+   ?INFO("CONV-MSG: ~p ~p", [ConvId, Status]),
+   Reply = jiffy:encode([conv_msg, ConvId, Status]),
+   ?INFO("CONV OUT: ~p", [Reply]),
    {reply, Reply, Req, State}.
 
 terminate(_Req, State) ->

@@ -41,14 +41,18 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
         return function(e, args) {
           var convId, msg, user;
           convId = args[0], user = args[1], msg = args[2];
-          return _this.append(user, msg);
+          if (convId === Cmon.conv_id()) {
+            return _this.append(user, msg);
+          }
         };
       })(this));
-      this.sub("#bullet@sys_msg", (function(_this) {
+      this.sub("#bullet@conv_msg", (function(_this) {
         return function(e, args) {
-          var convId, msg, user;
-          convId = args[0], user = args[1], msg = args[2];
-          return _this.append(user, msg);
+          var convId, msg;
+          convId = args[0], msg = args[1];
+          if (convId === Cmon.conv_id()) {
+            return _this.append([1, "system"], msg);
+          }
         };
       })(this));
       this.sub("#bullet@conv/status/part", (function(_this) {

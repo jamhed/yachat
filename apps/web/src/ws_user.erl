@@ -83,7 +83,8 @@ user_conv_list(Uid) when is_number(Uid) ->
 user_conv_list(_) -> [fail, protocol].
 
 user_p2p(Uid, PeerId) ->
-   Cid = db_conv:p2p(Uid,PeerId),
+   Cid = db_conv:p2p(Uid, PeerId),
+   db_conv:sys_notify(Cid, <<"p2p">>),
    [ok, Cid].
 
 %

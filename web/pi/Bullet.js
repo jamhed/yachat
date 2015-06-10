@@ -99,10 +99,20 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           }
         };
       })(this));
-      this.handler("sys_msg", (function(_this) {
-        return function(e, args) {
-          var cid, ev, ref, stamp, user;
-          return cid = args[0], user = args[1], (ref = args[2], stamp = ref[0], ev = ref[1]), args;
+      this.handler("conv_msg", (function(_this) {
+        return function(e, arg) {
+          var convId, msg, ref, stamp;
+          convId = arg[0], (ref = arg[1], stamp = ref[0], msg = ref[1]);
+          if (msg === "p2p") {
+            Cmon.set_conv_id(convId);
+            _this.conv_status("join", convId);
+          }
+          if (msg === "part") {
+            _this.debug("PART", convId);
+          }
+          if (msg === "join") {
+            return _this.debug("JOIN", convId);
+          }
         };
       })(this));
       this.handler("user/new", (function(_this) {
@@ -192,10 +202,7 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          if (status === "ok") {
-            Cmon.set_conv_id(convId);
-            return _this.conv_status("join", convId);
-          } else {
+          if (status !== "ok") {
             return _this.error("Error making p2p!");
           }
         };

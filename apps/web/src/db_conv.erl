@@ -66,13 +66,13 @@ generic(Uid) ->
 join(Uid, Cid) ->
    case is_user_in(Uid, Cid) of
       []  ->
-         sys_notify(Cid,Uid,<<"join">>),
-         dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()});
+         dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()}),
+         sys_notify(Cid,<<"join">>);
       Err -> Err
    end.
 
 leave(Uid, Cid) ->
-   sys_notify(Cid,Uid,<<"part">>),
+   sys_notify(Cid,<<"part">>),
    [ dbd:delete(user_conv, Id) || Id <- is_user_in(Uid, Cid) ].
 
 history(Cid) -> history(Cid, 10).
@@ -91,5 +91,5 @@ notify(Cid, UserId, MsgId) ->
 notify(Cid, UserId, Stamp, Text) ->
    db_msg:notify( Cid, UserId, [cvt:now_to_time_binary(Stamp), Text], db_conv:pids(Cid) ).
 
-sys_notify(Cid, UserId, Text) ->
-   db_msg:sys_notify( Cid, UserId, [cvt:now_to_time_binary(now()), Text], db_conv:pids(Cid) ).
+sys_notify(Cid, Text) ->
+   db_msg:sys_notify( Cid, [cvt:now_to_time_binary(now()), Text], db_conv:pids(Cid) ).
