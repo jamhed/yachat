@@ -35,13 +35,27 @@ is_user_in(Uid, Cid) ->
 	dbd:do(Q).
 
 % make
-
-p2p(Uid1, Uid2) ->
-	Cid = dbd:make_uid(),
-	dbd:put(#conv{id=Cid, type="p2p", stamp=now()}),
+p2p(Cid, Uid1, Uid2) when is_number(Cid), is_number(Uid1), is_number(Uid2) ->
 	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid1, conv_id=Cid, stamp=now()}),
 	dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid2, conv_id=Cid, stamp=now()}),
+   Cid.
+
+new_p2p_conv() ->
+	Cid = dbd:make_uid(),
+	dbd:put(#conv{id=Cid, type="p2p", stamp=now()}),
 	Cid.
+
+get_p2p_cid(Uid1, Uid2) ->
+   case find(Uid1, Uid2, "p2p") of
+      [C] -> C#conv.id;
+      _ ->
+         case find(Uid2, Uid1, "p2p") of
+            [C] -> C#conv.id;
+            _ -> new_p2p_conv()
+         end
+   end.
+
+p2p(Uid1, Uid2) -> p2p(get_p2p_cid(Uid1, Uid2), Uid1, Uid2).
 
 generic(Uid) ->
 	Cid = dbd:make_uid(),

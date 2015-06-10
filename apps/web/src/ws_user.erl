@@ -82,6 +82,10 @@ user_conv_list(Uid) when is_number(Uid) ->
    [ok, Convs];
 user_conv_list(_) -> [fail, protocol].
 
+user_p2p(Uid, PeerId) ->
+   Cid = db_conv:p2p(Uid,PeerId),
+   [ok, Cid].
+
 %
 % MESSAGES
 %
@@ -107,6 +111,10 @@ msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
 %msg get user info 
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);
+
+%msg get user info 
+msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
+   [M] ++ user_p2p(Uid, PeerId);
 
 %msg get users info [[UserId, Name, Email], ..., ]
 msg(M = <<"user/info">>, [Uid, L]) when is_number(Uid), is_list(L) ->

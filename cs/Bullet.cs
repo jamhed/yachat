@@ -131,6 +131,14 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             @conv_status "part"
             @error "Error join conversation!"
 
+      @handler "user/p2p", (e, args) =>
+         [ status, convId ] = args
+         if status == "ok"
+            Cmon.set_conv_id convId
+            @conv_status "join", convId
+         else
+            @error "Error making p2p!"
+
       @handler "conv/leave", (e, args) =>
          [ status, convId ] = args
          @conv_status "part", convId
@@ -210,9 +218,14 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
    send_msg: (msg) -> @send "msg/conv", Cmon.sid(), Cmon.conv_id(), msg
 
+   init_p2p: (args) ->
+      peerId = args.user_id
+      if peerId?
+         @send "user/p2p", Cmon.sid(), peerId
+
    invite: (a...) ->
       h = Cmon.list2hash a
-      @nsend ["user/email", h.email], (status, user) =>
+      @nsend ["user/email", Cmon.sid(), h.email], (status, user) =>
          if status == "ok"
             [id,name,email] = user
             @nsend ["conv/join", id, Cmon.conv_id()], (status, convId) =>

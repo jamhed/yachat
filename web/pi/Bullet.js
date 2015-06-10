@@ -188,6 +188,18 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           }
         };
       })(this));
+      this.handler("user/p2p", (function(_this) {
+        return function(e, args) {
+          var convId, status;
+          status = args[0], convId = args[1];
+          if (status === "ok") {
+            Cmon.set_conv_id(convId);
+            return _this.conv_status("join", convId);
+          } else {
+            return _this.error("Error making p2p!");
+          }
+        };
+      })(this));
       this.handler("conv/leave", (function(_this) {
         return function(e, args) {
           var convId, status;
@@ -301,11 +313,19 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       return this.send("msg/conv", Cmon.sid(), Cmon.conv_id(), msg);
     };
 
+    Bullet.prototype.init_p2p = function(args) {
+      var peerId;
+      peerId = args.user_id;
+      if (peerId != null) {
+        return this.send("user/p2p", Cmon.sid(), peerId);
+      }
+    };
+
     Bullet.prototype.invite = function() {
       var a, h;
       a = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       h = Cmon.list2hash(a);
-      return this.nsend(["user/email", h.email], (function(_this) {
+      return this.nsend(["user/email", Cmon.sid(), h.email], (function(_this) {
         return function(status, user) {
           var email, id, name;
           if (status === "ok") {
