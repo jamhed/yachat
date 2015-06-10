@@ -22,10 +22,11 @@ TODO
 1. Check convId for validity
 2. Split to proper modules
 4. Separate config file (not sys.options)
-5. P2P Chats
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
 11. Stale session (logout/reconnect)
+12. on leaving p2p conv destroy it
+13. notify peer on p2p
 
 DONE
 ====
@@ -56,4 +57,5 @@ DONE
 25. Session ids
 26. Date of birth/City fields
 27. Different user profiles -- full, short
+28. P2P Chats
 
