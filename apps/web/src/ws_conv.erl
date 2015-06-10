@@ -6,13 +6,13 @@
 % list users in conversation
 conv_users(Uid, ConvId) when is_number(Uid) ->
    List = db_conv:users(ConvId),
-   UserDetailList = db_user:detail(List),
+   UserDetailList = db_user:detail_short(List),
    [ok, UserDetailList];
 conv_users(_,_) -> [fail, args].
 
 % message history
 conv_history(SelfId, ConvId) when is_number(SelfId), is_number(ConvId) ->
-   History = [ [db_user:detail(Uid), [cvt:now_to_time_binary(Stamp), Text]]
+   History = [ [db_user:detail_short(Uid), [cvt:now_to_time_binary(Stamp), Text]]
       || #message{stamp=Stamp,text=Text,user_id=Uid} <- db_conv:history(ConvId) ],
    [ok, History];
 conv_history(_,_) -> [fail, agrs].

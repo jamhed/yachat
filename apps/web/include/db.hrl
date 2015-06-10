@@ -1,5 +1,5 @@
 % conversations. type=p2p, group, game
--record(user, {id, stamp, username, firstname, lastname, gender, email, password, facebook_id, avatar}).
+-record(user, {id, stamp, username, firstname, lastname, gender, email, password, facebook_id, avatar, birthdate, city}).
 -record(conv, {id, stamp, type}).
 -record(conv_msg, {conv_id, last_id}).
 -record(user_msg, {user_id, last_id}).

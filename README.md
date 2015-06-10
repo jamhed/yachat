@@ -18,15 +18,13 @@ $ make console
 TODO
 ====
 
+0. File upload
 1. Check convId for validity
 2. Split to proper modules
 4. Separate config file (not sys.options)
 5. P2P Chats
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
-8. Different user profiles -- full, short
-9. Date of birth/City fields
-10. File upload
 11. Stale session (logout/reconnect)
 
 DONE
@@ -56,3 +54,6 @@ DONE
 23. Invite user to conv by name/email
 24. Online status (connection on/off)
 25. Session ids
+26. Date of birth/City fields
+27. Different user profiles -- full, short
+

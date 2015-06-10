@@ -4,7 +4,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], function(Pi, Bullet, Cmon) {
+define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
   return Bullet = (function(superClass) {
     extend(Bullet, superClass);
 
@@ -30,16 +30,18 @@ define(["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
     };
 
     Bullet.prototype.init = function() {
-      FB.init({
-        appId: this.a.fb_app,
-        xfbml: true,
-        version: "v2.3"
-      });
-      FB.getLoginStatus((function(_this) {
-        return function(r) {
-          return _this.handle_fb_auth(r);
-        };
-      })(this));
+      if (typeof FB !== "undefined" && FB !== null) {
+        FB.init({
+          appId: this.a.fb_app,
+          xfbml: true,
+          version: "v2.3"
+        });
+        FB.getLoginStatus((function(_this) {
+          return function(r) {
+            return _this.handle_fb_auth(r);
+          };
+        })(this));
+      }
       this.cb_nsend = {};
       this.uri = this.a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/";
       this.bullet = $.bullet(this.uri, {

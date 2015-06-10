@@ -1,4 +1,5 @@
-define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+# define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
    seq: 0
    cb_nsend: null
@@ -13,12 +14,13 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 
    init: ->
 
-      FB.init
-         appId: @a.fb_app
-         xfbml: true
-         version: "v2.3"
+      if FB?
+         FB.init
+            appId: @a.fb_app
+            xfbml: true
+            version: "v2.3"
       
-      FB.getLoginStatus (r) => @handle_fb_auth r
+         FB.getLoginStatus (r) => @handle_fb_auth r
 
       @cb_nsend = {}
 

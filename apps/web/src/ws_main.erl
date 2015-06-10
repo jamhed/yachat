@@ -12,7 +12,7 @@ route_msg([H|T], M,A) ->
       Ret   -> Ret
    end.
 
-module_route(Uid, Msg, Args) when is_number(Uid) -> module_route(Msg, [Uid] ++ Args).
+module_route(Uid, Msg, Args) -> module_route(Msg, [Uid] ++ Args).
 module_route(Msg, Args) -> route_msg(handlers(), Msg, Args).
 
 pre_handle(Req, State, [<<"nmsg">>, Seq, [Msg, Sid | Args]]) when is_number(Seq), is_number(Sid)  ->
@@ -54,13 +54,13 @@ info({msg, _Sender, Data}, Req, State) ->
 
 info({new_msg, ConvId, SenderId, Text}, Req, State) ->
    ?INFO("IN-MSG: ~p ~p ~p", [ConvId, SenderId, Text]),
-   Reply = jiffy:encode([new_msg, ConvId, db_user:detail(SenderId), Text]),
+   Reply = jiffy:encode([new_msg, ConvId, db_user:detail_short(SenderId), Text]),
    ?INFO("IN-MSG OUT: ~p", [Reply]),
    {reply, Reply, Req, State};
 
 info({sys_msg, ConvId, Uid, Status}, Req, State) ->
    ?INFO("SYS-MSG: ~p ~p ~p", [ConvId, Uid, Status]),
-   Reply = jiffy:encode([sys_msg, ConvId, db_user:detail(Uid), Status]),
+   Reply = jiffy:encode([sys_msg, ConvId, db_user:detail_short(Uid), Status]),
    ?INFO("SYS OUT: ~p", [Reply]),
    {reply, Reply, Req, State}.
 
