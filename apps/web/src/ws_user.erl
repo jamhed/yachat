@@ -91,14 +91,30 @@ user_p2p(Uid, PeerId) ->
 % MESSAGES
 %
 
+
+%msg login anonymously, create new user
+msg(M = <<"user/new">>, []) ->
+   ?INFO("~s new", [M]),
+   NewUID = dbd:make_uid(),
+   [M] ++ user_new(NewUID, dbd:put(#user{id=NewUID, stamp=now()}));
+
+%msg login by email and password
+msg(M = <<"user/login">>, [Email, Password]) ->
+   ?INFO("~s email:~p password:~p", [M, Email, Password]),
+   [M] ++ user_login(Password, db_user:get_by_email(Email));
+
+%msg login by by facebook_id
+msg(M = <<"user/fb">>, [FbId]) ->
+   ?INFO("~s fbid:~p", [M, FbId]),
+   [M] ++ user_fb(FbId);
+
+%msg check stored Sid 
 msg(M = <<"user/get">>, [Uid]) ->
    ?INFO("~s uid: ~p", [M, Uid]),
    [M] ++ user_get(Uid);
 
-%msg find user by facebook_id
-msg(M = <<"user/fb">>, [FbId]) ->
-   ?INFO("~s fbid:~p", [M, FbId]),
-   [M] ++ user_fb(FbId);
+
+
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
@@ -120,17 +136,6 @@ msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
 %msg get users info [[UserId, Name, Email], ..., ]
 msg(M = <<"user/info">>, [Uid, L]) when is_number(Uid), is_list(L) ->
    [M] ++ user_info_list(Uid, L);
-
-%msg create new user
-msg(M = <<"user/new">>, []) ->
-   ?INFO("~s new", [M]),
-   NewUID = dbd:make_uid(),
-   [M] ++ user_new(NewUID, dbd:put(#user{id=NewUID, stamp=now()}));
-
-%msg login by email and password
-msg(M = <<"user/login">>, [Email, Password]) ->
-   ?INFO("~s email:~p password:~p", [M, Email, Password]),
-   [M] ++ user_login(Password, db_user:get_by_email(Email));
 
 %msg logout
 msg(M = <<"user/logout">>, []) ->
