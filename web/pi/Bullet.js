@@ -115,6 +115,14 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           }
         };
       })(this));
+      this.handler("sys_msg", (function(_this) {
+        return function(e, arg) {
+          var id, msg, ref;
+          ref = arg[0], msg = ref[0], id = ref[1];
+          _this.debug("sys msg", msg);
+          return _this.event("sys/" + msg, id);
+        };
+      })(this));
       this.handler("user/new", (function(_this) {
         return function(e, args) {
           var sessionId, status, userId;

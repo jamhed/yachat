@@ -29,18 +29,32 @@ multipart(Req, Prop) ->
 
 get_props(Plist, Props) -> [ proplists:get_value(Prop, Plist) || Prop <- Props ].
 
-write_user_file(Store, Data, Uid, Type, Mime) when is_number(Uid) ->
+user_file_store([[Id, _]], Mime, Store, _, _, Data) ->
+   {ok,File} = dbd:get(user_file, Id),
+   Path = filename:join(Store, integer_to_list(Id)),
+   file:write_file(Path, Data),
+   dbd:put(File#user_file{ mime=Mime }),
+   Id;
+
+user_file_store([], Mime, Store, Uid, Type, Data) ->
    FileId = dbd:make_uid(),
    Path = filename:join(Store, integer_to_list(FileId)),
    file:write_file(Path, Data),
-   dbd:put(#user_file{ id=FileId, user_id=Uid, stamp=now(), mime=Mime, type=Type }).
+   dbd:put(#user_file{ id=FileId, user_id=Uid, stamp=now(), mime=Mime, type=Type }),
+   FileId.
+
+write_user_file(Store, Data, Uid, Type, Mime) when is_number(Uid) ->
+   FileId = user_file_store( db_user:files(Uid, Type), Mime, Store, Uid, Type, Data),
+   db_msg:sys_notify(Uid, [<<"avatar/upload">>, FileId]),
+   ok.
 
 handle_upload(Req, StorePath) ->
    Plist = multipart(Req, []),
    [Sid, Data, Mime, Type] = get_props(Plist, [sid,file,mime,type]),
    Uid = db_user:sid_to_uid(erlang:binary_to_integer(Sid)),
    write_user_file(StorePath, Data, Uid, Type, Mime),
-   {ok, Req}.
+   % cowboy_req:reply(200, Req). BUG?
+   cowboy_req:reply(200, [{<<"connection">>, <<"close">>}], Req).
 
 handle_get_file([#user_file{ id=FileId, mime=Type }], Req, StorePath ) ->
    Path = filename:join(StorePath, integer_to_list(FileId)),

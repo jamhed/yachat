@@ -19,8 +19,13 @@ notify(Cid, SenderId, Message, [ H | T]) ->
 	notify(Cid, SenderId, Message, T);
 notify(_, _, _, []) -> ok.
 
-sys_notify(Cid, Message, [ H | T]) ->
+conv_notify(Cid, Message, [ H | T]) ->
 	H ! {conv_msg, Cid, Message},
-	sys_notify(Cid, Message, T);
-sys_notify(_, _, []) -> ok.
+	conv_notify(Cid, Message, T);
+conv_notify(_, _, []) -> ok.
 
+
+sys_notify_one(Pid, Message) -> Pid ! {sys_msg, Message}.
+
+sys_notify(Uid, Message) ->
+   [ sys_notify_one(UO#user_online.pid, Message) || UO <- db_user:get_online_status(Uid) ].

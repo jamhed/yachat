@@ -61,13 +61,13 @@ files(Uid) ->
 	Q = qlc:q([ [C#user_file.id,C#user_file.type,C#user_file.mime] || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
 	dbd:do(Q).
 
-list_online(_) ->
-	Q = qlc:q([ detail_short(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
-	dbd:do(Q).
-
 files(Uid, Type) ->
 	Q = qlc:q([ [C#user_file.id, C#user_file.mime] || C <- mnesia:table(user_file),
       C#user_file.user_id == Uid, C#user_file.type == Type ]),
+	dbd:do(Q).
+
+list_online(_) ->
+	Q = qlc:q([ detail_short(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
 	dbd:do(Q).
 
 pids([H | T]) -> [ pids(H) ] ++ [ pids(Uid) || Uid <- T ];
@@ -118,7 +118,7 @@ logout(Pid) ->
 
 notify_conv(_,[]) -> ok;
 notify_conv(Text, [H | T]) ->
-   db_conv:sys_notify(H, Text),
+   db_conv:conv_notify(H, Text),
    notify_conv(Text, T).
 
 get_online_status(Uid) ->

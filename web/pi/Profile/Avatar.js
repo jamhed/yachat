@@ -12,10 +12,12 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     }
 
     ConvText.prototype.draw = function(avatarList) {
-      var id, im, ref, type;
+      var id, im, ref, stamp, type;
       this.clear();
       ref = avatarList[0], id = ref[0], type = ref[1];
-      im = $("<img>").attr("src", "/store/avatar/" + id).addClass("img-responsive");
+      stamp = Date.now();
+      this.debug(id, stamp);
+      im = $("<img>").attr("src", "/store/avatar/" + id + "?" + stamp).addClass("img-responsive");
       return this.e.append(im);
     };
 
@@ -28,6 +30,11 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     };
 
     ConvText.prototype.init = function() {
+      this.sub("#bullet@sys/avatar/upload", (function(_this) {
+        return function(e, avatarId) {
+          return _this.draw([[avatarId, "image"]]);
+        };
+      })(this));
       return this.wait_ajax_done((function(_this) {
         return function() {
           return _this.query();
