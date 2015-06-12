@@ -57,6 +57,19 @@ conv(Uid) ->
 	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
 	dbd:do(Q).
 
+files(Uid) ->
+	Q = qlc:q([ {C#user_file.id,C#user_file.type,C#user_file.mime} || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
+	dbd:do(Q).
+
+list_online(_) ->
+	Q = qlc:q([ detail_short(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
+	dbd:do(Q).
+
+files(Uid, Type) ->
+	Q = qlc:q([ {C#user_file.id, C#user_file.mime} || C <- mnesia:table(user_file),
+      C#user_file.user_id == Uid, C#user_file.type == Type ]),
+	dbd:do(Q).
+
 pids([H | T]) -> [ pids(H) ] ++ [ pids(Uid) || Uid <- T ];
 pids(Uid) ->
 	Q = qlc:q([ U#user_online.pid || U <- mnesia:table(user_online), U#user_online.user_id == Uid ]),
@@ -90,9 +103,9 @@ drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
 
 drop_online_status_k([]) -> ok;
 drop_online_status_k([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
-   ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
+   ?INFO("drop_online_status_k: id=~p pid=~p", [Id, Pid]),
    notify_conv(<<"offline">>, conv(Uid)),
-   drop_online_status(R).
+   drop_online_status_k(R).
 
 
 offline(Pid) ->
@@ -108,8 +121,12 @@ notify_conv(Text, [H | T]) ->
    db_conv:sys_notify(H, Text),
    notify_conv(Text, T).
 
+get_online_status(Uid) ->
+	Q = qlc:q([ C || C <- mnesia:table(user_online), C#user_online.user_id == Uid ]),
+	dbd:do(Q).
+
 online(#user{id=Uid}, Pid) ->
-   case dbd:index(user_online, pid, Pid) of
+   case get_online_status(Uid) of
       [] ->
          ?INFO("user_online: user_id=~p pid=~p", [Uid, Pid]),
          Sid = dbd:make_uid(),

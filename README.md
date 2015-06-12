@@ -26,7 +26,8 @@ TODO
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
 13. proper sys_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
-14. file upload polishing: button css, type, content type, size -- separate table
+14. multiple upload handling
+17. user/update to use Jiffy built-in proplists 
 
 DONE
 ====
@@ -60,4 +61,7 @@ DONE
 28. P2P Chats
 29. notify peer on p2p
 30. File upload
+31. file upload polishing: button css, type, content type, size -- separate table
+32. user files list (by user_id, by type)
+33. online user list
 

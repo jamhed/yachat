@@ -3,7 +3,7 @@
       <div class="col-md-12">
          <h1>Edit profile</h1>
       </div><!-- col-md-12 -->
-      <div class="col-md-12">
+      <div class="col-md-8 col-sm-8 col-xs-8">
          <div class="form-group">
             <label for="username">User name</label>
             <input type="username" class="form-control form" id="username" placeholder="User your name">
@@ -17,8 +17,18 @@
             <input type="password" class="form-control form" id="password" placeholder="Password">
          </div><!-- form-group -->
       </div>
-      <input pi="Upload" type="file" name="avatar" data-url="/store">
-      <div class="col-md-12">
+
+      <div class="col-md-4 col-sm-4 col-xs-4" pi="Profile/Avatar">
+      </div>
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+         <span class="btn btn-default fileinput-button">
+            <span>Upload avatar</span>
+            <input pi="Upload" type="file" name="avatar" data-url="/store">
+         </span>
+      </div>
+      
+      <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px">
          <button type="submit" class="btn btn-default" pi="Form" el=".form" target="parent@update">Update</button>
          <div pi="Login/Facebook" style="display: none">
             <button type="submit" class="btn" style="margin-left: 20px" pi="pi/Button" target="#bullet@register_facebook">Update with Facebook</button>

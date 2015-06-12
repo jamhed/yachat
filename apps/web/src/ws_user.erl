@@ -82,6 +82,21 @@ user_conv_list(Uid) when is_number(Uid) ->
    [ok, Convs];
 user_conv_list(_) -> [fail, protocol].
 
+user_file_list(Uid) when is_number(Uid) ->
+   Files = db_user:files(Uid),
+   [ok, Files];
+user_file_list(_) -> [fail, protocol].
+
+user_file_list(Uid, Type) when is_number(Uid) ->
+   Files = db_user:files(Uid, Type),
+   [ok, Files];
+user_file_list(_, _) -> [fail, protocol].
+
+user_online_list(Uid) when is_number(Uid) ->
+   Files = db_user:list_online(Uid),
+   [ok, Files];
+user_online_list(_) -> [fail, protocol].
+
 user_p2p(Uid, PeerId) ->
    Cid = db_conv:p2p(Uid, PeerId),
    db_conv:sys_notify(Cid, <<"p2p">>),
@@ -112,9 +127,6 @@ msg(M = <<"user/fb">>, [FbId]) ->
 msg(M = <<"user/get">>, [Uid]) ->
    ?INFO("~s uid: ~p", [M, Uid]),
    [M] ++ user_get(Uid);
-
-
-
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
@@ -152,6 +164,22 @@ msg(M = <<"user/update">>, [Uid | List]) when is_number(Uid) ->
 msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_conv_list(Uid);
+
+%msg get user's files
+msg(M = <<"user/files">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ user_file_list(Uid);
+
+%msg get user's files
+msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
+   ?INFO("~s uid:~p type: ~p", [M, Uid, Type]),
+   [M] ++ user_file_list(Uid);
+
+%msg get user's online peers 
+msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ user_online_list(Uid);
+
 
 % no match in this module
 msg(_, _) -> skip.
