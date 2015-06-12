@@ -1,1 +1,1 @@
-[kernel,stdlib,crypto,cowlib,jiffy,sync,ranch,cowboy,bullet,asn1,compiler,hipe,inets,mnesia,public_key,runtime_tools,ssl,syntax_tools,tools,webtool,xmerl,cmon,db,web]
+[kernel,stdlib,cmon,db,asn1,compiler,crypto,cowlib,ranch,hipe,inets,jiffy,mnesia,public_key,runtime_tools,ssl,syntax_tools,tools,webtool,xmerl,cowboy,web]

@@ -18,7 +18,6 @@ $ make console
 TODO
 ====
 
-0. File upload
 1. Check convId for validity
 2. Split to proper modules
 4. Separate config file (not sys.options)
@@ -27,6 +26,7 @@ TODO
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
 13. proper sys_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
+14. file upload polishing: button css, type, content type, size -- separate table
 
 DONE
 ====
@@ -59,4 +59,5 @@ DONE
 27. Different user profiles -- full, short
 28. P2P Chats
 29. notify peer on p2p
+30. File upload
 

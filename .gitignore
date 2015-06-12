@@ -12,3 +12,4 @@ protocol.js
 .rebar
 ebin
 /bower_components
+/store

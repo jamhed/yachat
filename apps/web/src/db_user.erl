@@ -42,9 +42,8 @@ user_to_list({ok, #user{
    firstname=FirstName,
    lastname=LastName,
    gender=Gender,
-   avatar=Avatar,
    birthdate=BirthDate,
-   city=City} }) -> [ map_field(F) || F <- [Id,Name,Email,FirstName,LastName,Gender,Avatar,BirthDate,City] ];
+   city=City} }) -> [ map_field(F) || F <- [Id,Name,Email,FirstName,LastName,Gender,BirthDate,City] ];
 user_to_list(_) -> [].
 
 detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
