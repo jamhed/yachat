@@ -28,7 +28,6 @@ TODO
 13. proper sys_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
 14. multiple file upload handling
 17. user/update to use Jiffy built-in proplists 
-19. file content-type
 20. notification message
 
 DONE
@@ -67,5 +66,4 @@ DONE
 32. user files list (by user_id, by type)
 33. online user list
 34. file upload button/css
-
-
+35. file content-type

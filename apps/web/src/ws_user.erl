@@ -93,8 +93,13 @@ user_file_list(Uid, Type) when is_number(Uid) ->
 user_file_list(_, _) -> [fail, protocol].
 
 user_online_list(Uid) when is_number(Uid) ->
+<<<<<<< HEAD
    Users = db_user:list_online(Uid),
    [ok, Users];
+=======
+   Files = db_user:list_online(Uid),
+   [ok, Files];
+>>>>>>> c1451c88011f4fb19bb260a6dfaddbd156b367ce
 user_online_list(_) -> [fail, protocol].
 
 user_p2p(Uid, PeerId) ->
@@ -184,7 +189,6 @@ msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid, <<"avatar">>);
-
 
 % no match in this module
 msg(_, _) -> skip.
