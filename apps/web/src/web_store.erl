@@ -40,27 +40,28 @@ handle_upload(Req, StorePath) ->
    [Sid, Data, Mime, Type] = get_props(Plist, [sid,file,mime,type]),
    Uid = db_user:sid_to_uid(erlang:binary_to_integer(Sid)),
    write_user_file(StorePath, Data, Uid, Type, Mime),
-   Req.
+   {ok, Req}.
 
 handle_get_file([{FileId,Mime}], Req, StorePath ) when is_number(FileId) ->
    Path = filename:join(StorePath, integer_to_list(FileId)),
    F = fun (Socket, Transport) -> Transport:sendfile(Socket, Path) end,
    Req2 = cowboy_req:set_resp_body_fun(F, Req),
-   Req2.
+   Req2;
+
+handle_get_file(A,_,C) -> ?ERR("handle_log_file() ~p ~p", [A,C]).
 
 handle_get(Req, StorePath) ->
    {[Uid, Type], Req2} = cowboy_req:path_info(Req),
    handle_get_file( db_file:get( binary_to_integer(Uid), Type), Req2, StorePath).
 
 handle_method(<<"POST">>, Req, StorePath) -> handle_upload(Req, StorePath);
-handle_method(<<"GET">>, Req, StorePath) -> handle_get(Req, StorePath);
+handle_method(<<"GET">>, Req, StorePath) -> cowboy_req:reply(200, handle_get(Req, StorePath));
 handle_method(Method, _, _) -> ?ERR("Unhandled method: ~p", [Method]).
 
 handle(Req, State = [StorePath]) ->
    ?INFO("web_store", []),
    {Method, Req2} = cowboy_req:method(Req),
-   Req3 = handle_method(Method, Req2, StorePath),
+   {ok, Req3} = handle_method(Method, Req2, StorePath),
    {ok, Req3, State}.
 
-terminate(_Reason, _Req, _State) ->
-    ok.
+terminate(_, _, _) -> ?INFO("TERM", []), ok.
