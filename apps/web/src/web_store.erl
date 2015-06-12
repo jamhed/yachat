@@ -42,20 +42,22 @@ handle_upload(Req, StorePath) ->
    write_user_file(StorePath, Data, Uid, Type, Mime),
    {ok, Req}.
 
-handle_get_file([{FileId,Mime}], Req, StorePath ) when is_number(FileId) ->
+handle_get_file([#user_file{ id=FileId, mime=Type }], Req, StorePath ) ->
    Path = filename:join(StorePath, integer_to_list(FileId)),
    F = fun (Socket, Transport) -> Transport:sendfile(Socket, Path) end,
    Req2 = cowboy_req:set_resp_body_fun(F, Req),
-   Req2;
+   cowboy_req:reply(200, [{<<"content-type">>, Type}], Req2);
+handle_get_file(A,_,C) -> ?ERR("handle_get_file() ~p ~p", [A,C]).
 
-handle_get_file(A,_,C) -> ?ERR("handle_log_file() ~p ~p", [A,C]).
+handle_get_path(<<"avatar">>, Id, Req, StorePath) ->
+   handle_get_file( db_file:get( binary_to_integer(Id) ), Req, StorePath).
 
 handle_get(Req, StorePath) ->
-   {[Uid, Type], Req2} = cowboy_req:path_info(Req),
-   handle_get_file( db_file:get( binary_to_integer(Uid), Type), Req2, StorePath).
+   {[Type, Id], Req2} = cowboy_req:path_info(Req),
+   handle_get_path(Type, Id, Req2, StorePath).
 
 handle_method(<<"POST">>, Req, StorePath) -> handle_upload(Req, StorePath);
-handle_method(<<"GET">>, Req, StorePath) -> cowboy_req:reply(200, handle_get(Req, StorePath));
+handle_method(<<"GET">>, Req, StorePath) -> handle_get(Req, StorePath);
 handle_method(Method, _, _) -> ?ERR("Unhandled method: ~p", [Method]).
 
 handle(Req, State = [StorePath]) ->

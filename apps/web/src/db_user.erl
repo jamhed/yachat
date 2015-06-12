@@ -58,7 +58,7 @@ conv(Uid) ->
 	dbd:do(Q).
 
 files(Uid) ->
-	Q = qlc:q([ {C#user_file.id,C#user_file.type,C#user_file.mime} || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
+	Q = qlc:q([ [C#user_file.id,C#user_file.type,C#user_file.mime] || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
 	dbd:do(Q).
 
 list_online(_) ->
@@ -66,7 +66,7 @@ list_online(_) ->
 	dbd:do(Q).
 
 files(Uid, Type) ->
-	Q = qlc:q([ {C#user_file.id, C#user_file.mime} || C <- mnesia:table(user_file),
+	Q = qlc:q([ [C#user_file.id, C#user_file.mime] || C <- mnesia:table(user_file),
       C#user_file.user_id == Uid, C#user_file.type == Type ]),
 	dbd:do(Q).
 

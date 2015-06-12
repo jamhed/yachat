@@ -7,9 +7,15 @@
 -include_lib("cmon/include/logger.hrl").
 
 % id of convs user is in
-get(Uid, Type) ->
+get_by_type(Uid, Type) ->
 	Q = qlc:q([ {C#user_file.id, C#user_file.mime} || C <- mnesia:table(user_file),
       C#user_file.user_id == Uid,
       C#user_file.type == Type
    ]),
 	dbd:do(Q).
+
+get(Id) ->
+   case dbd:get(user_file, Id) of
+      {ok,File} -> [File];
+      _         -> []
+   end.

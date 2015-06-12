@@ -93,8 +93,8 @@ user_file_list(Uid, Type) when is_number(Uid) ->
 user_file_list(_, _) -> [fail, protocol].
 
 user_online_list(Uid) when is_number(Uid) ->
-   Files = db_user:list_online(Uid),
-   [ok, Files];
+   Users = db_user:list_online(Uid),
+   [ok, Users];
 user_online_list(_) -> [fail, protocol].
 
 user_p2p(Uid, PeerId) ->
@@ -179,6 +179,11 @@ msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_online_list(Uid);
+
+%msg get user's online peers 
+msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ user_file_list(Uid, <<"avatar">>);
 
 
 % no match in this module
