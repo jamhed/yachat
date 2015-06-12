@@ -19,16 +19,16 @@ TODO
 ====
 
 1. Check convId for validity
-2. Split to proper modules
+2. Split to proper modules ws_ and db_
 4. Separate config file (not sys.options)
 6. Count messages for diff. convs
 7. Filter messages for current conv in Dumper
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
-13. proper sys_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
-14. multiple file upload handling
+13. proper conv_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
 17. user/update to use Jiffy built-in proplists 
-20. notification message
+18. Rescale avatars
+19. User settings - get/set arbitrary attribute
 
 DONE
 ====
@@ -67,3 +67,6 @@ DONE
 33. online user list
 34. file upload button/css
 35. file content-type
+36. multiple file upload handling
+37. notification message on file upload
+
