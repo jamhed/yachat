@@ -13,17 +13,6 @@ get(Key, Default) ->
       {ok, V} -> V
    end.
 
-% default app to search
-get_a(App, Key, Default) ->
-   case application:get_env(Key) of
-      undefined -> 
-         case application:get_env(App,Key) of
-            undefined -> Default;
-            {ok, V} -> V
-         end;
-      {ok, V} -> V
-   end.
-
 get(Key) ->
    {ok, V} = application:get_env(Key),
    V.
@@ -38,3 +27,16 @@ get_a(App, Key) ->
          end;
       {ok, V} -> V
    end.
+
+% default app to search
+get_a(App, Key, Default) ->
+   case application:get_env(Key) of
+      undefined -> 
+         case application:get_env(App,Key) of
+            undefined -> Default;
+            {ok, V} -> V
+         end;
+      {ok, V} -> V
+   end.
+
+

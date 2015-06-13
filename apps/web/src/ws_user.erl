@@ -185,5 +185,14 @@ msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid, <<"avatar">>);
 
+msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ db_user:attr_get(Uid, Name);
+
+msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ db_user:attr_set(Uid, Name, Value);
+
+
 % no match in this module
 msg(_, _) -> skip.

@@ -62,8 +62,7 @@ exec(Q) -> F = fun() -> qlc:e(Q) end, {atomic, Val} = mnesia:transaction(F), Val
 
 just_one(Fun) ->
    case mnesia:transaction(Fun) of
-      {atomic, []}      -> {error, not_found};
-      {atomic, [R]}     -> {ok, R};
-      {atomic, [_|_]}   -> {error, duplicated};
+      {atomic, []}      -> [];
+      {atomic, [R]}     -> [R];
       Error -> Error
    end.

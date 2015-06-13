@@ -14,8 +14,4 @@ get_by_type(Uid, Type) ->
    ]),
 	dbd:do(Q).
 
-get(Id) ->
-   case dbd:get(user_file, Id) of
-      {ok,File} -> [File];
-      _         -> []
-   end.
+get(Id) -> dbd:get(user_file, Id).

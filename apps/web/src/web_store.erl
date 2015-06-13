@@ -30,7 +30,7 @@ multipart(Req, Prop) ->
 get_props(Plist, Props) -> [ proplists:get_value(Prop, Plist) || Prop <- Props ].
 
 user_file_store([[Id, _]], Mime, Store, _, _, Data) ->
-   {ok,File} = dbd:get(user_file, Id),
+   [File] = dbd:get(user_file, Id),
    Path = filename:join(Store, integer_to_list(Id)),
    file:write_file(Path, Data),
    dbd:put(File#user_file{ mime=Mime }),

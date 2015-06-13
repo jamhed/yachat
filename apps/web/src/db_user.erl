@@ -7,6 +7,8 @@
 -include_lib("cmon/include/logger.hrl").
 -define(SYSTEM,1).
 
+get(Id) when is_number(Id) -> dbd:get(user, Id).
+
 to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
 to_list(U) -> tl(tuple_to_list(U)).
 
@@ -32,10 +34,10 @@ map_field(undefined) -> null;
 map_field(Now = {_,_,_}) -> cvt:now_to_binary(Now);
 map_field(F) -> F.
 
-user_to_short_list({ok, #user{id=Id,username=Name,email=Email}}) -> [ map_field(F) || F <- [Id, Name, Email] ];
+user_to_short_list([#user{id=Id,username=Name,email=Email}]) -> [ map_field(F) || F <- [Id, Name, Email] ];
 user_to_short_list(_) -> [].
 
-user_to_list({ok, #user{
+user_to_list([#user{
    id=Id,
    username=Name,
    email=Email,
@@ -43,14 +45,14 @@ user_to_list({ok, #user{
    lastname=LastName,
    gender=Gender,
    birthdate=BirthDate,
-   city=City} }) -> [ map_field(F) || F <- [Id,Name,Email,FirstName,LastName,Gender,BirthDate,City] ];
+   city=City}] ) -> [ map_field(F) || F <- [Id,Name,Email,FirstName,LastName,Gender,BirthDate,City] ];
 user_to_list(_) -> [].
 
 detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
-detail(Uid) -> user_to_list( dbd:get(user, Uid) ).
+detail(Uid) -> user_to_list( get(Uid) ).
 
 detail_short([H|T]) -> [detail_short(H)] ++ [detail_short(U) || U <- T];
-detail_short(Uid) -> user_to_short_list( dbd:get(user, Uid) ).
+detail_short(Uid) -> user_to_short_list( get(Uid) ).
 
 % id of convs user is in
 conv(Uid) ->
@@ -81,10 +83,6 @@ sid_to_uid(Sid) ->
       _    -> fail
    end.
 
-% compat to index
-get(Id) when is_number(Id) -> get(dbd:get(user, Id));
-get({ok,U}) -> [U];
-get(_) -> [].
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].

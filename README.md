@@ -9,6 +9,7 @@ INSTALL
 =======
 
 ```
+$ git submodule init
 $ git submodule update
 $ bower install
 $ make
@@ -29,6 +30,8 @@ TODO
 17. user/update to use Jiffy built-in proplists 
 18. Rescale avatars
 19. User settings - get/set arbitrary attribute
+20. File delete
+21. Names for p2p confs
 
 DONE
 ====

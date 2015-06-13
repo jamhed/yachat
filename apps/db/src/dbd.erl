@@ -7,6 +7,9 @@
 
 % api
 
+cfg_mandatory(_Cfg, _Cfg=_Default, Error) -> erlang:error(Error), fail;
+cfg_mandatory(Cfg, _Default, _Error) -> Cfg.
+
 check_config() ->
    DBD = cfg:get_a(db, dbd, ""),
    SCHEMA = cfg:get_a(db, schema, []),
@@ -63,17 +66,6 @@ put(Record) ->
 get(Name, Key) ->
     DBA=?DBA,
     DBA:get(Name, Key).
-
-get(Name, Key, Default) ->
-    DBA=?DBA,
-    case DBA:get(Name, Key) of
-        {ok,{Name,Key,Value}} ->
-            ?INFO("get() name:~p key:~p value:~p", [Name, Key, Value]),
-            {ok,Value};
-        {error, _B} ->
-            ?INFO("get() name:~p key:~p default:~p", [Name, Key, Default]),
-            DBA:put({Name,Key,Default}),
-            {ok,Default} end.
 
 limit(QH, Limit) ->
    %% use a cursor to grab only Limit records
