@@ -408,6 +408,17 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       }
     };
 
+    Bullet.prototype.set_user_attr = function() {
+      return this.send("user/attr/set", Cmon.sid(), {
+        test: "value",
+        more: 123
+      });
+    };
+
+    Bullet.prototype.get_user_attr = function() {
+      return this.send("user/attr/get", Cmon.sid());
+    };
+
     return Bullet;
 
   })(Pi);

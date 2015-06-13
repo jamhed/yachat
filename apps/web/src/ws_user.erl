@@ -193,6 +193,15 @@ msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_set(Uid, Name, Value);
 
+% [{k,v}, ..., {k,v}]
+msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
+   ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
+   [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
+
+msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   R = [M] ++ [{db_user:attr_get_all(Uid)}],
+   ?INFO("~p", [R]), R;
 
 % no match in this module
 msg(_, _) -> skip.

@@ -279,3 +279,10 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          @send "user/profile", Cmon.sid()
       else
          @error "Error updating profile."
+
+
+   set_user_attr: ->
+      @send "user/attr/set", Cmon.sid(), test: "value", more: 123
+
+   get_user_attr: ->
+      @send "user/attr/get", Cmon.sid()

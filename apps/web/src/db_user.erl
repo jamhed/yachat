@@ -83,6 +83,16 @@ sid_to_uid(Sid) ->
       _    -> fail
    end.
 
+attr_get(Uid, Name) ->
+   Q = qlc:q([ {A#user_attr.id, A#user_attr.value} || A <- mnesia:table(user_attr),
+      A#user_attr.user_id == Uid, A#user_attr.id == Name ]),
+   dbd:do(Q).
+
+attr_get_all(Uid) -> [ {UA#user_attr.id, UA#user_attr.value} || UA <- dbd:index(user_attr, user_id, Uid) ].
+
+
+attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
+
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].
