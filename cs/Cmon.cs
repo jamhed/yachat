@@ -23,8 +23,7 @@ define [], () -> class Cmon
    @displayName: (id,name,email) -> if name then name else if email then email else id
 
    @displayNameA: (user) ->
-      [id,name,email] = user
-      @displayName id,name,email
+      @displayName user.id, user.username, user.email
 
    @list2hash: (list) ->
       ret = {}

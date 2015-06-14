@@ -51,9 +51,7 @@ define([], function() {
     };
 
     Cmon.displayNameA = function(user) {
-      var email, id, name;
-      id = user[0], name = user[1], email = user[2];
-      return this.displayName(id, name, email);
+      return this.displayName(user.id, user.username, user.email);
     };
 
     Cmon.list2hash = function(list) {

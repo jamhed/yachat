@@ -1,5 +1,6 @@
 -module(ws_conv).
 -export([msg/2]).
+-compile(export_all).
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
@@ -7,7 +8,7 @@
 conv_users(Uid, ConvId) when is_number(Uid) ->
    List = db_conv:users(ConvId),
    UserDetailList = db_user:detail_short(List),
-   [ok, UserDetailList];
+   [ ok, UserDetailList ];
 conv_users(_,_) -> [fail, args].
 
 % message history
@@ -37,7 +38,9 @@ conv_leave(_,_) -> [fail, args].
 
 %msg group list
 msg(M = <<"conv/users">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
-   [M] ++ conv_users(Uid, ConvId);
+   R = [M] ++ conv_users(Uid, ConvId),
+   ?INFO("R: ~p", [R]),
+   R;
 
 %msg message history
 msg(M = <<"conv/history">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId)  ->

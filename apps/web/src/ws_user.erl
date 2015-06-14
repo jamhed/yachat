@@ -8,7 +8,7 @@ to_proplist([K,V | T]) -> [{K,V} | to_proplist(T)];
 to_proplist([]) -> [].
 
 get_user_info([]) -> [fail, not_found, []];
-get_user_info([#user{id=Uid}]) -> [ok, db_user:detail(Uid)];
+get_user_info([#user{id=Uid}]) -> [ ok, db_user:detail(Uid) ];
 get_user_info(Err) -> ?ERR("get_user_info(): ~p", Err), [fail, protocol].
 
 % find user by email
@@ -58,18 +58,17 @@ check_keys(Uid, [#user{id=Uid}]) -> ne;
 check_keys(_, []) -> ne; 
 check_keys(_, _) -> e.
 
-check_user_keys(U, List) ->
-   P = to_proplist(List),
-   E = proplists:get_value(<<"email">>, P),
-   Fb = proplists:get_value(<<"facebook_id">>, P),
+check_user_keys(U, Plist) ->
+   E = proplists:get_value(<<"email">>, Plist),
+   Fb = proplists:get_value(<<"facebook_id">>, Plist),
    [check_keys(U#user.id, db_user:get_by_email(E)), check_keys(U#user.id, db_user:get_by_fb(Fb))].
 
 % update user
-user_update(Uid, List) when is_number(Uid), is_list(List) -> user_update(db_user:get(Uid), List);
-user_update([User], List) when is_record(User, user) ->
-   case check_user_keys(User, List) of
+user_update(Uid, Plist) when is_number(Uid), is_list(Plist) -> user_update(db_user:get(Uid), Plist);
+user_update([User], Plist) when is_record(User, user) ->
+   case check_user_keys(User, Plist) of
       [ne,ne] ->
-         Ux = db_user:set_by_name(User, List),
+         Ux = db_user:set_by_props(User, Plist),
          dbd:put(Ux),
          [ok];
       _ ->
@@ -156,9 +155,9 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
-msg(M = <<"user/update">>, [Uid | List]) when is_number(Uid) ->
-   ?INFO("~s uid:~p List:~p", [M, Uid, List]),
-   [M] ++ user_update(Uid, List);
+msg(M = <<"user/update">>, [Uid, {Plist}]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ user_update(Uid, Plist);
 
 %msg get user's convs 
 msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
@@ -195,6 +194,12 @@ msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_get(Uid, Name);
 
+%msg get user's attributes as json object
+msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   R = [M] ++ [{db_user:attr_get_all(Uid)}],
+   ?INFO("~p", [R]), R;
+
 %msg set user's attribute
 msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
@@ -205,12 +210,6 @@ msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
    ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
    [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
-
-%msg get user's attributes as json object
-msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
-   R = [M] ++ [{db_user:attr_get_all(Uid)}],
-   ?INFO("~p", [R]), R;
 
 % no match in this module
 msg(_, _) -> skip.

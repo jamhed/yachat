@@ -9,8 +9,14 @@
 
 get(Id) when is_number(Id) -> dbd:get(user, Id).
 
-to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), tl(tuple_to_list(U))).
-to_list(U) -> tl(tuple_to_list(U)).
+to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), to_list(U)).
+to_list(U) -> [ map_field(F) || F <- tl(tuple_to_list(U)) ].
+
+filter_props(Props, List) -> [ { F, proplists:get_value(F, Props) } || F <- List ].
+
+map_field(undefined) -> null;
+map_field(Now = {_,_,_}) -> cvt:now_to_binary(Now);
+map_field(F) -> F.
 
 enum_f() -> 
    Fields = record_info(fields, user),
@@ -29,30 +35,25 @@ set_by_name(U, []) -> U;
 set_by_name(U, [Name, Value | Rest ]) ->
    NameAtom = erlang:binary_to_atom(Name, utf8),
    set_by_name( set_by_name(U, NameAtom, Value), Rest ).
-   
-map_field(undefined) -> null;
-map_field(Now = {_,_,_}) -> cvt:now_to_binary(Now);
-map_field(F) -> F.
 
-user_to_short_list([#user{id=Id,username=Name,email=Email}]) -> [ map_field(F) || F <- [Id, Name, Email] ];
-user_to_short_list(_) -> [].
+set_by_props(U, []) -> U;
+set_by_props(U, [{Name,Value} | Rest]) ->
+   NameAtom = erlang:binary_to_atom(Name, utf8),
+   set_by_props( set_by_name(U, NameAtom, Value), Rest ).
+    
+user_to_props_short([U]) -> filter_props( to_proplist(U), [id,username,email] );
+user_to_props_short(_) -> [].
 
-user_to_list([#user{
-   id=Id,
-   username=Name,
-   email=Email,
-   firstname=FirstName,
-   lastname=LastName,
-   gender=Gender,
-   birthdate=BirthDate,
-   city=City}] ) -> [ map_field(F) || F <- [Id,Name,Email,FirstName,LastName,Gender,BirthDate,City] ];
-user_to_list(_) -> [].
+user_to_props([U]) ->
+   Plist = to_proplist(U),
+   proplists:delete(password, Plist);
+user_to_props(_) -> [].
 
-detail([H | T]) -> [detail(H)] ++ [ detail(U) || U <- T];
-detail(Uid) -> user_to_list( get(Uid) ).
+detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
+detail(Uid) -> {user_to_props( get(Uid) )}.
 
-detail_short([H|T]) -> [detail_short(H)] ++ [detail_short(U) || U <- T];
-detail_short(Uid) -> user_to_short_list( get(Uid) ).
+detail_short(List) when is_list(List)  -> [detail_short(Uid) || Uid <- List];
+detail_short(Uid) -> {user_to_props_short( get(Uid) )}.
 
 % id of convs user is in
 conv(Uid) ->
