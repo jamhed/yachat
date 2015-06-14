@@ -19,16 +19,20 @@ $ make console
 TODO
 ====
 17. user/update to use Jiffy built-in proplists
+18. Profile view as Yavuz requested
 
 1. Check convId for validity
 2. Split to proper modules ws_ and db_
 4. Separate config file (not sys.options)
 6. Count messages for diff. convs
-7. Filter messages for current conv in Dumper
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
 18. Rescale avatars
 21. Names for p2p confs
+
+
+TODO NEXT
+=========
 
 DONE
 ====
@@ -71,6 +75,5 @@ DONE
 37. notification message on file upload
 38. User settings - get/set arbitrary attribute
 39. proper conv_msg and handlers: conv/join CID, UID, conv/part CID, UID, user/p2p CID, UID, user/online CID, UID, user/offline CID, UID
-30. File delete message
-
-
+40. File delete message
+41. Filter messages for current conv in ConvText
