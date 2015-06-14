@@ -27,11 +27,9 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       })(this));
     };
 
-    Profile.prototype.draw = function(arg) {
-      var email, userId, userName;
-      userId = arg[0], userName = arg[1], email = arg[2];
-      $("#username", this.e).val(userName);
-      return $("#email", this.e).val(email);
+    Profile.prototype.draw = function(u) {
+      $("#username", this.e).val(u.username);
+      return $("#email", this.e).val(u.email);
     };
 
     Profile.prototype.query = function() {

@@ -269,8 +269,8 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
                email: r.email,
                firstname: r.first_name,
                lastname: r.last_name,
-               username, r.name,
-               gender, r.gender
+               username: r.name,
+               gender: r.gender
             ], (r) => @handle_fb_register_ok(r)
       else
          @error "Facebook status #{r.status}"
