@@ -14,6 +14,9 @@ to_list(U) -> [ map_field(F) || F <- tl(tuple_to_list(U)) ].
 
 filter_props(Props, List) -> [ { F, proplists:get_value(F, Props) } || F <- List ].
 
+extend_with_props(User, [{Name,Value} | Props]) -> extend_with_props(  User ++ [{Name,Value}], Props );
+extend_with_props(User, []) -> User.
+
 map_field(undefined) -> null;
 map_field(Now = {_,_,_}) -> cvt:now_to_binary(Now);
 map_field(F) -> F.
@@ -44,9 +47,13 @@ set_by_props(U, [{Name,Value} | Rest]) ->
 user_to_props_short([U]) -> filter_props( to_proplist(U), [id,username,email] );
 user_to_props_short(_) -> [].
 
+add_file(Plist, [{Name, Id}]) -> Plist ++ [{Name,Id}];
+add_file(Plist, []) -> Plist.
+
 user_to_props([U]) ->
    Plist = to_proplist(U),
-   proplists:delete(password, Plist);
+   proplists:delete(password, Plist),
+   add_file(Plist, db_file:by_type(U#user.id, <<"avatar">>));
 user_to_props(_) -> [].
 
 detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];

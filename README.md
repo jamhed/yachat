@@ -18,8 +18,7 @@ $ make console
 
 TODO
 ====
-17. user/update to use Jiffy built-in proplists
-18. Profile view as Yavuz requested
+18. Rescale avatars
 
 1. Check convId for validity
 2. Split to proper modules ws_ and db_
@@ -27,12 +26,12 @@ TODO
 6. Count messages for diff. convs
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
-18. Rescale avatars
 21. Names for p2p confs
 
 
 TODO NEXT
 =========
+1. Display uploaded file list
 
 DONE
 ====
@@ -77,3 +76,5 @@ DONE
 39. proper conv_msg and handlers: conv/join CID, UID, conv/part CID, UID, user/p2p CID, UID, user/online CID, UID, user/offline CID, UID
 40. File delete message
 41. Filter messages for current conv in ConvText
+42. user/update to use Jiffy built-in proplists
+43. Conv users list view as Yavuz requested

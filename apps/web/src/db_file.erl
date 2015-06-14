@@ -7,8 +7,8 @@
 -include_lib("cmon/include/logger.hrl").
 
 % id of convs user is in
-get_by_type(Uid, Type) ->
-	Q = qlc:q([ {C#user_file.id, C#user_file.mime} || C <- mnesia:table(user_file),
+by_type(Uid, Type) ->
+	Q = qlc:q([ {Type, C#user_file.id} || C <- mnesia:table(user_file),
       C#user_file.user_id == Uid,
       C#user_file.type == Type
    ]),

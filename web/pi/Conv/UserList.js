@@ -16,14 +16,14 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.draw = function(List) {
-      var email, i, id, len, name, ref, tmpl;
+      var User, i, len, tmpl;
       this.clear();
       tmpl = this.rt.source(this.a.view);
       for (i = 0, len = List.length; i < len; i++) {
-        ref = List[i], id = ref[0], name = ref[1], email = ref[2];
+        User = List[i];
         this.e.append(tmpl({
-          id: id,
-          display: Cmon.displayName(id, name, email)
+          id: User.id,
+          display: Cmon.displayNameA(User)
         }));
       }
       return this.rt.pi(this.e);
