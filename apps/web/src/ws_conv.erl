@@ -7,7 +7,7 @@
 % list users in conversation
 conv_users(Uid, ConvId) when is_number(Uid) ->
    List = db_conv:users(ConvId),
-   UserDetailList = db_user:detail(List),
+   UserDetailList = db_user:detail_short(List),
    [ ok, UserDetailList ];
 conv_users(_,_) -> [fail, args].
 
