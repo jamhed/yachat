@@ -48,10 +48,10 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       })(this));
       this.sub("#bullet@conv_msg", (function(_this) {
         return function(e, args) {
-          var convId, msg;
-          convId = args[0], msg = args[1];
+          var convId, msg, ref, ref1, stamp, user;
+          convId = args[0], (ref = args[1], stamp = ref[0], (ref1 = ref[1], msg = ref1[0], user = ref1[1]));
           if (convId === Cmon.conv_id()) {
-            return _this.append([1, "system"], msg);
+            return _this.append(user, [stamp, msg]);
           }
         };
       })(this));

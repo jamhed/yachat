@@ -26,7 +26,7 @@ user_info_list(_,_) -> [fail, protocol, sid].
 % get user
 user_get(Uid) when is_number(Uid) ->
    [U] = db_user:get(Uid),
-   Sid = db_user:online(U, self()),
+   Sid = db_user:online(Uid),
    [ok, User] = get_user_info([U]),
    [ok, Sid, User];
 user_get(_) -> [fail, db, []].
@@ -34,7 +34,7 @@ user_get(_) -> [fail, db, []].
 % find user by facebook id
 user_fb(FbId) when is_binary(FbId) ->
    [U] = db_user:get_by_fb(FbId),
-   Sid = db_user:online(U, self()),
+   Sid = db_user:online(U#user.id),
    [ok, User] = get_user_info([U]),
    [ok, Sid, User];
 user_fb(_) -> [fail, protocol, sid].
@@ -42,7 +42,7 @@ user_fb(_) -> [fail, protocol, sid].
 % login user
 user_login(Password, [#user{id=Uid, password=Password}]) ->
    db_user:offline(self()),
-   Sid = db_user:online(#user{id=Uid}, self()),
+   Sid = db_user:online(Uid),
    [ok, User] = get_user_info(db_user:get(Uid)),
    [ok, Sid, User];
 user_login(_, []) -> [fail, match];
@@ -50,7 +50,7 @@ user_login(_, _) -> [fail, protocol].
  
 % create user and session
 user_new(NewUid, ok) when is_number(NewUid) ->
-   Sid = db_user:online(#user{id=NewUid}, self()),
+   Sid = db_user:online(NewUid),
    [ok, Sid, NewUid];
 user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail].
 
@@ -99,7 +99,7 @@ user_online_list(_) -> [fail, protocol].
 
 user_p2p(Uid, PeerId) ->
    Cid = db_conv:p2p(Uid, PeerId),
-   db_conv:conv_notify(Cid, <<"p2p">>),
+   db_conv:conv_notify(Uid, Cid, [<<"p2p">>, db_user:detail_short(Uid)]),
    [ok, Cid].
 
 %
@@ -185,19 +185,23 @@ msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid, <<"avatar">>);
 
+%msg get user's attribute
 msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_get(Uid, Name);
 
+%msg set user's attribute
 msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_set(Uid, Name, Value);
 
 % [{k,v}, ..., {k,v}]
+%msg set user's attributes from json object
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
    ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
    [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
 
+%msg get user's attributes as json object
 msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    R = [M] ++ [{db_user:attr_get_all(Uid)}],

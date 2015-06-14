@@ -5,7 +5,8 @@
 
 send_msg(ConvId, UserId, Message) when is_number(ConvId), is_number(UserId) ->
    MsgId = db_msg:put(ConvId, UserId, Message),
-   db_conv:notify(ConvId, UserId, MsgId),
+   [#message{text=Text,stamp=Stamp}] = db_msg:get(MsgId),
+   db_conv:notify(ConvId, UserId, Stamp, Text),
    MsgId.
 
 msg_p2p(Uid, PeerId, Message) when is_number(Uid), is_number(PeerId) ->

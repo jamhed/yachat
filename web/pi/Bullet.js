@@ -101,8 +101,8 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       })(this));
       this.handler("conv_msg", (function(_this) {
         return function(e, arg) {
-          var convId, msg, ref, stamp;
-          convId = arg[0], (ref = arg[1], stamp = ref[0], msg = ref[1]);
+          var convId, msg, ref, ref1, stamp, user;
+          convId = arg[0], (ref = arg[1], stamp = ref[0], (ref1 = ref[1], msg = ref1[0], user = ref1[1]));
           if (msg === "p2p") {
             Cmon.set_conv_id(convId);
             _this.conv_status("join", convId);

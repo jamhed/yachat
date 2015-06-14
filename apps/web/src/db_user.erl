@@ -105,16 +105,15 @@ clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_on
 drop_online_status([]) -> ok;
 drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
-   notify_conv(<<"offline">>, conv(Uid)),
+   notify_conv(Uid, conv(Uid), [<<"offline">>, detail_short(Uid)]),
    dbd:delete(user_online, Id),
    drop_online_status(R).
 
 drop_online_status_k([]) -> ok;
 drop_online_status_k([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status_k: id=~p pid=~p", [Id, Pid]),
-   notify_conv(<<"offline">>, conv(Uid)),
+   notify_conv(Uid, conv(Uid), [<<"offline">>, detail_short(Uid)]),
    drop_online_status_k(R).
-
 
 offline(Pid) ->
    R = dbd:index(user_online, pid, Pid),
@@ -124,30 +123,30 @@ logout(Pid) ->
    R = dbd:index(user_online, pid, Pid),
    drop_online_status(R).
 
-notify_conv(_,[]) -> ok;
-notify_conv(Text, [H | T]) ->
-   db_conv:conv_notify(H, Text),
-   notify_conv(Text, T).
+notify_conv(_Uid, [], _Msg) -> ok;
+notify_conv(Uid, [Cid | Rest], Msg) ->
+   db_conv:notify(Uid, Cid, Msg),
+   notify_conv(Uid, Rest, Msg).
 
 get_online_status(Uid) ->
 	Q = qlc:q([ C || C <- mnesia:table(user_online), C#user_online.user_id == Uid ]),
 	dbd:do(Q).
 
-online(#user{id=Uid}, Pid) ->
-   case get_online_status(Uid) of
-      [] ->
-         ?INFO("user_online: user_id=~p pid=~p", [Uid, Pid]),
-         Sid = dbd:make_uid(),
-         dbd:put(#user_online{
-            id=dbd:next_id(user_online),
-            stamp=now(),
-            pid=Pid,
-            user_id=Uid,
-            session_id=Sid}),
-         notify_conv(<<"online">>, conv(Uid)),
-         Sid;
-      [UO] ->
-         ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),
-         dbd:put(UO#user_online{pid=Pid}),
-         UO#user_online.session_id
-   end.
+handle_online_status([], Uid, Pid) ->
+   ?INFO("user_online: user_id=~p pid=~p", [Uid, Pid]),
+   Sid = dbd:make_uid(),
+   dbd:put(#user_online{
+      id=dbd:next_id(user_online),
+      stamp=now(),
+      pid=Pid,
+      user_id=Uid,
+      session_id=Sid}),
+   notify_conv(Uid, conv(Uid), [<<"online">>, db_user:detail_short(Uid)]),
+   Sid;
+
+handle_online_status([UO], Uid, Pid) ->
+   ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),
+   dbd:put(UO#user_online{pid=Pid}),
+   UO#user_online.session_id.
+
+online(Uid) -> handle_online_status(get_online_status(Uid),Uid,self()).

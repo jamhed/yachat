@@ -18,6 +18,8 @@ $ make console
 
 TODO
 ====
+17. user/update to use Jiffy built-in proplists
+20. File delete
 
 1. Check convId for validity
 2. Split to proper modules ws_ and db_
@@ -26,11 +28,7 @@ TODO
 7. Filter messages for current conv in Dumper
 11. Stale session (logout/reconnect)
 12. on leaving p2p conv destroy it
-13. proper conv_msg and handlers: conv/join CID, conv/part CID, user/p2p CID
-17. user/update to use Jiffy built-in proplists 
 18. Rescale avatars
-19. User settings - get/set arbitrary attribute
-20. File delete
 21. Names for p2p confs
 
 DONE
@@ -72,4 +70,7 @@ DONE
 35. file content-type
 36. multiple file upload handling
 37. notification message on file upload
+38. User settings - get/set arbitrary attribute
+39. proper conv_msg and handlers: conv/join CID, UID, conv/part CID, UID, user/p2p CID, UID, user/online CID, UID, user/offline CID, UID
+
 

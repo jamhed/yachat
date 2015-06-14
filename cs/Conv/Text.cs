@@ -17,9 +17,9 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
             @append user, msg
 
       @sub "#bullet@conv_msg", (e, args) =>
-         [convId, msg] = args 
+         [convId, [stamp, [msg, user]]] = args
          if convId == Cmon.conv_id()
-            @append [1, "system"], msg
+            @append user, [stamp, msg]
 
       @sub "#bullet@conv/status/part", (e,args) => @clear()
 

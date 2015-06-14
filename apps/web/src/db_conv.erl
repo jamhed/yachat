@@ -30,6 +30,9 @@ users(Cid) ->
 	Q = qlc:q([ Uid || #user_conv{user_id=Uid, conv_id=_Cid} <- mnesia:table(user_conv), _Cid == Cid]),
 	dbd:do(Q).
 
+% users except Uid (self)
+users(Uid, Cid) -> lists:filter(fun(X) -> X /= Uid end, users(Cid)).
+
 is_user_in(Uid, Cid) ->
 	Q = qlc:q([ Id || #user_conv{ id=Id, user_id=_Uid, conv_id=_Cid } <- mnesia:table(user_conv), Uid == _Uid, Cid == _Cid ]),
 	dbd:do(Q).
@@ -67,12 +70,12 @@ join(Uid, Cid) ->
    case is_user_in(Uid, Cid) of
       []  ->
          dbd:put(#user_conv{id=dbd:next_id(user_conv), user_id=Uid, conv_id=Cid, stamp=now()}),
-         conv_notify(Cid,<<"join">>);
+         notify(Uid, Cid, [<<"join">>, db_user:detail_short(Uid)]);
       Err -> Err
    end.
 
 leave(Uid, Cid) ->
-   conv_notify(Cid,<<"part">>),
+   notify(Uid, Cid, [<<"part">>, db_user:detail_short(Uid)] ),
    [ dbd:delete(user_conv, Id) || Id <- is_user_in(Uid, Cid) ].
 
 history(Cid) -> history(Cid, 10).
@@ -81,15 +84,14 @@ history(Cid, Limit) ->
    Q = qlc:q([ M || M <- mnesia:table(message), M#message.conv_id == Cid ]),
    dbd:limit(Q, Limit).
 
+pids(Uid, Cid) -> lists:flatten( db_user:pids( users(Uid, Cid) ) ).
 pids(Cid) -> lists:flatten( db_user:pids( users(Cid) ) ).
 
-notify(Cid, UserId, MsgId) ->
-   ?INFO("notify() ~p ~p ~p", [Cid, UserId, MsgId]),
-   {ok, #message{text=Text,stamp=Stamp}} = db_msg:get(MsgId),
-   notify(Cid, UserId, Stamp, Text).
+notify(Cid, UserId, Stamp, Msg) ->
+   db_msg:notify( Cid, UserId, [cvt:now_to_time_binary(Stamp), Msg], db_conv:pids(Cid) ).
 
-notify(Cid, UserId, Stamp, Text) ->
-   db_msg:notify( Cid, UserId, [cvt:now_to_time_binary(Stamp), Text], db_conv:pids(Cid) ).
+notify(Uid, Cid, Msg) ->
+   db_msg:conv_notify( Cid, [cvt:now_to_time_binary(now()), Msg], pids(Uid, Cid) ).
 
-conv_notify(Cid, Text) ->
-   db_msg:conv_notify( Cid, [cvt:now_to_time_binary(now()), Text], db_conv:pids(Cid) ).
+notify(Cid, Msg) ->
+   db_msg:conv_notify( Cid, [cvt:now_to_time_binary(now()), Msg], pids(Cid) ).

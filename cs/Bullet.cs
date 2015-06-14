@@ -62,7 +62,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          else
             @error "no callback for seq", seq
       
-      @handler "conv_msg", (e, [convId, [stamp,msg]]) =>
+      @handler "conv_msg", (e, [convId, [stamp, [msg, user]]]) =>
          # p2p chat
          if msg == "p2p"
             Cmon.set_conv_id convId
