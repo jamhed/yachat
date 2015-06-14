@@ -14,9 +14,11 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     ConvText.prototype.draw = function(avatarList, stamp) {
       var id, im, ref, type;
       this.clear();
-      ref = avatarList[0], id = ref[0], type = ref[1];
-      im = $("<img>").attr("src", "/store/avatar/" + id + "?" + stamp).addClass("img-responsive");
-      return this.e.append(im);
+      if ((avatarList != null) && avatarList.length > 0) {
+        ref = avatarList[0], id = ref[0], type = ref[1];
+        im = $("<img>").attr("src", "/store/avatar/" + id + "?" + stamp).addClass("img-responsive");
+        return this.e.append(im);
+      }
     };
 
     ConvText.prototype.query = function() {
