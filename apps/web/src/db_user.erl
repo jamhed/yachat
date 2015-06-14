@@ -68,6 +68,8 @@ files(Uid, Type) ->
       C#user_file.user_id == Uid, C#user_file.type == Type ]),
 	dbd:do(Q).
 
+file_delete(_Uid, FileId) -> dbd:delete(user_file, FileId).
+
 list_online(_) ->
 	Q = qlc:q([ detail_short(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
 	dbd:do(Q).

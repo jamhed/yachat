@@ -170,6 +170,11 @@ msg(M = <<"user/files">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid);
 
+%msg delete file
+msg(M = <<"user/file/delete">>, [Uid, FileId]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ db_user:file_delete(Uid, FileId);
+
 %msg get user's files
 msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
    ?INFO("~s uid:~p type: ~p", [M, Uid, Type]),

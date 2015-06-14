@@ -19,7 +19,6 @@ $ make console
 TODO
 ====
 17. user/update to use Jiffy built-in proplists
-20. File delete
 
 1. Check convId for validity
 2. Split to proper modules ws_ and db_
@@ -72,5 +71,6 @@ DONE
 37. notification message on file upload
 38. User settings - get/set arbitrary attribute
 39. proper conv_msg and handlers: conv/join CID, UID, conv/part CID, UID, user/p2p CID, UID, user/online CID, UID, user/offline CID, UID
+30. File delete message
 
 
