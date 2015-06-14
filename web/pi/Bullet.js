@@ -303,7 +303,7 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.pub_event = function() {
       var args, ev;
       ev = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
-      return this.event(ev, args);
+      return this.event.apply(this, [ev].concat(slice.call(args)));
     };
 
     Bullet.prototype.anonymous = function() {

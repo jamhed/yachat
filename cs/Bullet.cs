@@ -210,7 +210,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    leave_conv: ->
       @send "conv/leave", Cmon.sid(), Cmon.conv_id()
 
-   pub_event: (ev, args...) -> @event ev, args
+   pub_event: (ev, args...) -> @event ev, args...
 
    anonymous: ->
       @send "user/new", []

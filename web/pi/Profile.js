@@ -49,7 +49,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
         return function(status, a) {
           if (status === "ok") {
             _this.info("Profile was updated.");
-            return _this.rpc("#bullet@pub_event", ["user/status/registered", Cmon.sid(), h.username, h.email]);
+            return _this.rpc("#bullet@pub_event", ["user/status/registered", h]);
           } else {
             return _this.error("Profile wasn't updated.");
           }

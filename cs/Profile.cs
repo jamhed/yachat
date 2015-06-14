@@ -18,6 +18,6 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
       @nsend ["user/update", Cmon.sid(), h], (status, a) =>
          if status == "ok"
             @info "Profile was updated."
-            @rpc "#bullet@pub_event", ["user/status/registered", Cmon.sid(), h.username, h.email]
+            @rpc "#bullet@pub_event", ["user/status/registered", h]
          else
             @error "Profile wasn't updated."
