@@ -32,6 +32,10 @@ TODO
 TODO NEXT
 =========
 1. Display uploaded file list
+2. Get avatar from facebook
+3. Auth with facebook (not using facebook id)
+4. On click on #index no reload sometimes
+5. On reconnects sometimes it says socket in connecting state
 
 DONE
 ====
