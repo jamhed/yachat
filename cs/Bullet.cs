@@ -265,12 +265,13 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          @handle_fb_auth r
          FB.api "/me", (r) =>
             @nsend ["user/update", Cmon.sid(),
-               "facebook_id", r.id,
-               "email", r.email,
-               "firstname", r.first_name,
-               "lastname", r.last_name,
-               "username", r.name,
-               "gender", r.gender], (r) => @handle_fb_register_ok(r)
+               facebook_id: r.id,
+               email: r.email,
+               firstname: r.first_name,
+               lastname: r.last_name,
+               username, r.name,
+               gender, r.gender
+            ], (r) => @handle_fb_register_ok(r)
       else
          @error "Facebook status #{r.status}"
  

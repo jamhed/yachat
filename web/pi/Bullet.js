@@ -390,7 +390,14 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
         this.handle_fb_auth(r);
         return FB.api("/me", (function(_this) {
           return function(r) {
-            return _this.nsend(["user/update", Cmon.sid(), "facebook_id", r.id, "email", r.email, "firstname", r.first_name, "lastname", r.last_name, "username", r.name, "gender", r.gender], function(r) {
+            return _this.nsend([
+              "user/update", Cmon.sid(), {
+                facebook_id: r.id,
+                email: r.email,
+                firstname: r.first_name,
+                lastname: r.last_name
+              }, username, r.name, gender, r.gender
+            ], function(r) {
               return _this.handle_fb_register_ok(r);
             });
           };
