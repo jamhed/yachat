@@ -1,0 +1,4 @@
+[
+{dbd, dbd_mnesia},
+{schema, [wdb]}
+].

@@ -2,33 +2,29 @@
 -compile(export_all).
 -include_lib("db/include/metainfo.hrl").
 -include_lib("cmon/include/logger.hrl").
+-include_lib("cmon/include/config.hrl").
 
--define(DBA, cfg:get_a(db, dbd)).
+-define(DBA, ?CFG(dbd)).
 
 % api
 
-cfg_mandatory(_Cfg, _Cfg=_Default, Error) -> erlang:error(Error), fail;
-cfg_mandatory(Cfg, _Default, _Error) -> Cfg.
+cfg_mandatory(Name, Default, Error) ->
+   case ?CFG(Name, Default) of
+      Default -> erlang:error(Error);
+      _       -> {ok, Name}
+   end.
 
 check_config() ->
-   DBD = cfg:get_a(db, dbd, ""),
-   SCHEMA = cfg:get_a(db, schema, []),
-   case DBD of
-      "" -> erlang:error(dbd_config_no_driver);
-      _  -> ok
-   end,
-   case SCHEMA of
-      [] -> erlang:error(dbd_config_no_schema);
-      _  -> ok
-   end,
-   {DBD, SCHEMA}.
+   [
+      cfg_mandatory(dbd, "", dbd_config_no_driver),
+      cfg_mandatory(schema, [], dbd_config_no_schema)
+   ].
 
-
-modules() -> cfg:get_a(db, schema).
+modules() -> ?CFG(schema).
 
 initialize()            ->
    DBA=?DBA,
-   Schema = cfg:get_a(db, schema),
+   Schema = ?CFG(schema),
    join(),
    DBA:initialize(Schema).
 

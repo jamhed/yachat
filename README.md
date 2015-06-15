@@ -18,12 +18,12 @@ $ make console
 
 TODO
 ====
+12. on leaving p2p conv destroy it
 
 2. Split to proper modules ws_ and db_
 4. Separate config file (not sys.options)
 6. Count messages for diff. convs
 11. Stale session (logout/reconnect)
-12. on leaving p2p conv destroy it
 21. Names for p2p confs
 
 

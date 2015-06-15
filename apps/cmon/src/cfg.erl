@@ -1,42 +1,37 @@
 -module(cfg).
 -compile(export_all).
+-include_lib("cmon/include/logger.hrl").
 
-get(App, Key, Default) ->
-   case application:get_env(App,Key) of
-      undefined -> Default;
-      {ok,V} -> V
+-define(PATH, "cfg").
+-define(ETS_NAME, cfg).
+
+
+ensure_ets_table() ->
+   case ets:info(?ETS_NAME) of
+      undefined -> ets:new(?ETS_NAME, [set,named_table]);
+      _  -> ?ETS_NAME
    end.
 
-get(Key, Default) ->
-   case application:get_env(Key) of
-      undefined -> Default;
-      {ok, V} -> V
-   end.
+handle_module_cfg(Module, []) ->
+   Path = filename:join("cfg", Module),
+   {ok, [Cfg]} = file:consult(Path),
+   ets:insert(?ETS_NAME, {Module, Cfg}),
+   ?INFO("Loaded config for ~p, path: ~p, data: ~p", [Module, Path, Cfg]),
+   Cfg;
+handle_module_cfg(Module, [{Module, PropList}]) -> PropList.
 
-get(Key) ->
-   {ok, V} = application:get_env(Key),
-   V.
+ensure_module_cfg(Module) ->
+   handle_module_cfg( Module, ets:lookup(?ETS_NAME, Module) ).
+   
+get_m(Module, Key) -> 
+   Cfg = ensure_module_cfg(Module),
+   Value = proplists:get_value(Key, Cfg),
+   Value.
 
-% default app to search
-get_a(App, Key) ->
-   case application:get_env(Key) of
-      undefined -> 
-         case application:get_env(App, Key) of
-            {ok, V} -> V;
-            Default -> Default
-         end;
-      {ok, V} -> V
-   end.
-
-% default app to search
-get_a(App, Key, Default) ->
-   case application:get_env(Key) of
-      undefined -> 
-         case application:get_env(App,Key) of
-            undefined -> Default;
-            {ok, V} -> V
-         end;
-      {ok, V} -> V
-   end.
+get_m(Module, Key, Default) ->
+   ensure_ets_table(),
+   Cfg = ensure_module_cfg(Module),
+   Value = proplists:get_value(Key, Cfg, Default),
+   Value.
 
 
