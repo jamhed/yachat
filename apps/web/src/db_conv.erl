@@ -6,6 +6,8 @@
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("cmon/include/logger.hrl").
 
+get(ConvId) -> dbd:get(conv, ConvId).
+
 get_by_users(Uid1, Uid2) ->
 	Q = qlc:q([ U1#user_conv.conv_id ||
 			U1 <- mnesia:table(user_conv), U1#user_conv.user_id == Uid1,
