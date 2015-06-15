@@ -21,6 +21,7 @@ dispatch_rules() ->
     cowboy_router:compile(
         [{'_', [
             {"/store/[...]",        web_store,        ["store"]},
+            {"/image/[...]",        web_image,        ["store"]},
             {"/",                   cowboy_static,    {file, "web/index.html"}},
             {"/main/ws/[...]",      bullet_handler,   [{handler, ws_main}]},
             {"/[...]",              cowboy_static,    {dir, "web"}}
