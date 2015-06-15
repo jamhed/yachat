@@ -3,7 +3,7 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
-send_msg(ConvId, UserId, Message) when is_number(ConvId), is_number(UserId) ->
+send_msg([#conv{id=ConvId}], UserId, Message) when is_number(ConvId), is_number(UserId) ->
    MsgId = db_msg:put(ConvId, UserId, Message),
    [#message{text=Text,stamp=Stamp}] = db_msg:get(MsgId),
    db_conv:notify(ConvId, UserId, Stamp, Text),
@@ -21,7 +21,7 @@ msg(M = <<"msg/p2p">>, [Sid, PeerId, Message]) when is_number(Sid), is_number(Pe
 
 %msg conv message
 msg(M = <<"msg/conv">>, [UserId, ConvId, Message]) when is_number(UserId), is_number(ConvId)  ->
-   MsgId = send_msg(ConvId, UserId, Message),
+   MsgId = send_msg(db_conv:get(ConvId), UserId, Message),
    [M, ok, ConvId, MsgId];
 
 msg(_,_) -> skip.
