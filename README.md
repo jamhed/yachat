@@ -18,9 +18,7 @@ $ make console
 
 TODO
 ====
-18. Rescale avatars
 
-1. Check convId for validity
 2. Split to proper modules ws_ and db_
 4. Separate config file (not sys.options)
 6. Count messages for diff. convs
@@ -82,3 +80,6 @@ DONE
 41. Filter messages for current conv in ConvText
 42. user/update to use Jiffy built-in proplists
 43. Conv users list view as Yavuz requested
+44. Rescale avatars
+45. Check convId for validity
+
