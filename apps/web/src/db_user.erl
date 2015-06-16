@@ -113,8 +113,8 @@ clear_online([]) -> ok;
 clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online(T).
 
 drop_online_status([]) -> ok;
-drop_online_status([UO = #user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
-   ?INFO("drop_online_status_k: id=~p pid=~p", [Id, Pid]),
+drop_online_status([UO = #user_online{id=Id, pid=Pid, user_id=Uid, session_id=Sid} | R]) ->
+   ?INFO("offline: uo_id=~p user_id=~p sid=~p pid=~p", [Id, Uid, Sid, Pid]),
    notify_conv(Uid, conv(Uid), [<<"offline">>, detail_short(Uid)]),
    dbd:put(UO#user_online{online=false, stamp=now()}),
    drop_online_status(R).

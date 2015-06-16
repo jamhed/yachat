@@ -68,18 +68,19 @@ code_change(_OldVsn, State, _Extra) ->
 
 %payload
 
-now_to_seconds({Mega, Sec, Micro}) -> Mega * 1000000 * 1000000 + Sec * 1000000 + Micro.
+now_to_ms({Mega, Sec, _Micro}) -> Mega * 1000000 * 1000 + Sec * 1000.
 
 get_stale_sessions() ->
-	Now = now_to_seconds(now()),
+	Now = now_to_ms(now()),
 	Q = qlc:q([ UO#user_online.id || UO <- mnesia:table(user_online),
-    	Now - now_to_seconds(UO#user_online.stamp) > ?STALE,
+    	Now - now_to_ms(UO#user_online.stamp) > ?STALE,
     	UO#user_online.online == false
     ]),
 	dbd:do(Q).
 
 delete_sessions([Id | Rest]) ->
-	?INFO("Purge session: ~p", [Id]),
+   [UO] = dbd:get(user_online, Id),
+	?INFO("Purge session: ~p", [ UO ]),
 	dbd:delete(user_online, Id),
 	delete_sessions(Rest);
 delete_sessions([]) -> ok.
