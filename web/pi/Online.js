@@ -30,7 +30,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
       for (i = 0, len = userList.length; i < len; i++) {
         userInfo = userList[i];
         this.e.append(tmpl({
-          id: userInfo[0],
+          id: userInfo.id,
           display: Cmon.displayNameA(userInfo)
         }));
       }

@@ -145,7 +145,10 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @handler "user/p2p", (e, args) =>
          [ status, convId ] = args
-         if status != "ok"
+         if status == "ok"
+            Cmon.set_conv_id convId
+            @conv_status "join", convId
+         else
             @error "Error making p2p!"
 
       @handler "conv/leave", (e, args) =>

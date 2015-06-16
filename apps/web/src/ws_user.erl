@@ -76,9 +76,26 @@ user_update([User], Plist) when is_record(User, user) ->
    end;
 user_update(_,_) -> [fail, args].
 
+get_user_name(#user{id=Id, username=undefined}) -> erlang:integer_to_binary(Id);
+get_user_name(#user{id=_Id, username=Name}) -> Name.
+
+
+
+get_conv_name(Uid, [#conv{id=Cid, type="p2p"}]) ->
+   ?INFO("~p ~p", [Uid, Cid]),
+   case db_conv:peers(Cid, Uid) of
+      [ PeerId | _] ->
+         [Peer] = db_user:get(PeerId),
+         [ {id,Cid}, {name, get_user_name(Peer)} ];
+      [] -> [ {id,Cid}, {name, null} ]
+   end;
+get_conv_name(_Uid, [#conv{id=Cid}]) -> [ {id,Cid}, {name,null} ].
+
+name_convs(Uid, CidList) -> [ {get_conv_name(Uid, db_conv:get(Cid))} || Cid <- CidList].
+
 user_conv_list(Uid) when is_number(Uid) ->
    Convs = db_user:conv(Uid),
-   [ok, Convs];
+   [ok, name_convs(Uid, Convs) ];
 user_conv_list(_) -> [fail, protocol].
 
 user_file_list(Uid) when is_number(Uid) ->
@@ -96,15 +113,20 @@ user_online_list(Uid) when is_number(Uid) ->
    [ok, Users];
 user_online_list(_) -> [fail, protocol].
 
-user_p2p(Uid, PeerId) ->
+user_make_p2p(Uid, PeerId) ->
    Cid = db_conv:p2p(Uid, PeerId),
-   db_conv:conv_notify(Uid, Cid, [<<"p2p">>, db_user:detail_short(Uid)]),
-   [ok, Cid].
+   db_conv:notify(Uid, Cid, [<<"p2p">>, db_user:detail_short(Uid)]),
+   [Peer | _] = db_user:detail_short(db_conv:peers(Cid, Uid)),
+   [ok, Cid, Peer].
 
 %
 % MESSAGES
 %
 
+%msg check stored Sid 
+msg(M = <<"user/get">>, [Uid]) ->
+   ?INFO("~s uid: ~p", [M, Uid]),
+   [M] ++ user_get(Uid);
 
 %msg login anonymously, create new user
 msg(M = <<"user/new">>, []) ->
@@ -117,15 +139,16 @@ msg(M = <<"user/login">>, [Email, Password]) ->
    ?INFO("~s email:~p password:~p", [M, Email, Password]),
    [M] ++ user_login(Password, db_user:get_by_email(Email));
 
+%msg logout
+msg(M = <<"user/logout">>, []) ->
+   ?INFO("~s", [M]),
+   db_user:logout(self()),
+   [M, ok];
+
 %msg login by by facebook_id
 msg(M = <<"user/fb">>, [FbId]) ->
    ?INFO("~s fbid:~p", [M, FbId]),
    [M] ++ user_fb(FbId);
-
-%msg check stored Sid 
-msg(M = <<"user/get">>, [Uid]) ->
-   ?INFO("~s uid: ~p", [M, Uid]),
-   [M] ++ user_get(Uid);
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
@@ -140,19 +163,14 @@ msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);
 
-%msg get user info 
-msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
-   [M] ++ user_p2p(Uid, PeerId);
-
 %msg get users info [[UserId, Name, Email], ..., ]
 msg(M = <<"user/info">>, [Uid, L]) when is_number(Uid), is_list(L) ->
    [M] ++ user_info_list(Uid, L);
 
-%msg logout
-msg(M = <<"user/logout">>, []) ->
-   ?INFO("~s", [M]),
-   db_user:logout(self()),
-   [M, ok];
+%msg make p2p conv
+msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
+   [M] ++ user_make_p2p(Uid, PeerId);
+
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
 msg(M = <<"user/update">>, [Uid, {Plist}]) when is_number(Uid) ->
@@ -162,7 +180,9 @@ msg(M = <<"user/update">>, [Uid, {Plist}]) when is_number(Uid) ->
 %msg get user's convs 
 msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
-   [M] ++ user_conv_list(Uid);
+   R = [M] ++ user_conv_list(Uid),
+   ?INFO("R: ~p", [R]),
+   R;
 
 %msg get user's files
 msg(M = <<"user/files">>, [Uid]) when is_number(Uid) ->

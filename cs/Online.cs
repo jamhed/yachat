@@ -8,7 +8,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Online extends Pi
    draw: (userList) ->
       @clear()
       tmpl = @rt.source @a.view
-      @e.append tmpl {id: userInfo[0], display: Cmon.displayNameA(userInfo) } for userInfo in userList
+      @e.append tmpl {id: userInfo.id, display: Cmon.displayNameA(userInfo) } for userInfo in userList
       @rt.pi @e
 
    query: ->

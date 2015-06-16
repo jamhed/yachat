@@ -28,6 +28,11 @@ find(Uid1, Uid2, Type) ->
 		_          -> []
 	end.
 
+peers(Cid, Uid) ->
+	Q = qlc:q([ C#user_conv.user_id || C <- mnesia:table(user_conv),
+      C#user_conv.conv_id == Cid, C#user_conv.user_id /= Uid]),
+	dbd:do(Q).
+
 users(Cid) ->
 	Q = qlc:q([ Uid || #user_conv{user_id=Uid, conv_id=_Cid} <- mnesia:table(user_conv), _Cid == Cid]),
 	dbd:do(Q).

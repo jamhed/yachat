@@ -210,7 +210,10 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
         return function(e, args) {
           var convId, status;
           status = args[0], convId = args[1];
-          if (status !== "ok") {
+          if (status === "ok") {
+            Cmon.set_conv_id(convId);
+            return _this.conv_status("join", convId);
+          } else {
             return _this.error("Error making p2p!");
           }
         };

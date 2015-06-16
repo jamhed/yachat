@@ -18,17 +18,16 @@ $ make console
 
 TODO
 ====
-12. on leaving p2p conv destroy it
 
+11. Stale session purge (logout/reconnect)
 2. Split to proper modules ws_ and db_
-4. Separate config file (not sys.options)
 6. Count messages for diff. convs
-11. Stale session (logout/reconnect)
-21. Names for p2p confs
+12. on leaving p2p conv destroy it?
 
 
 TODO NEXT
 =========
+0. On new user login/profile update notify user lists (lobby, convs)
 1. Display uploaded file list
 2. Get avatar from facebook
 3. Auth with facebook (not using facebook id)
@@ -82,4 +81,6 @@ DONE
 43. Conv users list view as Yavuz requested
 44. Rescale avatars
 45. Check convId for validity
-
+46. Reworked config and logging modules
+47. Separate config file (not sys.options)
+48. Names for p2p confs

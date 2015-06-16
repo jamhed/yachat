@@ -32,6 +32,9 @@ conv_join(_,_) -> [fail, args].
 conv_leave(Uid, [#conv{id=ConvId}]) when is_number(Uid), is_number(ConvId) -> db_conv:leave(Uid, ConvId), [ok];
 conv_leave(_,_) -> [fail, args].
 
+% conv peers
+conv_peers(Uid, [#conv{id=ConvId}]) -> db_user:detail_short( db_conv:peers(ConvId, Uid) ).
+
 %
 % MESSAGES
 %
@@ -39,6 +42,12 @@ conv_leave(_,_) -> [fail, args].
 %msg group list
 msg(M = <<"conv/users">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
    R = [M] ++ conv_users(Uid, db_conv:get(ConvId)),
+   ?INFO("R: ~p", [R]),
+   R;
+
+%msg peers list
+msg(M = <<"conv/peers">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
+   R = [M] ++ conv_peers(Uid, db_conv:get(ConvId)),
    ?INFO("R: ~p", [R]),
    R;
 

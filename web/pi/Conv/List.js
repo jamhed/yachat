@@ -16,13 +16,16 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.draw = function(List) {
-      var convId, i, len, tmpl;
+      var Name, conv, i, len, tmpl;
       tmpl = this.rt.source(this.a.view);
+      this.debug("DRAW", List);
       this.clear();
       for (i = 0, len = List.length; i < len; i++) {
-        convId = List[i];
+        conv = List[i];
+        Name = conv.name ? conv.name : conv.id;
         this.e.append(tmpl({
-          id: convId
+          id: conv.id,
+          name: Name
         }));
       }
       return this.rt.pi(this.e);
@@ -37,13 +40,13 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.autojoin = function(List) {
-      var convId, i, len, seen, storedConvId;
+      var conv, i, len, seen, storedConvId;
       storedConvId = Cmon.conv_id();
       seen = 0;
       for (i = 0, len = List.length; i < len; i++) {
-        convId = List[i];
-        if (storedConvId === convId) {
-          this.rpc("#bullet@pub_event", ["conv/status/join", convId]);
+        conv = List[i];
+        if (storedConvId === conv.id) {
+          this.rpc("#bullet@pub_event", ["conv/status/join", conv.id]);
           seen = 1;
         }
       }

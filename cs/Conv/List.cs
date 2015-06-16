@@ -4,10 +4,13 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
 
    draw: (List) ->
       tmpl = @rt.source @a.view
+      
+      @debug "DRAW", List
 
       @clear()
-      for convId in List
-         @e.append tmpl {id: convId}
+      for conv in List
+         Name = if conv.name then conv.name else conv.id
+         @e.append tmpl id: conv.id, name: Name
      
       @rt.pi @e
 
@@ -16,9 +19,9 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
    autojoin: (List) ->
       storedConvId = Cmon.conv_id()
       seen = 0
-      for convId in List
-         if storedConvId == convId
-            @rpc "#bullet@pub_event", ["conv/status/join", convId]
+      for conv in List
+         if storedConvId == conv.id
+            @rpc "#bullet@pub_event", ["conv/status/join", conv.id]
             seen = 1
       if ! seen
          @rpc "#bullet@pub_event", ["conv/status/part"]
