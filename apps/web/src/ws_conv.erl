@@ -25,7 +25,7 @@ conv_new(Uid) when is_number(Uid) ->
 conv_new(_) -> [fail, args].
 
 % join conversation
-conv_join(Uid, [#conv{id=ConvId}]) when is_number(Uid), is_number(ConvId) -> db_conv:join(Uid, ConvId), [ok, ConvId];
+conv_join(Uid, ConvId) when is_number(Uid), is_number(ConvId) -> db_conv:join(Uid, ConvId), [ok, ConvId];
 conv_join(_,_) -> [fail, args].
 
 % leave conversation
@@ -61,7 +61,7 @@ msg(M = <<"conv/new">>, [Uid]) when is_number(Uid) ->
 
 %msg join group
 msg(M = <<"conv/join">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId) ->
-   [M] ++ conv_join(Uid, db_conv:get(ConvId));
+   [M] ++ conv_join(Uid, ConvId);
 
 %msg leave group
 msg(M = <<"conv/leave">>, [Uid, ConvId]) when is_number(Uid), is_number(ConvId)  ->
