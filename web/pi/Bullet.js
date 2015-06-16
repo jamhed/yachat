@@ -109,9 +109,11 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
           }
           if (msg === "part") {
             _this.debug("PART", convId);
+            _this.event("conv/update", convId);
           }
           if (msg === "join") {
-            return _this.debug("JOIN", convId);
+            _this.debug("JOIN", convId);
+            return _this.event("conv/update", convId);
           }
         };
       })(this));

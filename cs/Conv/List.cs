@@ -28,6 +28,8 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
  
    init: ->
 
+      @sub "#bullet@conv/update", (ev, args) => @query()
+
       @sub "#bullet@conv/status/join", (ev, args) => @query()
 
       @sub "#bullet@conv/status/part", (ev, args) => @query()

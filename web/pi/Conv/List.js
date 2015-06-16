@@ -56,6 +56,11 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.init = function() {
+      this.sub("#bullet@conv/update", (function(_this) {
+        return function(ev, args) {
+          return _this.query();
+        };
+      })(this));
       this.sub("#bullet@conv/status/join", (function(_this) {
         return function(ev, args) {
           return _this.query();

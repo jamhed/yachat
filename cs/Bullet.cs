@@ -69,8 +69,10 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             @conv_status "join", convId
          if msg == "part"
             @debug "PART", convId
+            @event "conv/update", convId
          if msg == "join"
             @debug "JOIN", convId
+            @event "conv/update", convId
 
       @handler "sys_msg", (e, [[msg,id]]) =>
          @debug "sys msg", msg
