@@ -19,8 +19,6 @@ $ make console
 TODO
 ====
 
-1. no conv userlist update on join?
-
 11. Stale session purge (logout/reconnect)
 2. Split to proper modules ws_ and db_
 6. Count messages for diff. convs
