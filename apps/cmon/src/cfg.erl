@@ -7,7 +7,7 @@
 
 ensure_ets_table() ->
    case ets:info(?ETS_NAME) of
-      undefined -> ets:new(?ETS_NAME, [set,named_table]);
+      undefined -> ets:new(?ETS_NAME, [set,named_table,public]);
       _  -> ?ETS_NAME
    end.
 

@@ -113,21 +113,15 @@ clear_online([]) -> ok;
 clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online(T).
 
 drop_online_status([]) -> ok;
-drop_online_status([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
-   ?INFO("drop_online_status: id=~p pid=~p", [Id, Pid]),
-   notify_conv(Uid, conv(Uid), [<<"offline">>, detail_short(Uid)]),
-   dbd:delete(user_online, Id),
-   drop_online_status(R).
-
-drop_online_status_k([]) -> ok;
-drop_online_status_k([#user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
+drop_online_status([UO = #user_online{id=Id, pid=Pid, user_id=Uid} | R]) ->
    ?INFO("drop_online_status_k: id=~p pid=~p", [Id, Pid]),
    notify_conv(Uid, conv(Uid), [<<"offline">>, detail_short(Uid)]),
-   drop_online_status_k(R).
+   dbd:put(UO#user_online{online=false, stamp=now()}),
+   drop_online_status(R).
 
 offline(Pid) ->
    R = dbd:index(user_online, pid, Pid),
-   drop_online_status_k(R).
+   drop_online_status(R).
 
 logout(Pid) ->
    R = dbd:index(user_online, pid, Pid),
@@ -150,13 +144,14 @@ handle_online_status([], Uid, Pid) ->
       stamp=now(),
       pid=Pid,
       user_id=Uid,
-      session_id=Sid}),
+      session_id=Sid,
+      online=true}),
    notify_conv(Uid, conv(Uid), [<<"online">>, db_user:detail_short(Uid)]),
    Sid;
 
 handle_online_status([UO], Uid, Pid) ->
    ?INFO("user_online: already online, skip: user_id=~p pid=~p", [Uid, Pid]),
-   dbd:put(UO#user_online{pid=Pid}),
+   dbd:put(UO#user_online{pid=Pid, online=true, stamp=now()}),
    UO#user_online.session_id.
 
 online(Uid) -> handle_online_status(get_online_status(Uid),Uid,self()).

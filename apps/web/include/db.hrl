@@ -4,5 +4,5 @@
 -record(message, {id, text, stamp, user_id, conv_id}).
 -record(user_attr, {id, user_id, value}).
 -record(user_conv, {id, user_id, conv_id, stamp}).
--record(user_online, {id, stamp, pid, user_id, session_id}).
+-record(user_online, {id, stamp, pid, user_id, session_id, online}).
 -record(user_file, {id, user_id, stamp, type, mime}).
