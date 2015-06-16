@@ -91,7 +91,8 @@ get_conv_name(Uid, [#conv{id=Cid, type="p2p"}]) ->
    end;
 get_conv_name(_Uid, [#conv{id=Cid}]) -> [ {id,Cid}, {name,null} ].
 
-name_convs(Uid, CidList) -> [ {get_conv_name(Uid, db_conv:get(Cid))} || Cid <- CidList].
+name_convs(Uid, CidList) -> [ {get_conv_name(Uid, db_conv:get(Cid))} || Cid <- CidList];
+name_convs(Uid, []) -> [].
 
 user_conv_list(Uid) when is_number(Uid) ->
    Convs = db_user:conv(Uid),
