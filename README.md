@@ -19,9 +19,8 @@ $ make console
 TODO
 ====
 
-11. Stale session purge (logout/reconnect)
 2. Split to proper modules ws_ and db_
-6. Count messages for diff. convs
+6. Count messages for diff. convs in UI
 12. on leaving p2p conv destroy it?
 
 
@@ -84,3 +83,5 @@ DONE
 46. Reworked config and logging modules
 47. Separate config file (not sys.options)
 48. Names for p2p confs
+49. Stale session purge (logout/reconnect)
+
