@@ -1,0 +1,8 @@
+{application, game,
+[
+   {description, "Game.Okay"},
+   {vsn, "1"},
+   {registered, []},
+   {applications, [kernel, stdlib]},
+   {env, []}
+]}.
