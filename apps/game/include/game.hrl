@@ -1,2 +1,2 @@
 -record(player, {id, hand, discard}).
--record(game, {id, stamp, stash, jocker, player1, player2, player3, player4}).
+-record(game, {id, stamp, dealer, active, stash, jocker, players}).
