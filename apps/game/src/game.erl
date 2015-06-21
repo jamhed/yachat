@@ -15,7 +15,7 @@ gen_hand(N, Hand, Stash) ->
 	{E, Stash1} = random_peek(Stash),
 	gen_hand(N-1, [E] ++ Hand, Stash1).
 
-gen_game() ->
+gen() ->
 	Stash = gen_stash(),
 	{Jocker, Stash1} = random_peek(Stash),
     {Player1, Stash2} = gen_hand(14, [], [[0,0], [0,0]] ++ Stash1),
@@ -48,36 +48,41 @@ prev_player(Id) -> Id-1.
 setnth(1, [_|Rest], New) -> [New|Rest];
 setnth(I, [E|Rest], New) -> [E|setnth(I-1, Rest, New)].
 
-active_player(#game{active=No, players=Players}) -> lists:nth(No, Players).
-right_player(#game{active=No, players=Players}) -> lists:nth(prev_player(No), Players).
+active_player(G = #game{active=No}) -> player(G, No).
+right_player(G = #game{active=No}) -> player(G, prev_player(No)).
+player(#game{players=Players}, No) -> lists:nth(prev_player(No), Players).
 
 next_turn(G=#game{active=No}) -> G#game{active=next_player(No)}.
 
-update_active_player(G = #game{active=No, players=Players}, NewPlayer) ->
+update_player(G = #game{players=Players}, No, NewPlayer) ->
 	G#game{ players=setnth(No, Players, NewPlayer) }.
 
-update_active_player_hand(G = #game{active=No}, NewHand) ->
-	Player = active_player(G),
+update_player_hand(G = #game{}, No, NewHand) ->
+	Player = player(G, No),
+	update_player(G, No, Player#player{ hand=NewHand }).
 
-take(G = #game{active=No, players=Players}, right) ->
+update_player_discard(G = #game{}, No, NewDiscard) ->
+	Player = player(G, No),
+	update_player(G, No, Player#player{ discard=NewDiscard }).
+
+take(G = #game{active=No}, right) ->
 	Player = active_player(G),
 	RightPlayer = right_player(G),
 	[Tile | NewDiscard] = RightPlayer#player.discard,
-	NewPlayer = Player#player{ hand=[Tile] ++ Player#player.hand},
-	NewRightPlayer = RightPlayer#player{ discard=NewDiscard },
-	G#game{ players=setnth(prev_player(No), setnth(No, Players, NewPlayer), NewRightPlayer) };
+	G1 = update_player_hand(G, No, [Tile] ++ Player#player.hand),
+	G2 = update_player_discard(G1, prev_player(No), NewDiscard),
+	G2;
 
-take(G = #game{active=No, stash=[Tile|NewStash], players=Players}, table) ->
+take(G = #game{active=No, stash=[Tile|NewStash]}, table) ->
 	Player = active_player(G),
-	NewPlayer = Player#player{hand=[Tile] ++ Player#player.hand},
-	update_active_player(G#game{stash=NewStash}, NewPlayer).
+	update_player_hand(G#game{stash=NewStash}, No, [Tile] ++ Player#player.hand).
 
-discard(G = #game{active=No, players=Players}, Tile) ->
+discard(G = #game{active=No}, Tile) ->
 	Player = active_player(G),
 	NewHand = lists:delete(Tile, Player#player.hand),
 	case Player#player.hand of
 		NewHand ->
 			{fail, no_tail_to_discard, No, Tile};
 		_ ->
-			update_active_player(G, Player#player{hand = NewHand})
+			update_player_hand(G, No, NewHand)
 	end.
