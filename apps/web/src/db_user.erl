@@ -52,8 +52,8 @@ add_file(Plist, []) -> Plist.
 
 user_to_props([U]) ->
    Plist = to_proplist(U),
-   proplists:delete(password, Plist),
-   add_file(Plist, db_file:by_type(U#user.id, <<"avatar">>));
+   Plist1 = proplists:delete(password, Plist),
+   add_file(Plist1, db_file:by_type(U#user.id, <<"avatar">>));
 user_to_props(_) -> [].
 
 detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
