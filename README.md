@@ -18,11 +18,7 @@ $ make console
 
 TODO
 ====
-
-2. Split to proper modules ws_ and db_
-6. Count messages for diff. convs in UI
-12. on leaving p2p conv destroy it?
-
+5. On reconnects sometimes it says socket in connecting state
 
 TODO NEXT
 =========
@@ -31,7 +27,10 @@ TODO NEXT
 2. Get avatar from facebook
 3. Auth with facebook (not using facebook id)
 4. On click on #index no reload sometimes
-5. On reconnects sometimes it says socket in connecting state
+
+2. Split to proper modules ws_ and db_
+6. Count messages for diff. convs in UI
+12. on leaving p2p conv destroy it?
 
 DONE
 ====
@@ -84,4 +83,4 @@ DONE
 47. Separate config file (not sys.options)
 48. Names for p2p confs
 49. Stale session purge (logout/reconnect)
-
+50. On logout purge session

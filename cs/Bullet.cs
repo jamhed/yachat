@@ -13,6 +13,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    attr: -> super.concat ["uri", "fb_app"]
 
    init: ->
+      super
 
       if FB?
          FB.init
@@ -192,7 +193,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    # methods
 
    send: (msg...) ->
-      @debug "MSG", msg
+      @debug "A-MSG", msg
       @bullet.send JSON.stringify msg  
 
    # [msg, arg1, ..]
@@ -285,7 +286,6 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          @send "user/profile", Cmon.sid()
       else
          @error "Error updating profile."
-
 
    set_user_attr: ->
       @send "user/attr/set", Cmon.sid(), test: "value", more: 123

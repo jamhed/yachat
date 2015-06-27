@@ -57,6 +57,7 @@ define ["pi/Pi"], (aPi) -> class aForm extends aPi
                i.val "" 
 
    init: ->
+      super
       @e.click (ev) => @onClick ev
 
    onClick: (ev) ->

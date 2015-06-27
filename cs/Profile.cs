@@ -1,7 +1,8 @@
 define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 
    init: ->
-      @sub "#bullet@user/profile", (ev, [status, userInfo]) => @draw userInfo
+      super
+      @bsub "user/profile", (ev, [status, userInfo]) => @draw userInfo
       @wait_ajax_done () => @query()
    
    draw: (u) ->

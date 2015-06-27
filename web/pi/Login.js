@@ -2,7 +2,7 @@
 var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-define(["pi/Pi"], function(aPi) {
+define(["Nsend"], function(aPi) {
   var Login;
   return Login = (function(superClass) {
     extend(Login, superClass);
@@ -16,9 +16,10 @@ define(["pi/Pi"], function(aPi) {
     };
 
     Login.prototype.init = function() {
+      Login.__super__.init.apply(this, arguments);
       return this.e.click((function(_this) {
         return function(ev) {
-          return _this.rpc("#bullet@self", [], function(bullet) {
+          return _this.brpc("self", [], function(bullet) {
             var h;
             h = bullet.fb_status === "connected" ? {
               fb_connect: 1

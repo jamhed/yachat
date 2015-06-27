@@ -10,6 +10,8 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
    query: -> @nsend ["user/avatar", Cmon.sid()], (status, avatarList) => @draw avatarList, ""
 
    init: ->
-      @sub "#bullet@sys/avatar/upload", (e, avatarId) => @draw [[avatarId, "image"]], Date.now()
+      super
+      
+      @bsub "sys/avatar/upload", (e, avatarId) => @draw [[avatarId, "image"]], Date.now()
 
       @wait_ajax_done => @query()

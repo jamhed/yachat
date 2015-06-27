@@ -16,6 +16,7 @@ define(["pi/Pi"], function(Pi) {
     };
 
     ProfileAttr.prototype.init = function() {
+      ProfileAttr.__super__.init.apply(this, arguments);
       return this.e.click((function(_this) {
         return function(ev, args) {
           return _this.rpc(_this.a.target);

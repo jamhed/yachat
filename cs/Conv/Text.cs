@@ -11,26 +11,22 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
    query: -> @nsend ["conv/history", Cmon.sid(), Cmon.conv_id()], (status, rows) => @draw rows
 
    init: ->
-      @sub "#bullet@new_msg", (e, args) =>
+      super
+      @bsub "new_msg", (e, args) =>
          [convId, user, msg] = args
          if convId == Cmon.conv_id()
             @append user, msg
 
-      @sub "#bullet@conv_msg", (e, args) =>
+      @bsub "conv_msg", (e, args) =>
          [convId, [stamp, [msg, user]]] = args
          if convId == Cmon.conv_id()
             @append user, [stamp, msg]
 
-      @sub "#bullet@conv/status/part", (e,args) => @clear()
-
-      @sub "#bullet@conv/status/join", (e, args) => @query()
-
-      @sub "#bullet@user/status/registered", (ev, args) => @query()
-
-      @sub "#bullet@user/status/anonymous", (ev, args) => @query()
-
-      @sub "#bullet@user/status/not_logged", (ev, args) => @clear()
-
+      @bsub "conv/status/part", (e,args) => @clear()
+      @bsub "conv/status/join", (e, args) => @query()
+      @bsub "user/status/registered", (ev, args) => @query()
+      @bsub "user/status/anonymous", (ev, args) => @query()
+      @bsub "user/status/not_logged", (ev, args) => @clear()
 
    append: (user, msg) ->
       [stamp,text] = msg
@@ -40,5 +36,3 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
       holder.prepend text_div
       holder.prepend stamp_div
       @e.prepend holder
-
-

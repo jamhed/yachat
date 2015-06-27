@@ -16,6 +16,7 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     };
 
     Online.prototype.init = function() {
+      Online.__super__.init.apply(this, arguments);
       return this.wait_ajax_done((function(_this) {
         return function() {
           return _this.query();

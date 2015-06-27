@@ -30,6 +30,7 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     };
 
     Bullet.prototype.init = function() {
+      Bullet.__super__.init.apply(this, arguments);
       if (typeof FB !== "undefined" && FB !== null) {
         FB.init({
           appId: this.a.fb_app,
@@ -275,7 +276,7 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
     Bullet.prototype.send = function() {
       var msg;
       msg = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      this.debug("MSG", msg);
+      this.debug("A-MSG", msg);
       return this.bullet.send(JSON.stringify(msg));
     };
 

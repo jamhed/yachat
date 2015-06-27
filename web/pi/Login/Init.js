@@ -12,12 +12,13 @@ define(["Nsend"], function(Pi) {
     }
 
     LoginInit.prototype.init = function() {
+      LoginInit.__super__.init.apply(this, arguments);
       return this.wait_ajax_done((function(_this) {
         return function() {
           if (_this.e.attr("processed") === "2") {
             return;
           }
-          return _this.rpc("#bullet@check_user_id");
+          return _this.brpc("check_user_id");
         };
       })(this));
     };

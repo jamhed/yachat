@@ -18,7 +18,6 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     ConvList.prototype.draw = function(List) {
       var Name, conv, i, len, tmpl;
       tmpl = this.rt.source(this.a.view);
-      this.debug("DRAW", List);
       this.clear();
       for (i = 0, len = List.length; i < len; i++) {
         conv = List[i];
@@ -56,32 +55,33 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.init = function() {
-      this.sub("#bullet@conv/update", (function(_this) {
+      ConvList.__super__.init.apply(this, arguments);
+      this.bsub("conv/update", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@conv/status/join", (function(_this) {
+      this.bsub("conv/status/join", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@conv/status/part", (function(_this) {
+      this.bsub("conv/status/part", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@user/status/registered", (function(_this) {
+      this.bsub("user/status/registered", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@user/status/anonymous", (function(_this) {
+      this.bsub("user/status/anonymous", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@user/status/not_logged", (function(_this) {
+      this.bsub("user/status/not_logged", (function(_this) {
         return function(ev, args) {
           return _this.clear();
         };

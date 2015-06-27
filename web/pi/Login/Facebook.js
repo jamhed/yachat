@@ -12,6 +12,7 @@ define(["Nsend"], function(aPi) {
     }
 
     LoginFacebook.prototype.init = function() {
+      LoginFacebook.__super__.init.apply(this, arguments);
       return this.wait_ajax_done((function(_this) {
         return function() {
           return _this.ncall(function(bo) {

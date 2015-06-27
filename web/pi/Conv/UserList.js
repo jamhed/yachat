@@ -38,37 +38,38 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     ConvList.prototype.init = function() {
-      this.sub("#bullet@conv/update", (function(_this) {
+      ConvList.__super__.init.apply(this, arguments);
+      this.bsub("conv/update", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@conv/status/invite", (function(_this) {
+      this.bsub("conv/status/invite", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@conv/status/join", (function(_this) {
+      this.bsub("conv/status/join", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@conv/status/part", (function(_this) {
+      this.bsub("conv/status/part", (function(_this) {
         return function(ev, args) {
           return _this.clear();
         };
       })(this));
-      this.sub("#bullet@user/status/registered", (function(_this) {
+      this.bsub("user/status/registered", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      this.sub("#bullet@user/status/anonymous", (function(_this) {
+      this.bsub("user/status/anonymous", (function(_this) {
         return function(ev, args) {
           return _this.query();
         };
       })(this));
-      return this.sub("#bullet@user/status/not_logged", (function(_this) {
+      return this.bsub("user/status/not_logged", (function(_this) {
         return function(ev, args) {
           return _this.clear();
         };

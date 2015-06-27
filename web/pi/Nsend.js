@@ -12,18 +12,46 @@ define(["pi/Pi"], function(aPi) {
       return Nsend.__super__.constructor.apply(this, arguments);
     }
 
+    Nsend.prototype.attr = function() {
+      return Nsend.__super__.attr.apply(this, arguments).concat(['bullet']);
+    };
+
+    Nsend.prototype.init = function() {
+      if (!this.a.bullet) {
+        return this.a.bullet = "#bullet";
+      }
+    };
+
     Nsend.prototype.nsend = function(msg, callback) {
-      return this.rpc("#bullet@self", [], (function(_this) {
-        return function(bullet) {
-          return bullet.nsend(msg, callback);
+      return this.rpc(this.a.bullet + "@self", [], (function(_this) {
+        return function(b) {
+          return b.nsend(msg, callback);
         };
       })(this));
     };
 
     Nsend.prototype.ncall = function(callback) {
-      return this.rpc("#bullet@self", [], function(bulletObj) {
-        return callback(bulletObj);
+      return this.rpc(this.a.bullet + "@self", [], function(b) {
+        return callback(b);
       });
+    };
+
+    Nsend.prototype.send = function() {
+      var msg;
+      msg = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      return this.rpc(this.a.bullet + "@self", [], (function(_this) {
+        return function(b) {
+          return b.send.apply(b, msg);
+        };
+      })(this));
+    };
+
+    Nsend.prototype.bsub = function(ev, callback) {
+      return this.sub(this.a.bullet + "@" + ev, callback);
+    };
+
+    Nsend.prototype.brpc = function(method, args, callback) {
+      return this.rpc(this.a.bullet + "@" + method, args, callback);
     };
 
     Nsend.prototype.error = function() {
@@ -37,7 +65,7 @@ define(["pi/Pi"], function(aPi) {
     Nsend.prototype.info = function() {
       var m;
       m = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      return this.rt.append("dialog/info", {
+      return rt.append("dialog/info", {
         text: m.join(" ")
       });
     };

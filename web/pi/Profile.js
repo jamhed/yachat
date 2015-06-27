@@ -13,7 +13,8 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     }
 
     Profile.prototype.init = function() {
-      this.sub("#bullet@user/profile", (function(_this) {
+      Profile.__super__.init.apply(this, arguments);
+      this.bsub("user/profile", (function(_this) {
         return function(ev, arg) {
           var status, userInfo;
           status = arg[0], userInfo = arg[1];

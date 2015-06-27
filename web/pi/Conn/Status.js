@@ -12,14 +12,15 @@ define(["Nsend"], function(Pi) {
     }
 
     ConnStatus.prototype.init = function() {
-      this.sub("#bullet@conn/open", (function(_this) {
+      ConnStatus.__super__.init.apply(this, arguments);
+      this.bsub("conn/open", (function(_this) {
         return function() {
           return _this.e.css({
             color: "#fff"
           });
         };
       })(this));
-      return this.sub("#bullet@conn/close", (function(_this) {
+      return this.bsub("conn/close", (function(_this) {
         return function() {
           return _this.e.css({
             color: "#aaa"

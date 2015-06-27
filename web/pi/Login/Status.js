@@ -18,7 +18,6 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     LoginStatus.prototype.logged = function(user) {
       var tmpl;
       this.clear();
-      this.debug("USER:", user);
       tmpl = mSource.get(this.a.logout);
       this.e.html(tmpl({
         display: Cmon.displayNameA(user)
@@ -33,17 +32,18 @@ define(["Nsend", "pi/m/Source", "Cmon"], function(aPi, mSource, Cmon) {
     };
 
     LoginStatus.prototype.init = function() {
-      this.sub("#bullet@user/status/registered", (function(_this) {
+      LoginStatus.__super__.init.apply(this, arguments);
+      this.bsub("user/status/registered", (function(_this) {
         return function(ev, user) {
           return _this.logged(user);
         };
       })(this));
-      this.sub("#bullet@user/status/not_logged", (function(_this) {
+      this.bsub("user/status/not_logged", (function(_this) {
         return function(ev) {
           return _this.not_logged();
         };
       })(this));
-      return this.sub("#bullet@user/status/anonymous", (function(_this) {
+      return this.bsub("user/status/anonymous", (function(_this) {
         return function(ev, user) {
           return _this.logged(user);
         };

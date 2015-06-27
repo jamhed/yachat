@@ -1,12 +1,23 @@
 define ["pi/Pi"], (aPi) -> class Nsend extends aPi
-   
-   nsend: (msg, callback) -> @rpc "#bullet@self", [], (bullet) => bullet.nsend msg, callback
 
-   ncall: (callback) -> @rpc "#bullet@self", [], (bulletObj) -> callback bulletObj
+	attr: -> super.concat ['bullet']
 
-   error: (m...) -> 
-      @rt.append "dialog/error", text: m.join(" ")
+	init: ->
+		if ! @a.bullet
+			@a.bullet = "#bullet"
 
-   info: (m...) -> 
-      @rt.append "dialog/info", text: m.join(" ")
+	nsend: (msg, callback) -> @rpc "#{@a.bullet}@self", [], (b) => b.nsend msg, callback
 
+	ncall: (callback) -> @rpc "#{@a.bullet}@self", [], (b) -> callback(b)
+
+	send: (msg...) -> @rpc "#{@a.bullet}@self", [], (b) => b.send msg...
+
+	bsub: (ev, callback) -> @sub "#{@a.bullet}@#{ev}", callback
+
+	brpc: (method, args, callback) -> @rpc "#{@a.bullet}@#{method}", args, callback
+
+	error: (m...) -> 
+		@rt.append "dialog/error", text: m.join(" ")
+
+	info: (m...) -> 
+		rt.append "dialog/info", text: m.join(" ")

@@ -3,6 +3,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Online extends Pi
    attr: -> super.concat ["view"]
 
    init: ->
+      super
       @wait_ajax_done () => @query()
    
    draw: (userList) ->

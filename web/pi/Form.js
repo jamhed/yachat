@@ -143,6 +143,7 @@ define(["pi/Pi"], function(aPi) {
     };
 
     aForm.prototype.init = function() {
+      aForm.__super__.init.apply(this, arguments);
       return this.e.click((function(_this) {
         return function(ev) {
           return _this.onClick(ev);

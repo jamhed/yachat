@@ -4,7 +4,6 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
 
    logged: (user) ->
       @clear()
-      @debug "USER:", user
       tmpl = mSource.get(@a.logout)
       @e.html tmpl display: Cmon.displayNameA user
       @rt.pi @e
@@ -15,9 +14,8 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
       @rt.pi @e
  
    init: ->
-
-      @sub "#bullet@user/status/registered", (ev, user) => @logged user
-
-      @sub "#bullet@user/status/not_logged", (ev) => @not_logged()
-     
-      @sub "#bullet@user/status/anonymous", (ev, user) => @logged user
+      super
+      
+      @bsub "user/status/registered", (ev, user) => @logged user
+      @bsub "user/status/not_logged", (ev) => @not_logged()
+      @bsub "user/status/anonymous", (ev, user) => @logged user

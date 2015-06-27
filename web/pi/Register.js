@@ -3,7 +3,7 @@ var extend = function(child, parent) { for (var key in parent) { if (hasProp.cal
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
-define(["pi/Pi"], function(Pi) {
+define(["Nsend"], function(Pi) {
   var Register;
   return Register = (function(superClass) {
     extend(Register, superClass);
@@ -17,7 +17,7 @@ define(["pi/Pi"], function(Pi) {
     };
 
     Register.prototype.init = function() {
-      return this.sub("#bullet@user/register", (function(_this) {
+      return this.bsub("user/register", (function(_this) {
         return function(e, args) {
           var status;
           return status = args[0], args;

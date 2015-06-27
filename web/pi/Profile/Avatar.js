@@ -30,7 +30,8 @@ define(["Nsend", "Cmon"], function(Pi, Cmon) {
     };
 
     ConvText.prototype.init = function() {
-      this.sub("#bullet@sys/avatar/upload", (function(_this) {
+      ConvText.__super__.init.apply(this, arguments);
+      this.bsub("sys/avatar/upload", (function(_this) {
         return function(e, avatarId) {
           return _this.draw([[avatarId, "image"]], Date.now());
         };

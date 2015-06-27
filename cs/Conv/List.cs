@@ -5,8 +5,6 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
    draw: (List) ->
       tmpl = @rt.source @a.view
       
-      @debug "DRAW", List
-
       @clear()
       for conv in List
          Name = if conv.name then conv.name else conv.id
@@ -27,18 +25,15 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
          @rpc "#bullet@pub_event", ["conv/status/part"]
  
    init: ->
-
-      @sub "#bullet@conv/update", (ev, args) => @query()
-
-      @sub "#bullet@conv/status/join", (ev, args) => @query()
-
-      @sub "#bullet@conv/status/part", (ev, args) => @query()
+      super
       
-      @sub "#bullet@user/status/registered", (ev, args) => @query()
-
-      @sub "#bullet@user/status/anonymous", (ev, args) => @query()
-
-      @sub "#bullet@user/status/not_logged", (ev, args) => @clear()
+      @bsub "conv/update", (ev, args) => @query()
+      @bsub "conv/status/join", (ev, args) => @query()
+      @bsub "conv/status/part", (ev, args) => @query()
+      @bsub "user/status/registered", (ev, args) => @query()
+      @bsub "user/status/anonymous", (ev, args) => @query()
+      @bsub "user/status/not_logged", (ev, args) => @clear()
 
       @wait_ajax_done =>
          @nsend ["user/conv_list", Cmon.sid()], (status, List) => @autojoin List
+
