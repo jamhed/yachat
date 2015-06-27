@@ -119,13 +119,20 @@ drop_online_status([UO = #user_online{id=Id, pid=Pid, user_id=Uid, session_id=Si
    dbd:put(UO#user_online{online=false, stamp=now()}),
    drop_online_status(R).
 
+notify_logout([]) -> ok;
+notify_logout([#user_online{id=Id, pid=Pid, user_id=Uid, session_id=Sid} | R]) ->
+   ?INFO("logout: uo_id=~p user_id=~p sid=~p pid=~p", [Id, Uid, Sid, Pid]),
+   notify_conv(Uid, conv(Uid), [<<"logout">>, detail_short(Uid)]),
+   dbd:delete(user_online, Id),
+   notify_logout(R).
+
 offline(Pid) ->
    R = dbd:index(user_online, pid, Pid),
    drop_online_status(R).
 
 logout(Pid) ->
    R = dbd:index(user_online, pid, Pid),
-   drop_online_status(R).
+   notify_logout(R).
 
 notify_conv(_Uid, [], _Msg) -> ok;
 notify_conv(Uid, [Cid | Rest], Msg) ->

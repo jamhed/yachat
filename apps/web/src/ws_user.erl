@@ -51,7 +51,7 @@ user_login(_, _) -> [fail, protocol].
 % create user and session
 user_new(NewUid, ok) when is_number(NewUid) ->
    Sid = db_user:online(NewUid),
-   [ok, Sid, NewUid];
+   [ok, Sid, db_user:detail_short(NewUid)];
 user_new(Id, Status) -> ?ERR("user_new() id:~p status:~p", [Id, Status]), [fail].
 
 check_keys(Uid, [#user{id=Uid}]) -> ne;
@@ -91,8 +91,8 @@ get_conv_name(Uid, [#conv{id=Cid, type="p2p"}]) ->
    end;
 get_conv_name(_Uid, [#conv{id=Cid}]) -> [ {id,Cid}, {name,null} ].
 
-name_convs(Uid, CidList) -> [ {get_conv_name(Uid, db_conv:get(Cid))} || Cid <- CidList];
-name_convs(Uid, []) -> [].
+name_convs(_Uid, []) -> [];
+name_convs(Uid, CidList) -> [ {get_conv_name(Uid, db_conv:get(Cid))} || Cid <- CidList].
 
 user_conv_list(Uid) when is_number(Uid) ->
    Convs = db_user:conv(Uid),
@@ -115,10 +115,14 @@ user_online_list(Uid) when is_number(Uid) ->
 user_online_list(_) -> [fail, protocol].
 
 user_make_p2p(Uid, PeerId) ->
-   Cid = db_conv:p2p(Uid, PeerId),
-   db_conv:notify(Uid, Cid, [<<"p2p">>, db_user:detail_short(Uid)]),
-   [Peer | _] = db_user:detail_short(db_conv:peers(Cid, Uid)),
-   [ok, Cid, Peer].
+   case Uid of
+      PeerId -> [fail, no_self_p2p];
+      _ ->
+         Cid = db_conv:p2p(Uid, PeerId),
+         db_conv:notify(Uid, Cid, [<<"p2p">>, db_user:detail_short(Uid)]),
+         [Peer | _] = db_user:detail_short(db_conv:peers(Cid, Uid)),
+         [ok, Cid, Peer]
+   end.
 
 %
 % MESSAGES

@@ -127,11 +127,11 @@ define(["Nsend", "/js/bullet.js", "Cmon"], function(Pi, Bullet, Cmon) {
       })(this));
       this.handler("user/new", (function(_this) {
         return function(e, args) {
-          var sessionId, status, userId;
-          status = args[0], sessionId = args[1], userId = args[2];
+          var sessionId, status, user;
+          status = args[0], sessionId = args[1], user = args[2];
           if (status === "ok") {
             Cmon.set_sid(sessionId);
-            return _this.user_status("anonymous", [userId]);
+            return _this.user_status("anonymous", user);
           } else {
             _this.user_status = "not_logged";
             return _this.error("Server protocol");

@@ -83,11 +83,11 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @handler "user/new", (e, args) =>
          
-         [ status, sessionId, userId ] = args
+         [ status, sessionId, user ] = args
 
          if status == "ok"
             Cmon.set_sid sessionId
-            @user_status "anonymous", [userId]
+            @user_status "anonymous", user
          else
             @user_status ="not_logged"
             @error "Server protocol"
