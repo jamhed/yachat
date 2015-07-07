@@ -30,8 +30,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
       @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
 
       @bullet.onopen = () =>
-         @debug "conn()"
-         @event "conn/open"
+         @event "conn/open", ""
      
       @bullet.ondisconnect = =>
          @user_status "not_logged"
@@ -53,12 +52,12 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @handler "nmsg", (e, data) =>
          [seq, [msg, args...]] = data
-         @debug "NMSG:", seq, msg, args
+         @debug "bullet", "NMSG:", seq, msg, args
          if @cb_nsend[seq]
             if @cb_nsend[seq].msg == msg
                @cb_nsend[seq].fn args...
             else
-               @debug "NMSG:", "unmatched message for seq", seq, msg, @cb_nsend[seq].msg, args
+               @debug "bullet", "NMSG:", "unmatched message for seq", seq, msg, @cb_nsend[seq].msg, args
             delete @cb_nsend[seq]
          else
             @error "no callback for seq", seq
@@ -69,14 +68,14 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             Cmon.set_conv_id convId
             @conv_status "join", convId
          if msg == "part"
-            @debug "PART", convId
+            @debug "bullet", "PART", convId
             @event "conv/update", convId
          if msg == "join"
-            @debug "JOIN", convId
+            @debug "bullet", "JOIN", convId
             @event "conv/update", convId
 
       @handler "sys_msg", (e, [[msg,id]]) =>
-         @debug "sys msg", msg
+         @debug "bullet", "sys msg", msg
          @event "sys/#{msg}", id
 
 
@@ -174,32 +173,30 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
          @user_status "not_logged"
  
    user_status: (status, userRec) ->
-      @debug "user status:", status
       @_user_status = status
       @event "user/status/#{status}", userRec
 
    conv_status: (status, convId) ->
       @_conv_status = status
-      @debug "conv status:", status, convId
       @event "conv/status/#{status}", convId
 
    error: (m...) -> 
-      @rt.append "dialog/error", text: m.join(" ")
+      @append "dialog/error", text: m.join(" ")
 
    event: (e,args) =>
-      @debug "EVENT", e, args # [].concat args...
+      @debug "bullet", "EVENT", e, args # [].concat args...
       super e, args
       
    # methods
 
    send: (msg...) ->
-      @debug "A-MSG", msg
+      @debug "bullet", "A-MSG", msg
       @bullet.send JSON.stringify msg  
 
    # [msg, arg1, ..]
    nsend: (msg, callback) ->
       @seq = @seq + 1
-      @debug "N-MSG", @seq, msg
+      @debug "bullet", "N-MSG", @seq, msg
       @cb_nsend[@seq] = fn: callback, msg: msg[0]
       @bullet.send JSON.stringify ["nmsg", @seq, msg]
 
@@ -249,7 +246,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             @error "Can't find user by email."
 
    dialog_invite: ->
-      @rt.append "dialog/invite"
+      @append "dialog/invite"
 
    register_facebook: ->
       FB.login ((r) => @handle_fb_register(r)), scope: "public_profile,email"

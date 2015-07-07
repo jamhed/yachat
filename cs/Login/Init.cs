@@ -2,7 +2,9 @@ define ["Nsend"], (Pi) -> class LoginInit extends Pi
 
 	init: ->
 		super
+		@wait_ajax_done => @query()
 
-		@wait_ajax_done =>
-			return if @e.attr("processed") == "2"
-			@brpc "check_user_id"
+		@sub "#router@hash/change", =>
+			@wait_ajax_done => @query()
+
+	query: -> @brpc "check_user_id"
