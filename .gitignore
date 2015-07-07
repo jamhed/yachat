@@ -13,3 +13,5 @@ protocol.js
 ebin
 /bower_components
 /store
+web/js
+web/pi
