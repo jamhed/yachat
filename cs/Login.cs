@@ -8,5 +8,5 @@ define ["Nsend"], (aPi) -> class Login extends aPi
 			@brpc "self", [], (bullet) =>
 				h = if bullet.fb_status == "connected" then fb_connect: 1 else fb_connect: 0
 
-				@rt.append @a.dialog, h
-				@rt.pi @e
+				@append @a.dialog, h
+				@process @e

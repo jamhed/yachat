@@ -3,14 +3,14 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
    attr: -> super.concat ["view"]
 
    draw: (List) ->
-      tmpl = @rt.source @a.view
+      tmpl = @tmpl @a.view
       
       @clear()
       for conv in List
          Name = if conv.name then conv.name else conv.id
          @e.append tmpl id: conv.id, name: Name
      
-      @rt.pi @e
+      @process @e
 
    query: -> @nsend ["user/conv_list", Cmon.sid()], (status, List) => @draw List
 

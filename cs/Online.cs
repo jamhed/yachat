@@ -8,11 +8,11 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Online extends Pi
    
    draw: (userList) ->
       @clear()
-      tmpl = @rt.source @a.view
+      tmpl = @tmpl @a.view
       @e.append tmpl {id: userInfo.id, display: Cmon.displayNameA(userInfo) } for userInfo in userList
-      @rt.pi @e
+      @process @e
 
    query: ->
       @nsend ["user/online", Cmon.sid()], (status, userList) =>
-         @debug status, userList
+         @debug "online", status, userList
          @draw userList

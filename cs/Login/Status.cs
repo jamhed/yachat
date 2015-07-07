@@ -4,14 +4,14 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
 
    logged: (user) ->
       @clear()
-      tmpl = mSource.get(@a.logout)
+      tmpl = @tmpl @a.logout
       @e.html tmpl display: Cmon.displayNameA user
-      @rt.pi @e
+      @process @e
 
    not_logged: ->
       @clear()
-      @e.html mSource.get(@a.login)
-      @rt.pi @e
+      @e.html @tmpl @a.login
+      @process @e
  
    init: ->
       super

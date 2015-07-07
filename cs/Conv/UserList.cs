@@ -4,9 +4,9 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
 
    draw: (List) ->
       @clear()
-      tmpl = @rt.source @a.view
+      tmpl = @tmpl @a.view
       @e.append tmpl {id: User.id, display: Cmon.displayNameA User } for User in List
-      @rt.pi @e
+      @append @e
 
    query: ->
       @nsend ["conv/users", Cmon.sid(), Cmon.conv_id()], (status, List) => @draw List

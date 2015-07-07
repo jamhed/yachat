@@ -17,7 +17,7 @@ define ["pi/Pi"], (aPi) -> class Nsend extends aPi
 	brpc: (method, args, callback) -> @rpc "#{@a.bullet}@#{method}", args, callback
 
 	error: (m...) -> 
-		@rt.append "dialog/error", text: m.join(" ")
+		@append "dialog/error", text: m.join(" ")
 
 	info: (m...) -> 
-		rt.append "dialog/info", text: m.join(" ")
+		@append "dialog/info", text: m.join(" ")

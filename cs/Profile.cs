@@ -11,7 +11,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 
    query: ->
       @nsend ["user/get", Cmon.sid()], (status, sessionId, userInfo) =>
-         @debug status, userInfo
+         @debug "profile", status, userInfo
          @draw userInfo
 
    update: (l...)  ->
