@@ -26,7 +26,6 @@ TODO NEXT
 1. Display uploaded file list
 2. Get avatar from facebook
 3. Auth with facebook (not using facebook id)
-4. On click on #index no reload sometimes
 
 2. Split to proper modules ws_ and db_
 6. Count messages for diff. convs in UI
@@ -84,3 +83,5 @@ DONE
 48. Names for p2p confs
 49. Stale session purge (logout/reconnect)
 50. On logout purge session
+51. On click on #index no reload sometimes
+
