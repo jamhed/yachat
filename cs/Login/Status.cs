@@ -9,6 +9,7 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
       @process @e
 
    not_logged: ->
+      @debug "not_logged"
       @clear()
       @e.html @tmpl @a.login
       @process @e

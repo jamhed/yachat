@@ -84,4 +84,3 @@ DONE
 49. Stale session purge (logout/reconnect)
 50. On logout purge session
 51. On click on #index no reload sometimes
-

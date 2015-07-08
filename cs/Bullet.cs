@@ -27,10 +27,13 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @uri = @a.uri || "ws://" + window.location.hostname + ":" + window.location.port + "/main/ws/"
       
-      @bullet = $.bullet @uri, disableWebSocket: false, disableEventSource: true, disableXHRPolling: true
+      @bullet = $.bullet @uri,
+         disableWebSocket: false,
+         disableEventSource: true,
+         disableXHRPolling: true
 
       @bullet.onopen = () =>
-         @event "conn/open", ""
+         @event "conn/open"
      
       @bullet.ondisconnect = =>
          @user_status "not_logged"
@@ -52,12 +55,12 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
       @handler "nmsg", (e, data) =>
          [seq, [msg, args...]] = data
-         @debug "bullet", "NMSG:", seq, msg, args
+         @debug "NMSG:", seq, msg, args
          if @cb_nsend[seq]
             if @cb_nsend[seq].msg == msg
                @cb_nsend[seq].fn args...
             else
-               @debug "bullet", "NMSG:", "unmatched message for seq", seq, msg, @cb_nsend[seq].msg, args
+               @debug "NMSG:", "unmatched message for seq", seq, msg, @cb_nsend[seq].msg, args
             delete @cb_nsend[seq]
          else
             @error "no callback for seq", seq
@@ -68,14 +71,14 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
             Cmon.set_conv_id convId
             @conv_status "join", convId
          if msg == "part"
-            @debug "bullet", "PART", convId
+            @debug "PART", convId
             @event "conv/update", convId
          if msg == "join"
-            @debug "bullet", "JOIN", convId
+            @debug "JOIN", convId
             @event "conv/update", convId
 
       @handler "sys_msg", (e, [[msg,id]]) =>
-         @debug "bullet", "sys msg", msg
+         @debug "sys msg", msg
          @event "sys/#{msg}", id
 
 
@@ -183,20 +186,20 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    error: (m...) -> 
       @append "dialog/error", text: m.join(" ")
 
-   event: (e,args) =>
-      @debug "bullet", "EVENT", e, args # [].concat args...
+   event: (e,args = []) =>
+      @debug "event", e, args # [].concat args...
       super e, args
       
    # methods
 
    send: (msg...) ->
-      @debug "bullet", "A-MSG", msg
+      @debug "A-MSG", msg
       @bullet.send JSON.stringify msg  
 
    # [msg, arg1, ..]
    nsend: (msg, callback) ->
       @seq = @seq + 1
-      @debug "bullet", "N-MSG", @seq, msg
+      @debug "N-MSG", @seq, msg
       @cb_nsend[@seq] = fn: callback, msg: msg[0]
       @bullet.send JSON.stringify ["nmsg", @seq, msg]
 
