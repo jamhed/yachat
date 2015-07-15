@@ -1,5 +1,5 @@
-define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
-# define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+# define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
    seq: 0
    cb_nsend: null
@@ -256,7 +256,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 
    fb_login: ->
       if @fb_status == "connected"
-         @send "user/fb", [@fb_id]
+         @send "user/fb", [@fb_id, @fb_token]
       else
          @error "Connect profile to facebook first!"
 
@@ -269,14 +269,16 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
    handle_fb_register: (r) ->
       if r.status == "connected"
          @handle_fb_auth r
-         FB.api "/me", (r) =>
+         FB.api "/me", (profile) =>
+            @debug r, profile
             @nsend ["user/update", Cmon.sid(),
-               facebook_id: r.id,
-               email: r.email,
-               firstname: r.first_name,
-               lastname: r.last_name,
-               username: r.name,
-               gender: r.gender
+               facebook_id: profile.id,
+               facebook_token: @fb_token,
+               email: profile.email,
+               firstname: profile.first_name,
+               lastname: profile.last_name,
+               username: profile.name,
+               gender: profile.gender
             ], (r) => @handle_fb_register_ok(r)
       else
          @error "Facebook status #{r.status}"

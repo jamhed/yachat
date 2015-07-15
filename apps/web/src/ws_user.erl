@@ -32,12 +32,12 @@ user_get(Uid) when is_number(Uid) ->
 user_get(_) -> [fail, db, []].
 
 % find user by facebook id
-user_fb(FbId) when is_binary(FbId) ->
+user_fb(FbId, ok) when is_binary(FbId) ->
    [U] = db_user:get_by_fb(FbId),
    Sid = db_user:online(U#user.id),
    [ok, User] = get_user_info([U]),
    [ok, Sid, User];
-user_fb(_) -> [fail, protocol, sid].
+user_fb(_, _) -> [fail, protocol, sid].
 
 % login user
 user_login(Password, [#user{id=Uid, password=Password}]) ->
@@ -61,25 +61,28 @@ check_keys(_, _) -> e.
 check_user_keys(U, Plist) ->
    E = proplists:get_value(<<"email">>, Plist),
    Fb = proplists:get_value(<<"facebook_id">>, Plist),
-   [check_keys(U#user.id, db_user:get_by_email(E)), check_keys(U#user.id, db_user:get_by_fb(Fb))].
+   Token = proplists:get_value(<<"facebook_token">>, Plist),
+   [
+      check_keys(U#user.id, db_user:get_by_email(E)),
+      check_keys(U#user.id, db_user:get_by_fb(Fb)),
+      ext_auth:check_fb(Fb, Token)
+   ].
 
 % update user
 user_update(Uid, Plist) when is_number(Uid), is_list(Plist) -> user_update(db_user:get(Uid), Plist);
 user_update([User], Plist) when is_record(User, user) ->
    case check_user_keys(User, Plist) of
-      [ne,ne] ->
+      [ne,ne,ok] ->
          Ux = db_user:set_by_props(User, Plist),
          dbd:put(Ux),
          [ok];
-      _ ->
-         [fail, exists]
+      [_,_,Fb] ->
+         [fail, exists, Fb]
    end;
 user_update(_,_) -> [fail, args].
 
 get_user_name(#user{id=Id, username=undefined}) -> erlang:integer_to_binary(Id);
 get_user_name(#user{id=_Id, username=Name}) -> Name.
-
-
 
 get_conv_name(Uid, [#conv{id=Cid, type="p2p"}]) ->
    ?INFO("~p ~p", [Uid, Cid]),
@@ -151,9 +154,9 @@ msg(M = <<"user/logout">>, []) ->
    [M, ok];
 
 %msg login by by facebook_id
-msg(M = <<"user/fb">>, [FbId]) ->
+msg(M = <<"user/fb">>, [FbId, Token]) ->
    ?INFO("~s fbid:~p", [M, FbId]),
-   [M] ++ user_fb(FbId);
+   [M] ++ user_fb(FbId, ext_auth:check_fb(FbId, Token));
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
