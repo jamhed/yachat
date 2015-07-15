@@ -68,6 +68,14 @@ check_user_keys(U, Plist) ->
       ext_auth:check_fb(Fb, Token)
    ].
 
+get_fb_avatar(Uid, FbId) when is_binary(FbId) ->
+   {Mime, Data} = ext_auth:fb_picture(erlang:binary_to_integer(FbId)),
+   FileId = user_file:store("store", Data, Uid, <<"avatar">>, Mime),
+   db_msg:sys_notify(Uid, [<<"avatar/upload">>, FileId]);
+get_fb_avatar(Uid, Fbid) ->
+   ?INFO("no fb avatar:~p ~p", [Uid, Fbid]),
+   ok.
+
 % update user
 user_update(Uid, Plist) when is_number(Uid), is_list(Plist) -> user_update(db_user:get(Uid), Plist);
 user_update([User], Plist) when is_record(User, user) ->
@@ -75,6 +83,7 @@ user_update([User], Plist) when is_record(User, user) ->
       [ne,ne,ok] ->
          Ux = db_user:set_by_props(User, Plist),
          dbd:put(Ux),
+         get_fb_avatar(User#user.id, proplists:get_value(<<"facebook_id">>, Plist)),
          [ok];
       [_,_,Fb] ->
          [fail, exists, Fb]
