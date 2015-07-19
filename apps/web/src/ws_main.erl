@@ -19,21 +19,21 @@ pre_handle(Req, State, [<<"nmsg">>, Seq, [Msg, Sid | Args]]) when is_number(Seq)
    ?INFO("N-MSG: ~p MSG: ~p SID: ~p ARGS: ~p", [Seq, Msg, Sid, Args]),
    Raw = module_route( db_user:sid_to_uid(Sid), Msg, Args ),
    Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
-   ?INFO("N-MSG REPLY: ~p", [Reply]),
+   ?INFO("N-MSG REPLY: ~ts", [Reply]),
    {reply, Reply, Req, State};
 
 pre_handle(Req, State, [ Msg, Sid | Args ]) when is_number(Sid), is_list(Args) ->
    ?INFO("A-MSG: ~p SID: ~p ARGS: ~p", [Msg, Sid, Args]),
    Raw =  module_route( db_user:sid_to_uid(Sid), Msg, Args ),
    Reply = jiffy:encode(Raw),
-   ?INFO("A-MSG REPLY: ~p", [Reply]),
+   ?INFO("A-MSG REPLY: ~ts", [Reply]),
    {reply, Reply, Req, State};
 
 pre_handle(Req, State, [ Msg, Args ]) when is_list(Args) ->
    ?INFO("MSG: ~p ARGS: ~p", [Msg, Args]),
    Raw = module_route( Msg, Args ),
    Reply = jiffy:encode(Raw),
-   ?INFO("MSG REPLY: ~p", [Reply]),
+   ?INFO("MSG REPLY: ~ts", [Reply]),
    {reply, Reply, Req, State};
 
 pre_handle(Req, State, _) -> {reply, <<"income_message_format_error">>, Req, State}.
