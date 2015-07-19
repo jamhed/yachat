@@ -7,7 +7,7 @@
 
 metainfo() -> 
     #schema{name=dbd,tables=[
-        #table{name=user,fields=record_info(fields,user), keys=[facebook_id, email]},
+        #table{name=user,fields=record_info(fields,user), keys=[facebook_id, email, username]},
         #table{name=conv,fields=record_info(fields,conv), keys=[]},
         #table{name=message, fields=record_info(fields, message), keys=[user_id]},
         #table{name=user_attr, fields=record_info(fields, user_attr), keys=[user_id]},
