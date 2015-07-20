@@ -18,21 +18,21 @@ $ make console
 
 TODO
 ====
-5. On reconnects sometimes it says socket in connecting state
+
 
 TODO NEXT
 =========
 0. On new user login/profile update notify user lists (lobby, convs)
 1. Display uploaded file list
-2. Get avatar from facebook
-3. Auth with facebook (not using facebook id)
-
 2. Split to proper modules ws_ and db_
 6. Count messages for diff. convs in UI
 12. on leaving p2p conv destroy it?
 
 DONE
 ====
+2. Get avatar from facebook
+3. Auth with facebook (not using facebook id)
+5. On reconnects sometimes it says socket in connecting state
 1. 60-sec reconnect
 2. Message timestamps
 3. User registration with names and emails
