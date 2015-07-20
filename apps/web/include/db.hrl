@@ -6,3 +6,4 @@
 -record(user_conv, {id, user_id, conv_id, stamp}).
 -record(user_online, {id, stamp, pid, user_id, session_id, online}).
 -record(user_file, {id, user_id, stamp, type, mime}).
+-record(user_friend, {id, stamp, type, user_id, friend_id}).
