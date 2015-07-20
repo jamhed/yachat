@@ -106,8 +106,11 @@ attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].
+
 get_by_email(Id) when is_binary(Id) -> dbd:index(user, email, Id);
 get_by_email(_) -> [].
+
+get_by_name(Name) -> dbd:index(user, username, Name).
 
 clear_online([]) -> ok;
 clear_online([#user_online{id=Id} | T]) -> dbd:delete(user_online, Id), clear_online(T).

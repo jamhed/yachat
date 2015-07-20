@@ -156,16 +156,20 @@ msg(M = <<"user/login">>, [Email, Password]) ->
    ?INFO("~s email:~p password:~p", [M, Email, Password]),
    [M] ++ user_login(Password, db_user:get_by_email(Email));
 
-%msg logout
-msg(M = <<"user/logout">>, []) ->
-   ?INFO("~s", [M]),
-   db_user:logout(self()),
-   [M, ok];
+msg(M = <<"user/login/name", [Name, Password]) ->
+   ?INFO("~s name:~p password:~p", [M, Name, Password]),
+   [M] ++ user_login(Password, db_user:get_by_username(Name));
 
 %msg login by by facebook_id
 msg(M = <<"user/fb">>, [FbId, Token]) ->
    ?INFO("~s fbid:~p", [M, FbId]),
    [M] ++ user_fb(FbId, ext_auth:check_fb(FbId, Token));
+
+%msg logout
+msg(M = <<"user/logout">>, []) ->
+   ?INFO("~s", [M]),
+   db_user:logout(self()),
+   [M, ok];
 
 %msg find user by email
 msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
@@ -187,7 +191,6 @@ msg(M = <<"user/info">>, [Uid, L]) when is_number(Uid), is_list(L) ->
 %msg make p2p conv
 msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_make_p2p(Uid, PeerId);
-
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
 msg(M = <<"user/update">>, [Uid, {Plist}]) when is_number(Uid) ->
