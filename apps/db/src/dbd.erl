@@ -14,7 +14,7 @@ map_cfg(Value, _Error) -> {ok, Value}.
 check_cfg_exists(Name, Error) -> map_cfg(?CFG(Name), Error).
 
 check_config() ->
-	cfg:valudate([
+	cfg:validate([
 		check_cfg_exists(dbd, dbd_config_no_driver),
 		check_cfg_exists(schema, dbd_config_no_schema)
 	]).

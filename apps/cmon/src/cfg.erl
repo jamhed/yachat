@@ -32,7 +32,8 @@ handle_module_cfg(Module, [{Module, PropList}]) -> PropList.
 ensure_module_cfg(Module) ->
    handle_module_cfg( Module, ets:lookup(?ETS_NAME, Module) ).
    
-get_m(Module, Key) -> 
+get_m(Module, Key) ->
+   ensure_ets_table(),
    Cfg = ensure_module_cfg(Module),
    Value = proplists:get_value(Key, Cfg),
    Value.
