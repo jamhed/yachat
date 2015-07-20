@@ -165,3 +165,37 @@ handle_online_status([UO], Uid, Pid) ->
    UO#user_online.session_id.
 
 online(Uid) -> handle_online_status(get_online_status(Uid),Uid,self()).
+
+% friends
+
+map_status_result([]) -> offline;
+map_status_result(R) when is_list(R) -> online.
+
+add_online_status({UserProps}) ->
+   Uid = proplists:get_value(id, UserProps),
+   Status = get_online_status(Uid),
+   {UserProps ++ {status, map_status_result(Status)}}.
+
+get_friends_ids(Uid) ->
+   Q = qlc:q([ C#user_friend.friend_id || C <- mnesia:table(user_friend),
+      C#user_friend.user_id == Uid ]),
+   dbd:do(Q).
+
+get_friends(Uid) -> [ add_online_status(detail_short(FriendId)) || FriendId <- get_friends_ids(Uid) ].
+
+add_friend(Uid, FriendId) -> add_friend(Uid, FriendId, check_friendship(Uid, FriendId)).
+
+add_friend(_Uid, _FriendId, [_F|_Rest]) -> ok;
+add_friend(Uid, FriendId, []) ->
+   dbd:put(#user_friend{
+      id=dbd:next_id(user_friend),
+      stamp=now(),
+      user_id=Uid,
+      friend_id=FriendId,
+      type=friend
+   }).
+
+check_friendship(Uid, FriendId) ->
+   Q = qlc:q([ C || C <- mnesia:table(user_friend),
+      C#user_friend.user_id == Uid, C#user_friend.friend_id == FriendId ]),
+   dbd:do(Q).

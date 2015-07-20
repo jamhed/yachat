@@ -1,6 +1,5 @@
 -module(ws_user).
 -compile(export_all).
-% -export([msg/2]).
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
@@ -250,6 +249,15 @@ msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
    ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
    [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
+
+msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
+   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
+   ok = db_user:add_friend(Uid, FriendId),
+   [M, ok];
+
+msg(M = <<"user/get/friends">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ db_user:get_friends(Uid);
 
 % no match in this module
 msg(_, _) -> skip.
