@@ -72,6 +72,10 @@ body {
 <a href="#profile">Profile</a>
 </script>
 
+<script pi="pi/Source" name="menu/logout/friends" type="text/x-dot">
+<a href="#friends">Friends</a>
+</script>
+
 <script pi="pi/Source" name="menu/login" type="text/x-dot">
 </script>
 
@@ -104,9 +108,11 @@ body {
             <ul class="nav navbar-nav">
                <li><a href="#about">About</a></li>
                <li><a href="#contact">Contact</a></li>
-               <li pi="Login/Status" login="menu/login" logout="menu/logout"></li>
+               <li pi="Login/Status" login="menu/login" logout="menu/logout"></span>
+               <li pi="Login/Status" login="menu/login" logout="menu/logout/friends"></span>
             </ul>
-            <div class="navbar-form navbar-right" pi="Login/Status" login="button/login" logout="button/logout"></div>
+            <div class="navbar-form navbar-right"
+               pi="Login/Status" login="button/login" logout="button/logout"></div>
          </div><!--/.nav-collapse -->
       </div>
    </nav>

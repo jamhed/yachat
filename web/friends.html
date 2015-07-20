@@ -1,0 +1,33 @@
+<script pi="pi/Source" name="profile/friend" type="text/x-dot">
+<div>
+	{{= it.username }} status: {{= it.status }}, 
+	<a href="#" pi="pi/Button" target="parent@remove" data-id="{{= it.id }}">remove</a>
+</div>
+</script>
+
+<script pi="pi/Source" name="dialog/search" type="text/x-dot">
+<div pi="Dialog/Simple" title="Search user">
+   <div>
+      <input type="text" id="term" class="form-control invite" placeholder="User id or username">
+   </div>
+   <div style="margin-top: 20px">
+      <input type="button" class="btn" value="Search" pi="Form" el=".invite" target="#friends@search parent@close">
+      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+   </div>
+</div>
+</script>
+
+<div class="container">
+   <div class="row">
+   		<div class="col-md-12">
+			<button
+				type="button" class="btn" pi="pi/Button" target="#friends@search_dialog">
+					Add friend
+			</button>
+		</div>
+    	<div class="col-md-12">
+    		<h1>Friends</h1>
+    	</div><!-- col-md-12 -->
+    	<div class="col-md-12" id="friends" pi="Profile/Friends" friend="profile/friend"></div>
+    </div><!-- row -->
+</div><!-- container -->

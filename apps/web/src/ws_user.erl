@@ -1,6 +1,5 @@
 -module(ws_user).
 -compile(export_all).
-% -export([msg/2]).
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
@@ -9,7 +8,7 @@ to_proplist([]) -> [].
 
 get_user_info([]) -> [fail, not_found, []];
 get_user_info([#user{id=Uid}]) -> [ ok, db_user:detail(Uid) ];
-get_user_info(Err) -> ?ERR("get_user_info(): ~p", Err), [fail, protocol].
+get_user_info(Err) -> ?ERR("get_user_info(): ~p", [Err]), [fail, protocol].
 
 % find user by email
 user_email(Uid, Email) when is_number(Uid), is_binary(Email) -> get_user_info(db_user:get_by_email(Email));
@@ -180,6 +179,9 @@ msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
 msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
    [M] ++ get_user_info(db_user:get(Uid));
 
+msg(M = <<"user/lookup">>, [Uid, Term]) ->
+   [M] ++ get_user_info(db_user:lookup(Term));
+
 %msg get user info 
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);
@@ -250,6 +252,20 @@ msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
    ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
    [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
+
+msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
+   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
+   ok = db_user:add_friend(Uid, FriendId),
+   [M, ok];
+
+msg(M = <<"user/del/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
+   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
+   ok = db_user:del_friend(Uid, FriendId),
+   [M, ok];
+
+msg(M = <<"user/get/friends">>, [Uid]) when is_number(Uid) ->
+   ?INFO("~s uid:~p", [M, Uid]),
+   [M] ++ [db_user:get_friends(Uid)];
 
 % no match in this module
 msg(_, _) -> skip.

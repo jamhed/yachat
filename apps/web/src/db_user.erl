@@ -100,9 +100,19 @@ attr_get(Uid, Name) ->
 
 attr_get_all(Uid) -> [ {UA#user_attr.id, UA#user_attr.value} || UA <- dbd:index(user_attr, user_id, Uid) ].
 
-
 attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
 
+select_one([]) -> [];
+select_one([U|_]) -> [U].
+
+% term could be user_id or username binary
+lookup(Term) -> 
+   try 
+      Uid = erlang:binary_to_integer(Term),
+      dbd:get(user, Uid)
+   catch
+      _:_ -> select_one(dbd:index(user, username, Term))
+   end.
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].
@@ -165,3 +175,42 @@ handle_online_status([UO], Uid, Pid) ->
    UO#user_online.session_id.
 
 online(Uid) -> handle_online_status(get_online_status(Uid),Uid,self()).
+
+% friends
+
+map_status_result([]) -> offline;
+map_status_result(R) when is_list(R) -> online.
+
+add_online_status({UserProps}) ->
+   Uid = proplists:get_value(id, UserProps),
+   Status = get_online_status(Uid),
+   {UserProps ++ [{status, map_status_result(Status)}]}.
+
+get_friends_ids(Uid) ->
+   Q = qlc:q([ C#user_friend.friend_id || C <- mnesia:table(user_friend),
+      C#user_friend.user_id == Uid ]),
+   dbd:do(Q).
+
+get_friends(Uid) -> [ add_online_status(detail_short(FriendId)) || FriendId <- get_friends_ids(Uid) ].
+
+del_friend_record(#user_friend{id=Id}) -> dbd:delete(user_friend, Id).
+
+del_friend(Uid, FriendId) -> del_friend(check_friendship(Uid, FriendId)).
+del_friend(List) when is_list(List) -> lists:foreach(fun del_friend_record/1, List).
+
+add_friend(Uid, FriendId) -> add_friend(Uid, FriendId, check_friendship(Uid, FriendId)).
+
+add_friend(_Uid, _FriendId, [_F|_Rest]) -> ok;
+add_friend(Uid, FriendId, []) ->
+   dbd:put(#user_friend{
+      id=dbd:next_id(user_friend),
+      stamp=now(),
+      user_id=Uid,
+      friend_id=FriendId,
+      type=friend
+   }).
+
+check_friendship(Uid, FriendId) ->
+   Q = qlc:q([ C || C <- mnesia:table(user_friend),
+      C#user_friend.user_id == Uid, C#user_friend.friend_id == FriendId ]),
+   dbd:do(Q).
