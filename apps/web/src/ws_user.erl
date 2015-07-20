@@ -219,7 +219,7 @@ msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
 %msg get user's online peers 
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
-   [M, db_user:list_online()];
+   [M, db_user:list_online(20)];
 
 %msg get user's online peers 
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->

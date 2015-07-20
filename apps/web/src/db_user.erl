@@ -78,9 +78,14 @@ files(Uid, Type) ->
 
 file_delete(_Uid, FileId) -> dbd:delete(user_file, FileId).
 
-list_online() ->
-	Q = qlc:q([ detail(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
-	dbd:do(Q).
+list_online(Limit) ->
+	Q = qlc:q([ C#user_online.user_id || C <- mnesia:table(user_online) ]),
+	detail(dbd:limit(Q, Limit)).
+
+list_online(Offset, Limit) ->
+   Q = qlc:q([ C#user_online.user_id || C <- mnesia:table(user_online) ]),
+   detail(dbd:limit(Q, Offset, Limit)).
+
 
 pids([H | T]) -> [ pids(H) ] ++ [ pids(Uid) || Uid <- T ];
 pids(Uid) ->

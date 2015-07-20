@@ -73,6 +73,20 @@ limit(QH, Limit) ->
 	{atomic, Msgs} = mnesia:transaction(F),
 	Msgs.
 
+limit(QH, 0, Limit) -> limit(QH, Limit);
+limit(QH, 1, Limit) -> limit(QH, Limit);
+limit(QH, Offset, Limit) ->
+	?INFO("limit", []),
+	F = fun() ->
+		QC = qlc:cursor(qlc:sort(QH, {order, descending})),
+		qlc:next_answers(QC, Offset - 1), % skip
+		M = qlc:next_answers(QC, Limit),
+		qlc:delete_cursor(QC),
+		M
+	end,
+	{atomic, Msgs} = mnesia:transaction(F),
+	Msgs.
+
 do(Q) ->
 	F = fun() -> qlc:e(Q) end,
 	{atomic, Val} = mnesia:transaction(F),
