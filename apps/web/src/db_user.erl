@@ -100,9 +100,13 @@ attr_get(Uid, Name) ->
 
 attr_get_all(Uid) -> [ {UA#user_attr.id, UA#user_attr.value} || UA <- dbd:index(user_attr, user_id, Uid) ].
 
-
 attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
 
+select_one([]) -> [];
+select_one([U|_]) -> [U].
+
+lookup(Term) when is_integer(Term) -> dbd:get(user, Term);
+lookup(Term) -> select_one(dbd:index(user, username, Term)).
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].
@@ -174,7 +178,7 @@ map_status_result(R) when is_list(R) -> online.
 add_online_status({UserProps}) ->
    Uid = proplists:get_value(id, UserProps),
    Status = get_online_status(Uid),
-   {UserProps ++ {status, map_status_result(Status)}}.
+   {UserProps ++ [{status, map_status_result(Status)}]}.
 
 get_friends_ids(Uid) ->
    Q = qlc:q([ C#user_friend.friend_id || C <- mnesia:table(user_friend),

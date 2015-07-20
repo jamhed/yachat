@@ -8,7 +8,7 @@ to_proplist([]) -> [].
 
 get_user_info([]) -> [fail, not_found, []];
 get_user_info([#user{id=Uid}]) -> [ ok, db_user:detail(Uid) ];
-get_user_info(Err) -> ?ERR("get_user_info(): ~p", Err), [fail, protocol].
+get_user_info(Err) -> ?ERR("get_user_info(): ~p", [Err]), [fail, protocol].
 
 % find user by email
 user_email(Uid, Email) when is_number(Uid), is_binary(Email) -> get_user_info(db_user:get_by_email(Email));
@@ -179,6 +179,9 @@ msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
 msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
    [M] ++ get_user_info(db_user:get(Uid));
 
+msg(M = <<"user/lookup">>, [Uid, Term]) ->
+   [M] ++ get_user_info(db_user:lookup(Term));
+
 %msg get user info 
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);
@@ -262,7 +265,7 @@ msg(M = <<"user/del/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(F
 
 msg(M = <<"user/get/friends">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
-   [M] ++ db_user:get_friends(Uid);
+   [M] ++ [db_user:get_friends(Uid)];
 
 % no match in this module
 msg(_, _) -> skip.
