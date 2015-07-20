@@ -255,6 +255,11 @@ msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(F
    ok = db_user:add_friend(Uid, FriendId),
    [M, ok];
 
+msg(M = <<"user/del/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
+   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
+   ok = db_user:del_friend(Uid, FriendId),
+   [M, ok];
+
 msg(M = <<"user/get/friends">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:get_friends(Uid);

@@ -183,6 +183,11 @@ get_friends_ids(Uid) ->
 
 get_friends(Uid) -> [ add_online_status(detail_short(FriendId)) || FriendId <- get_friends_ids(Uid) ].
 
+del_friend_record(#user_friend{id=Id}) -> dbd:delete(user_friend, Id).
+
+del_friend(Uid, FriendId) -> del_friend(check_friendship(Uid, FriendId)).
+del_friend(List) when is_list(List) -> lists:foreach(fun del_friend_record/1, List).
+
 add_friend(Uid, FriendId) -> add_friend(Uid, FriendId, check_friendship(Uid, FriendId)).
 
 add_friend(_Uid, _FriendId, [_F|_Rest]) -> ok;
