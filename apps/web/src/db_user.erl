@@ -105,8 +105,14 @@ attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=
 select_one([]) -> [];
 select_one([U|_]) -> [U].
 
-lookup(Term) when is_integer(Term) -> dbd:get(user, Term);
-lookup(Term) -> select_one(dbd:index(user, username, Term)).
+% term could be user_id or username binary
+lookup(Term) -> 
+   try 
+      Uid = erlang:binary_to_integer(Term),
+      dbd:get(user, Uid)
+   catch
+      _:_ -> select_one(dbd:index(user, username, Term))
+   end.
 
 get_by_fb(Id) when is_binary(Id) -> dbd:index(user, facebook_id, Id);
 get_by_fb(_) -> [].
