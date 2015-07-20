@@ -5,6 +5,12 @@
 -define(PATH, "cfg").
 -define(ETS_NAME, cfg).
 
+validate(Props) ->
+   case proplists:get_value(fail, Props) of
+      undefined -> ok;
+      _ -> erlang:error({config_error, Props})
+   end.
+
 ensure_ets_table() ->
    case ets:info(?ETS_NAME) of
       undefined -> ets:new(?ETS_NAME, [set,named_table,public]);
@@ -19,7 +25,7 @@ handle_module_cfg(Module, []) ->
    Path = filename:join("cfg", Module),
    Cfg = handle_read_file(Module, file:consult(Path)),
    ets:insert(?ETS_NAME, {Module, Cfg}),
-   ?INFO("Loaded config for ~p, path: ~p, data: ~p", [Module, Path, Cfg]),
+   ?INFO("Loaded config for module:~p, path:~p, data:~180p", [Module, Path, Cfg]),
    Cfg;
 handle_module_cfg(Module, [{Module, PropList}]) -> PropList.
 
@@ -36,5 +42,3 @@ get_m(Module, Key, Default) ->
    Cfg = ensure_module_cfg(Module),
    Value = proplists:get_value(Key, Cfg, Default),
    Value.
-
-
