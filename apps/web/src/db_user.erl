@@ -78,7 +78,7 @@ files(Uid, Type) ->
 
 file_delete(_Uid, FileId) -> dbd:delete(user_file, FileId).
 
-list_online(_) ->
+list_online() ->
 	Q = qlc:q([ detail(C#user_online.user_id) || C <- mnesia:table(user_online) ]),
 	dbd:do(Q).
 

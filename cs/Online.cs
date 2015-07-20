@@ -13,6 +13,4 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Online extends Pi
       @process @e
 
    query: ->
-      @nsend ["user/online", Cmon.sid()], (status, userList) =>
-         @debug "online", status, userList
-         @draw userList
+      @nsend ["user/online", Cmon.sid()], (userList) => @draw userList

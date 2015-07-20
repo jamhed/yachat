@@ -120,11 +120,6 @@ user_file_list(Uid, Type) when is_number(Uid) ->
    [ok, Files];
 user_file_list(_, _) -> [fail, protocol].
 
-user_online_list(Uid) when is_number(Uid) ->
-   Users = db_user:list_online(Uid),
-   [ok, Users];
-user_online_list(_) -> [fail, protocol].
-
 user_make_p2p(Uid, PeerId) ->
    case Uid of
       PeerId -> [fail, no_self_p2p];
@@ -224,7 +219,7 @@ msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
 %msg get user's online peers 
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
    ?INFO("~s uid:~p", [M, Uid]),
-   [M] ++ user_online_list(Uid);
+   [M, db_user:list_online()];
 
 %msg get user's online peers 
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
