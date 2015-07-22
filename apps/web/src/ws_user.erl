@@ -136,32 +136,27 @@ user_make_p2p(Uid, PeerId) ->
 
 %msg check stored Sid 
 msg(M = <<"user/get">>, [Uid]) ->
-   ?INFO("~s uid: ~p", [M, Uid]),
    [M] ++ user_get(Uid);
 
 %msg login anonymously, create new user
 msg(M = <<"user/new">>, []) ->
-   ?INFO("~s new", [M]),
    NewUID = dbd:make_uid(),
    [M] ++ user_new(NewUID, dbd:put(#user{id=NewUID, stamp=now()}));
 
 %msg login by email and password
 msg(M = <<"user/login">>, [Email, Password]) ->
-   ?INFO("~s email:~p password:~p", [M, Email, Password]),
    [M] ++ user_login(Password, db_user:get_by_email(Email));
 
-msg(M = <<"user/login/name", [Name, Password]) ->
-   ?INFO("~s name:~p password:~p", [M, Name, Password]),
-   [M] ++ user_login(Password, db_user:get_by_username(Name));
+
+msg(M = <<"user/login/name">>, [Name, Password]) ->
+   [M] ++ user_login(Password, db_user:get_by_name(Name));
 
 %msg login by by facebook_id
 msg(M = <<"user/fb">>, [FbId, Token]) ->
-   ?INFO("~s fbid:~p", [M, FbId]),
    [M] ++ user_fb(FbId, ext_auth:check_fb(FbId, Token));
 
 %msg logout
 msg(M = <<"user/logout">>, []) ->
-   ?INFO("~s", [M]),
    db_user:logout(self()),
    [M, ok];
 
@@ -174,7 +169,7 @@ msg(M = <<"user/email">>, [Uid, Email]) when is_number(Uid) ->
 msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
    [M] ++ get_user_info(db_user:get(Uid));
 
-msg(M = <<"user/lookup">>, [Uid, Term]) ->
+msg(M = <<"user/lookup">>, [_Uid, Term]) ->
    [M] ++ get_user_info(db_user:lookup(Term));
 
 %msg get user info 
@@ -191,75 +186,61 @@ msg(M = <<"user/p2p">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
 
 %msg update specified user profile field [Uid, Name1, Value1, ..., NameN, ValueN]
 msg(M = <<"user/update">>, [Uid, {Plist}]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_update(Uid, Plist);
 
 %msg get user's convs 
 msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    R = [M] ++ user_conv_list(Uid),
    ?INFO("R: ~p", [R]),
    R;
 
 %msg get user's files
 msg(M = <<"user/files">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid);
 
 %msg delete file
 msg(M = <<"user/file/delete">>, [Uid, FileId]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:file_delete(Uid, FileId);
 
 %msg get user's files
-msg(M = <<"user/files">>, [Uid, Type]) when is_number(Uid) ->
-   ?INFO("~s uid:~p type: ~p", [M, Uid, Type]),
+msg(M = <<"user/files">>, [Uid, _Type]) when is_number(Uid) ->
    [M] ++ user_file_list(Uid);
 
 %msg get user's online peers 
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M, db_user:list_online(20)];
 
 %msg get user's online peers 
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ user_file_list(Uid, <<"avatar">>);
 
 %msg get user's attribute
 msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_get(Uid, Name);
 
 %msg get user's attributes as json object
 msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    R = [M] ++ [{db_user:attr_get_all(Uid)}],
    ?INFO("~p", [R]), R;
 
 %msg set user's attribute
 msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ db_user:attr_set(Uid, Name, Value);
 
 % [{k,v}, ..., {k,v}]
 %msg set user's attributes from json object
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
-   ?INFO("~s uid:~p plist: ~p", [M, Uid, Plist]),
    [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
 
 msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
-   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
    ok = db_user:add_friend(Uid, FriendId),
    [M, ok];
 
 msg(M = <<"user/del/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
-   ?INFO("~s uid:~p friend_id:~p", [M, Uid, FriendId]),
    ok = db_user:del_friend(Uid, FriendId),
    [M, ok];
 
 msg(M = <<"user/get/friends">>, [Uid]) when is_number(Uid) ->
-   ?INFO("~s uid:~p", [M, Uid]),
    [M] ++ [db_user:get_friends(Uid)];
 
 % no match in this module
