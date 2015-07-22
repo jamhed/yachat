@@ -5,21 +5,23 @@
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("cmon/include/logger.hrl").
--define(SYSTEM,1).
+-include_lib("db/include/db_macro.hrl").
+-
+define(SYSTEM,1).
 
 get(Id) when is_number(Id) -> dbd:get(user, Id).
 
-to_proplist(#user{} = U) -> lists:zip(record_info(fields, user), to_list(U)).
+?TO_PROPS(user,?MODULE).
 to_list(U) -> [ map_field(F) || F <- tl(tuple_to_list(U)) ].
 
 filter_props(Props, List) -> [ { F, proplists:get_value(F, Props) } || F <- List ].
 
-extend_with_props(User, [{Name,Value} | Props]) -> extend_with_props(  User ++ [{Name,Value}], Props );
-extend_with_props(User, []) -> User.
-
 map_field(undefined) -> null;
 map_field(Now = {_,_,_}) -> cvt:now_to_binary(Now);
 map_field(F) -> F.
+
+extend_with_props(User, [{Name,Value} | Props]) -> extend_with_props(  User ++ [{Name,Value}], Props );
+extend_with_props(User, []) -> User.
 
 enum_f() -> 
    Fields = record_info(fields, user),
