@@ -1,1 +1,1 @@
--define(TO_PROPS(Name, DbMod), to_proplist(#Name{} = U) -> lists:zip(record_info(fields, Name), DbMod:to_list(U))).
+-define(TO_PROPS(Name), to_proplist(#Name{} = U) -> lists:zip(record_info(fields, Name), db_func:to_list(U))).
