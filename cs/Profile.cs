@@ -14,8 +14,8 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
          @debug "profile", status, userInfo
          @draw userInfo
 
-   update: (l...)  ->
-      h = Cmon.list2hash l
+   update: (List)  ->
+      h = Cmon.list2hash List
       @nsend ["user/update", Cmon.sid(), h], (status, a) =>
          if status == "ok"
             @info "Profile was updated."
