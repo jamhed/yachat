@@ -8,15 +8,21 @@ get_app() ->
       _         -> "_"
    end.
 
+check_log(true, Module, Line, _String, Args, Fun) -> log(Module, Line, _String, Args, Fun);
+check_log(_, _, _, _, _, _) -> skip.
+
+member_of(_Module, []) -> true;
+member_of(Module, List) -> lists:member(Module, List).
+
+check(true, false) -> true;
+check(_, _) -> false.
+
 log_f(Module, Line, _String, Args, Fun) ->
-   case List = ?CFG(log_modules, []) of
-      [] -> log(Module, Line, _String, Args, Fun);
-      _  ->
-         case lists:member(Module, List) of
-            true -> log(Module, Line, _String, Args, Fun);
-            false -> skip
-         end
-   end.
+   Check = check(
+      member_of(Module, ?CFG(log_modules, [])),
+      member_of(Module, ?CFG(skip_modules))
+   ),
+   check_log(Check, Module, Line, _String, Args, Fun).
 
 log(Module, Line, _String, Args, Fun) ->
    String = get_app() ++ "/" ++ atom_to_list(Module) ++ "." ++ integer_to_list(Line) ++ ": " ++ _String ++ "~n",
