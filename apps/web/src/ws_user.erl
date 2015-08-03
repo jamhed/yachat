@@ -3,9 +3,6 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 
-to_proplist([K,V | T]) -> [{K,V} | to_proplist(T)]; 
-to_proplist([]) -> [].
-
 get_user_info([]) -> [fail, not_found, []];
 get_user_info([#user{id=Uid}]) -> [ ok, db_user:detail(Uid) ];
 get_user_info(Err) -> ?ERR("get_user_info(): ~p", [Err]), [fail, protocol].
