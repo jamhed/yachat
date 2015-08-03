@@ -1,7 +1,6 @@
 -module(db_msg).
 -compile({no_auto_import,[put/1,get/1]}).
 -compile(export_all).
--include_lib("db/include/metainfo.hrl").
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("cmon/include/logger.hrl").
