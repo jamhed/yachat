@@ -2,6 +2,17 @@
 -compile(export_all).
 -include_lib("cmon/include/config.hrl").
 
+map_cfg(undefined, Error) -> {fail, Error};
+map_cfg(Value, _Error) -> {ok, Value}.
+
+check_cfg_exists(Name, Error) -> map_cfg(?CFG(Name), Error).
+
+check_config() ->
+   cfg:validate([
+      check_cfg_exists(log_modules, "Logger: no log_modules parameter in config"),
+      check_cfg_exists(skip_modules, "Logger: no skip_modules parameter in config")
+   ]).
+
 get_app() ->
    case application:get_application() of
       {ok, App} -> atom_to_list(App);
