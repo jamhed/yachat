@@ -19,7 +19,6 @@ $ make console
 TODO
 ====
 
-
 TODO NEXT
 =========
 0. On new user login/profile update notify user lists (lobby, convs)
@@ -30,6 +29,7 @@ TODO NEXT
 
 DONE
 ====
+1. check and verbosely complain about mandatory logger config params
 2. Get avatar from facebook
 3. Auth with facebook (not using facebook id)
 5. On reconnects sometimes it says socket in connecting state
