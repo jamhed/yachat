@@ -58,25 +58,27 @@ body {
 </div>
 </script>
 
-
-<script pi="pi/Source" name="button/login" type="text/x-dot">
-<button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
-</script>
-
-<script pi="pi/Source" name="button/logout" type="text/x-dot">
-<span style="color: white; margin-right: 20px">{{! it.display }}</span>
-<button type="submit" class="btn btn-default" pi="pi/Button" target="#bullet@logout">Logout</button>
-</script>
-
-<script pi="pi/Source" name="menu/logout" type="text/x-dot">
-<a href="#profile">Profile</a>
-</script>
-
-<script pi="pi/Source" name="menu/logout/friends" type="text/x-dot">
-<a href="#friends">Friends</a>
+<script pi="pi/Source" name="menu/logged" type="text/x-dot">
+<ul class="nav navbar-nav">   
+   <li><a href="#about">About</a></li>
+   <li><a href="#contact">Contact</a></li>
+   <li><a href="#profile">Profile</a></li>
+   <li><a href="#friends">Friends</a></li>
+</ul>
+<div class="navbar-form navbar-right">
+   <span style="color: white; margin-right: 20px">{{! it.display }}</span>
+   <button type="submit" class="btn btn-default" pi="pi/Button" target="#bullet@logout">Logout</button>
+</div>
 </script>
 
 <script pi="pi/Source" name="menu/login" type="text/x-dot">
+<ul class="nav navbar-nav">
+   <li><a href="#about">About</a></li>
+   <li><a href="#contact">Contact</a></li>
+</ul>
+<div class="navbar-form navbar-right">
+   <button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
+</div>
 </script>
 
 <script pi="pi/Source" name="dialog/invite" type="text/x-dot">
@@ -104,19 +106,11 @@ body {
             </button>
             <a class="navbar-brand" href="#" style="color: #fff" pi="Conn/Status">YChat</a>
          </div>
-         <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-               <li><a href="#about">About</a></li>
-               <li><a href="#contact">Contact</a></li>
-               <li pi="Login/Status" login="menu/login" logout="menu/logout"></span>
-               <li pi="Login/Status" login="menu/login" logout="menu/logout/friends"></span>
-            </ul>
-            <div class="navbar-form navbar-right"
-               pi="Login/Status" login="button/login" logout="button/logout"></div>
-         </div><!--/.nav-collapse -->
+         <div id="navbar" class="collapse navbar-collapse"
+            pi="Login/Status" login="menu/login" logout="menu/logged">
+         </div>
       </div>
    </nav>
-
 
    <div id="bullet" pi="Bullet" fb_app="800053446775351"></div>
 
