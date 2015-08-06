@@ -14,5 +14,9 @@ metainfo() ->
     	?TABLE(user_conv, [user_id, conv_id]),
     	?TABLE(user_online, [user_id, pid, session_id]),
     	?TABLE(user_file, [user_id]),
-    	?TABLE(user_friend, [user_id, friend_id])
+    	?TABLE(user_friend, [user_id, friend_id]),
+        % todo lists
+        ?TABLE(todo, []),
+        ?TABLE(todo_item, [todo_id]),
+        ?TABLE(user_todo, [user_id, todo_id])
     ]}.

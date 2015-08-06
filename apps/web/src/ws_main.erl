@@ -4,7 +4,7 @@
 -export([init/4, stream/3, info/3, terminate/2]).
 -record(state, {}).
 
-handlers() -> [ws_user, ws_msg, ws_conv, ws_stub].
+handlers() -> [ws_user, ws_msg, ws_conv, ws_todo, ws_stub].
 
 route_msg([H|T], M,A) ->
    case H:msg(M,A) of

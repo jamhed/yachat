@@ -7,3 +7,9 @@
 -record(user_online, {id, stamp, pid, user_id, session_id, online}).
 -record(user_file, {id, user_id, stamp, type, mime}).
 -record(user_friend, {id, stamp, type, user_id, friend_id}).
+
+% todo
+
+-record(todo, {id, stamp, name, move_to}).
+-record(user_todo, {id, user_id, todo_id}).
+-record(todo_item, {id, todo_id, prev_id, stamp, text}).
