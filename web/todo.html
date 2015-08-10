@@ -1,11 +1,15 @@
 <script pi="pi/Source" name="todo" type="text/x-dot">
 <div class="col-md-12">
-  <h3 style="margin: 0px">
-    <div style="cursor:pointer{{?it.default}}; text-decoration:underline{{?}}" pi="pi/Button" target="#lists@edit" data-id="{{= it.id }}">{{= it.name }}</div>
+  {{ if(it.default) { }}
+  <h3 style="margin: 0px; border-bottom: 1px solid #555">
+  {{ } else { }}
+  <h3 style="margin: 0px; border-bottom: 1px solid #bbb">
+  {{ } }}
+    <div style="cursor:pointer" pi="pi/Button" target="#lists@edit" data-id="{{= it.id }}">{{= it.name }}</div>
   </h3> 
 </div>
 <div class="col-md-12">
-  <ol id="{{= it.id }}" class="items"></ol>
+  <ol id="{{= it.id }}" style="margin-top: 10px" class="items"></ol>
 </div>
 </script>
 
