@@ -19,12 +19,12 @@ define ["pi/Pi"], (aPi) -> class aForm extends aPi
             ret[group] = [] if ! ret[group]
             if i.attr("type") == "checkbox"
                if i.prop("checked")
-                  ret[group].push { name: i.attr("name"), value: true, class: i.attr("class") }
+                  ret[group].push { name: i.attr("name"), value: true }
                else
-                  ret[group].push { name: i.attr("name"), value: false, class: i.attr("class") }
+                  ret[group].push { name: i.attr("name"), value: false }
             else if i.attr("type") == "radio"
                if i.prop("checked")
-                  ret[group].push { name: i.attr("name"), value: i.attr("value"), class: i.attr("class") }
+                  ret[group].push { name: i.attr("name"), value: i.attr("value") }
             else
                tmp = name: i.attr("id"), value: i.val()
                if i.attr "item_map"
@@ -63,5 +63,5 @@ define ["pi/Pi"], (aPi) -> class aForm extends aPi
    onClick: (ev) ->
       ev.preventDefault()
       data = @serialize $(@a.el)
-      @rpc @a.target, data.form, ->
+      @rpc @a.target, [data.form, @e.data()], ->
       return data

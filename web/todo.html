@@ -1,0 +1,69 @@
+<script pi="pi/Source" name="todo" type="text/x-dot">
+<div class="col-md-12">
+  <h3 style="margin: 0px">
+    <div style="cursor:pointer{{?it.default}}; color:red{{?}}" pi="pi/Button" target="#lists@edit" data-id="{{= it.id }}">{{= it.name }}</div>
+  </h3> 
+</div>
+<div class="col-md-12">
+  <ol id="{{= it.id }}" class="items"></ol>
+</div>
+</script>
+
+<script pi="pi/Source" name="item" type="text/x-dot">
+<li>
+  <a href="#" pi="pi/Button" target="#lists@delete_item" data-list-id="{{!it.list_id}}" data-id="{{!it.id}}">
+    {{= it.text }}
+  </a>
+</li> 
+</script>
+
+<script pi="pi/Source" name="todo/dialog" type="text/x-dot">
+<div pi="Dialog/Simple" title="Todo list">
+   <div>
+      <input type="text" id="name" class="form-control todo" placeholder="Name" value="{{! it.name }}">
+   </div>
+  <div class="checkbox">
+    <label>
+      <input id="default" name="default" class="todo" type="checkbox" {{? it.default }}checked{{?}}>Default list
+    </label>
+  </div>
+  <div class="form-group">
+    <label for="move_to">On delete move to:</label>
+    <select id="move_to" class="todo form-control" pi="Todo/List" default="{{!it.move_to}}" bullet="#bullet">
+    </select>
+  </div>    
+  <div style="margin-top: 20px">
+    <input type="button" class="btn" value="Save" data-id="{{! it.id }}" pi="Form" el=".todo"
+      target="#lists@update parent@close">
+    <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+    {{? it.id }}
+    <input type="button" class="btn pull-right" value="Delete" pi="pi/Button" data-id="{{! it.id }}"
+      target="#lists@delete parent@close">
+    {{?}}
+  </div>
+</div>
+</script>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+		  <button
+        type="button" class="btn" pi="pi/Button" target="#lists@add_dialog">
+				  Add
+		  </button>
+    </div><!-- col-md-12 -->
+  </div><!-- row -->
+
+  <div class="row" style="margin-top:10px; margin-bottom: 20px">
+     <div class="col-md-12">
+        <div class="form-inline">
+           <div class="form-group" style="width: 100%">
+              <input type="text"
+                style="width: 100%" class="form-control" placeholder="Todo" pi="Todo/Msg">
+           </div>
+        </div>
+     </div>
+  </div>
+
+  <div class="row" id="lists" pi="Todo" todo="todo" item="item"></div>
+</div><!-- container -->

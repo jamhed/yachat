@@ -31,7 +31,7 @@ check(_, _) -> false.
 log_f(Module, Line, _String, Args, Fun) ->
    Check = check(
       member_of(Module, ?CFG(log_modules, [])),
-      member_of(Module, ?CFG(skip_modules))
+      lists:member(Module, ?CFG(skip_modules))
    ),
    check_log(Check, Module, Line, _String, Args, Fun).
 
