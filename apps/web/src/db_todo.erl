@@ -20,19 +20,22 @@ from_proplist(Plist) ->
 		name = proplists:get_value(name, Plist),
 		default = proplists:get_value(default, Plist),
 		id = proplists:get_value(id, Plist),
-		move_to = proplists:get_value(move_to, lists:reverse(Plist))
+		move_to = proplists:get_value(move_to, lists:reverse(Plist)),
+		prio = proplists:get_value(prio, Plist)
 	}.
 
 % U = user, Uid
 % T = todo, Tid
 % TI = todo item
 
+% sort_todo(#todo{prio=prioA}, #todo{prio=prioB}) -> true.
+
 get(Uid) ->
 	Q = qlc:q([ T ||
 			UT <- mnesia:table(user_todo), UT#user_todo.user_id == Uid,
 			T <- mnesia:table(todo), T#todo.id == UT#user_todo.todo_id
 			]),
-	dbd:do(Q).
+	lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)).
 
 get_default(Uid) ->
 	Q = qlc:q([ T ||
