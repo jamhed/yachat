@@ -5,7 +5,13 @@
   {{ } else { }}
   <h3 style="margin: 0px; border-bottom: 1px solid #bbb">
   {{ } }}
-    <div style="cursor:pointer" pi="pi/Button" target="#lists@edit" data-id="{{= it.id }}">{{= it.name }}</div>
+    <span style="cursor:pointer" pi="pi/Button" target="#lists@edit" data-id="{{=it.id}}">
+      {{=it.name}}
+    </span>
+    <span>
+      <input type="checkbox" class="default"
+        pi="Todo/Default" target="#lists@query" id="{{!it.id}}" {{?it.default}}checked{{?}}>
+    </span>
   </h3> 
 </div>
 <div class="col-md-12">
@@ -69,7 +75,7 @@
      <div class="col-md-12">
         <div class="form-inline">
            <div class="form-group" style="width: 100%">
-              <input type="text"
+              <input type="text" id="entry-field"
                 style="width: 100%" class="form-control" placeholder="Entry text" pi="Todo/Msg">
            </div>
         </div>

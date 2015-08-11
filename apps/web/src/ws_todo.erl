@@ -44,9 +44,13 @@ msg(M = <<"todo/add">>, [Uid, Tid, Text]) ->
 msg(M = <<"todo/default">>, [Uid]) ->
 	[M] ++ [to_props(db_todo:get_default(Uid))];
 
+msg(M = <<"todo/default">>, [Uid, Tid, State]) ->
+	[T] = get(Uid, Tid),
+	[M] ++ [db_todo:put(Uid, T#todo{default=State})];
+
 %msg add item to todo list
 msg(M = <<"todo/add">>, [Uid, Text]) ->
-	[M] ++ [add(db_todo:get_default(Uid))];
+	[M] ++ [add(db_todo:get_default(Uid), Text)];
 
 %msg del or move item from todo list
 msg(M = <<"todo/del">>, [Uid, Tid]) ->

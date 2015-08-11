@@ -18,8 +18,8 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
                do (I) =>
                   I.list_id = T.id
                   items.append @item I 
-
       @process()
+      $("#entry-field").focus()
 
    edit_dialog: (List) ->
       e = @append "todo/dialog", List
