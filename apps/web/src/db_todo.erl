@@ -75,7 +75,8 @@ put(Uid, Todo = #todo{}) ->
 
 add([#todo{id=Tid}], Text) ->
 	Id = dbd:make_uid(),
-	dbd:put(#todo_item{id=Id, stamp=now(), text=Text, todo_id=Tid});
+	dbd:put(#todo_item{id=Id, stamp=now(), text=Text, todo_id=Tid}),
+	Tid;
 
 add(_, _) -> fail.
 

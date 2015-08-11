@@ -13,7 +13,7 @@ to_props_with_items([H = #todo{id=Tid} | T]) ->
 	[{Props ++ [{items, jiffy_wrapper(db_todo:to_proplist(Items))}]}] ++ to_props_with_items(T);
 to_props_with_items([]) -> [].
 
-to_props([H = #todo{id=Tid} | T]) ->
+to_props([H = #todo{} | T]) ->
 	Props = db_todo:to_proplist(H),
 	[{Props}] ++ to_props(T);
 to_props([]) -> [].
@@ -24,10 +24,11 @@ msg(M = <<"todo/update">>, [Uid, Form]) ->
 	Todo = db_todo:from_proplist(Plist),
 	[M] ++ [put(Uid, Todo)];
 
-%msg get all todo lists for user
+%msg get all todo lists with items for user
 msg(M = <<"todo/get">>, [Uid]) ->
 	[M] ++ [to_props_with_items(get(Uid))];
 
+% get all todo lists without items for user
 msg(M = <<"todo/list">>, [Uid]) ->
 	[M] ++ [to_props(get(Uid))];
 
@@ -39,9 +40,13 @@ msg(M = <<"todo/get">>, [Uid, Tid]) ->
 msg(M = <<"todo/add">>, [Uid, Tid, Text]) ->
 	[M] ++ [add(get(Uid, Tid), Text)];
 
+%msg get default todo list (check we can write)
+msg(M = <<"todo/default">>, [Uid]) ->
+	[M] ++ [to_props(db_todo:get_default(Uid))];
+
 %msg add item to todo list
 msg(M = <<"todo/add">>, [Uid, Text]) ->
-	[M] ++ [add(db_todo:get_default(Uid), Text)];
+	[M] ++ [add(db_todo:get_default(Uid))];
 
 %msg del or move item from todo list
 msg(M = <<"todo/del">>, [Uid, Tid]) ->
