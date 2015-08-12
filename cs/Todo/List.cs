@@ -9,9 +9,9 @@ define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList e
 		@query()
 
 	onChange: (ev, ui) ->
-		@e.attr "default", ui.item.value
-		@a.default = ui.item.value
 		value = if parseInt(ui.item.value) then parseInt(ui.item.value) else ui.item.value
+		@e.attr "default", value
+		@a.default = value
 		@nsend ["todo/move_to", Cmon.sid(), parseInt(@a.id), value], => @query()
 
 	draw: (List) ->
@@ -22,7 +22,7 @@ define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList e
 			do (T) =>
 				sel = if "#{T.id}" == @a.default then "selected" else ""
 				@e.append "<option #{sel} value=#{T.id}>#{T.name}"
-		@e.selectmenu("refresh")
+		@e.selectmenu "refresh"
 
 	query: ->
 		@nsend ["todo/list", Cmon.sid()], (List) => @draw(List)
