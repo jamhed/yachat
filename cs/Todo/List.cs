@@ -20,7 +20,6 @@ define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList e
 		List.push id: "keep", name: "Keep"
 		for T in List
 			do (T) =>
-				@debug @a.default, T.id
 				sel = if "#{T.id}" == @a.default then "selected" else ""
 				@e.append "<option #{sel} value=#{T.id}>#{T.name}"
 		@e.selectmenu("refresh")
