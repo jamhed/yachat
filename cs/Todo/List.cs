@@ -1,11 +1,12 @@
 define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList extends Pi
 
-	attr: -> super.concat ["default", "id"]
+	attr: -> super.concat ["default", "id", "inline"]
 
 	init: ->
 		super
-		@e.selectmenu
-			change: (ev, ui) => @onChange(ev, ui)
+		if @a.inline
+			@e.selectmenu
+				change: (ev, ui) => @onChange(ev, ui)
 		@query()
 
 	onChange: (ev, ui) ->
@@ -22,7 +23,8 @@ define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList e
 			do (T) =>
 				sel = if "#{T.id}" == @a.default then "selected" else ""
 				@e.append "<option #{sel} value=#{T.id}>#{T.name}"
-		@e.selectmenu "refresh"
+		if @a.inline
+			@e.selectmenu "refresh"
 
 	query: ->
 		@nsend ["todo/list", Cmon.sid()], (List) => @draw(List)
