@@ -1,21 +1,37 @@
+<style type="text/css">
+.todo-header {
+  margin: 0px;
+  border-bottom: 1px solid #bbb;
+  padding-bottom: 3px;
+}
+.todo-default {
+  border-bottom: 1px solid #555;
+}
+span.ui-selectmenu-text {
+  font-weight: normal;
+}
+</style>
+
 <script pi="pi/Source" name="todo" type="text/x-dot">
-<div class="col-md-12">
-  {{ if(it.default) { }}
-  <h3 style="margin: 0px; border-bottom: 1px solid #555">
-  {{ } else { }}
-  <h3 style="margin: 0px; border-bottom: 1px solid #bbb">
-  {{ } }}
-    <span style="cursor:pointer" pi="pi/Button" target="#lists@edit" data-id="{{=it.id}}">
-      {{=it.name}}
-    </span>
-    <span>
+<div style="margin-bottom: 10px">
+  <div class="row form-inline todo-header {{? it.default }}todo-default{{?}}" >
+    <div class="form-group col-md-4"
+      style="cursor:pointer; bottom: -10px" pi="pi/Button" target="#lists@edit" data-id="{{=it.id}}">
+      <h3 style="display:inline">{{=it.name}}</h3>
+    </div>
+    <div class="col-md-1" style="bottom: -14px">
       <input type="checkbox" class="default"
         pi="Todo/Default" target="#lists@query" id="{{!it.id}}" {{?it.default}}checked{{?}}>
-    </span>
-  </h3> 
-</div>
-<div class="col-md-12">
-  <ol id="{{= it.id }}" style="margin-top: 10px" class="items"></ol>
+    </div>
+    <div class="form-group col-md-2">
+      <select style="width: 100%" id="{{!it.id}}" pi="Todo/List" default="{{!it.move_to}}"></select>    
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <ol id="{{= it.id }}" style="margin-top: 10px" class="items"></ol>
+    </div>
+  </div>
 </div>
 </script>
 
@@ -82,7 +98,7 @@
      </div>
   </div>
 
-  <div class="row" id="lists" pi="Todo" todo="todo" item="item"></div>
+  <div id="lists" pi="Todo" todo="todo" item="item"></div>
 </script>
 
 <script pi="pi/Source" name="content/login" type="text/x-dot">
