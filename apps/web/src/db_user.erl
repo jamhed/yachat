@@ -95,13 +95,17 @@ sid_to_uid(Sid) ->
    end.
 
 attr_get(Uid, Name) ->
-   Q = qlc:q([ {A#user_attr.id, A#user_attr.value} || A <- mnesia:table(user_attr),
+   Q = qlc:q([ {[{name, A#user_attr.id}, {value, A#user_attr.value}]} || A <- mnesia:table(user_attr),
       A#user_attr.user_id == Uid, A#user_attr.id == Name ]),
    dbd:do(Q).
 
 attr_get_all(Uid) -> [ {UA#user_attr.id, UA#user_attr.value} || UA <- dbd:index(user_attr, user_id, Uid) ].
 
+attr_list(Uid) -> [ {[{name, UA#user_attr.id}, {value, UA#user_attr.value}]} || UA <- dbd:index(user_attr, user_id, Uid) ].
+
 attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
+
+attr_del(Uid, Name) -> dbd:delete(user_attr, Name).
 
 select_one([]) -> [];
 select_one([U|_]) -> [U].

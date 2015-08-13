@@ -1,18 +1,19 @@
 define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 
+   attr: -> super.concat ["template"]
+
    init: ->
       super
       @bsub "user/profile", (ev, [status, userInfo]) => @draw userInfo
       @wait_ajax_done () => @query()
    
    draw: (u) ->
-      $("#username", @e).val(u.username)
-      $("#email", @e).val(u.email)
+      @debug "draw"
+      @e.html @tmpl @a.template, u
+      @process()
 
    query: ->
-      @nsend ["user/get", Cmon.sid()], (status, sessionId, userInfo) =>
-         @debug "profile", status, userInfo
-         @draw userInfo
+      @nsend ["user/get", Cmon.sid()], (status, sessionId, userInfo) => @draw userInfo
 
    update: (List)  ->
       h = Cmon.list2hash List

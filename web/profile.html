@@ -1,53 +1,91 @@
-<div class="container" pi="Profile">
-   <div class="row">
-      <div class="col-md-12">
-         <h1>Edit profile</h1>
-      </div><!-- col-md-12 -->
-      <div class="col-md-8 col-sm-8 col-xs-8">
-         <div class="form-group">
-            <label for="username">User name</label>
-            <input type="username" class="form-control form" id="username" placeholder="User your name">
-         </div><!-- form-group -->
-         <div class="form-group">
-            <label for="email">Email address</label>
-            <input type="email" class="form-control form" id="email" placeholder="Enter email">
-         </div><!-- form-group -->
-         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control form" id="password" placeholder="Password">
-         </div><!-- form-group -->
+<script pi="pi/Source" name="attr/row" type="text/x-dot">
+<div class="form-group">
+   <label for="{{!it.name}}">{{!it.name}}:</label>
+   <div class="input-group">
+      <input type="text" id="{{!it.name}}" class="form-control" value="{{!it.value}}">
+      <div class="input-group-addon" style="cursor: pointer" pi="pi/Button" data-name="{{!it.name}}" target="#attr@edit">
+         <span class="glyphicon glyphicon-edit"></span>
       </div>
+   </div>
+</div>
+</script>
 
-      <div class="col-md-4 col-sm-4 col-xs-4" pi="Profile/Avatar">
-      </div>
+<script pi="pi/Source" name="attr/dialog" type="text/x-dot">
+<div pi="Dialog/Simple" title="Attribute">
+  <div>
+    <label for="name">Name</label>
+      <input type="text" id="name" class="form-control attr" placeholder="Name" value="{{! it.name }}">
+  </div>
 
-      <div class="col-md-12 col-sm-12 col-xs-12">
-         <span class="btn btn-default fileinput-button">
-            <span>Upload avatar</span>
-            <input pi="Upload" type="file" name="avatar" data-url="/store">
-         </span>
-         <button class="btn btn-default" pi="Profile/Attr" target="#bullet@set_user_attr">Attr</button>
-         <button class="btn btn-default" pi="Profile/Attr" target="#bullet@get_user_attr">Attr</button>
-      </div>
+  <div class="form-group">
+    <label for="value">Value:</label>
+      <input type="text" id="value" class="form-control attr" placeholder="Value" value="{{! it.value }}">
+  </div>
+
+  <div style="margin-top: 20px">
+    <input type="button" class="btn" value="Save" data-id="{{! it.id }}" pi="Form" el=".attr"
+      target="#attr@update parent@close">
+    <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+    {{? it.name }}
+    <input type="button" class="btn pull-right" value="Delete" pi="pi/Button" data-name="{{!it.name}}"
+      target="#attr@delete parent@close">
+    {{?}}
+  </div>
+</div>
+</script>
+
+
+<script pi="pi/Source" name="profile" type="text/x-dot">
+<div class="row">
+   <div class="col-md-12">
+      <h1>User profile</h1>
+   </div><!-- col-md-12 -->
+   <div class="col-md-8 col-sm-8 col-xs-8">
+      <div class="form-group">
+         <label for="username">User name:</label>
+         <input type="username" class="form-control form" id="username" placeholder="User your name" value="{{!it.username}}">
+      </div><!-- form-group -->
+      <div class="form-group">
+         <label for="email">Email address:</label>
+         <input type="email" class="form-control form" id="email" placeholder="Enter email" value="{{!it.email}}">
+      </div><!-- form-group -->
+      <div class="form-group">
+         <label for="password">Password</label>
+         <input type="password" class="form-control form" id="password" placeholder="Password">
+      </div><!-- form-group -->
+   </div>
+   <div class="col-md-4 col-sm-4 col-xs-4" pi="Profile/Avatar">
+   </div>
+   <div class="col-md-12 col-sm-12 col-xs-12">
+      <span class="btn btn-default fileinput-button">
+         <span>Upload avatar</span>
+         <input pi="Upload" type="file" name="avatar" data-url="/store">
+      </span>
+   </div>
       
-      <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px">
-         <button type="submit" class="btn btn-default" pi="Form" el=".form" target="parent@update">Update</button>
-         <div pi="Login/Facebook" style="display: none">
-            <button type="submit" class="btn" style="margin-left: 20px" pi="pi/Button" target="#bullet@register_facebook">Update with Facebook</button>
-         </div>
-      </div><!-- col-md-12 -->     
-   </div><!-- row -->
+   <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 20px">
+      <button type="submit" class="btn btn-default" pi="Form" el=".form" target="parent@update">Update</button>
+      <div pi="Login/Facebook" style="display: none">
+         <button type="submit" class="btn" style="margin-left: 20px" pi="pi/Button" target="#bullet@register_facebook">Update with Facebook</button>
+      </div>
+   </div><!-- col-md-12 -->     
+</div><!-- row -->
    
-   <div class="row">
-      <div class="col-md-12">
-         <h2>Attributes</h2>
-      </div><!-- col-md-12 -->
+<div class="row">
+   <div class="col-md-12">
+      <h2>Profile attributes</h2>
+   </div><!-- col-md-12 -->
+   <div class="col-md-12">
+      <button type="button" class="btn" pi="pi/Button" target="#attr@add_dialog">Add</button>
    </div>
+   <div class="col-md-8" id="attr" pi="Profile/Attr" template="attr/row"></div>   
+</div>
 
-   <div class="row">
-      <div class="col-md-12">
-         <h2>Images</h2>
-      </div><!-- col-md-12 -->
-   </div>
+<div class="row">
+   <div class="col-md-12">
+      <h2>Images</h2>
+   </div><!-- col-md-12 -->
+</div>
+</script>
 
-</div><!-- container -->
+<div class="container" pi="Profile" template="profile"></div>

@@ -215,6 +215,13 @@ msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
    [M] ++ db_user:attr_get(Uid, Name);
 
+msg(M = <<"user/attr/del">>, [Uid, Name]) when is_number(Uid) ->
+   [M] ++ [db_user:attr_del(Uid, Name)];
+
+%msg list user's attributes
+msg(M = <<"user/attr/list">>, [Uid]) when is_number(Uid) ->
+   [M] ++ [db_user:attr_list(Uid)];
+
 %msg get user's attributes as json object
 msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
    R = [M] ++ [{db_user:attr_get_all(Uid)}],
