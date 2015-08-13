@@ -222,7 +222,6 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
       @send "user/new", []
 
    login: (args, obj) ->
-      @debug args
       h = Cmon.list2hash args
       @send "user/login", [h.email, h.password]
 

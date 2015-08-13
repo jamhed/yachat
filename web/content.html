@@ -11,6 +11,17 @@
 <button class="btn btn-default" style="margin-right: 10px" pi="pi/Button" target="#bullet@join_conv" data-conv="{{!it.id}}">{{!it.name}}</button>
 </script>
 
+<script pi="pi/Source" name="conv/row" type="text/x-dot">
+<div class="row">
+  <div class="col-md-3 col-sm-4 col-xs-4">
+    {{!it.timestamp}}&nbsp;&nbsp;{{!it.username}}:
+  </div>
+  <div class="col-md-9 col-sm-8 col-xs-8">
+    {{!it.text}}
+  </div>
+</div>
+</script>
+
 <script pi="pi/Source" name="user/view" type="text/x-dot">
 <div>
 <a href="#" pi="pi/Button" target="#bullet@init_p2p" data-user_id="{{!it.id}}">{{!it.display}}</a>
@@ -51,11 +62,7 @@
    <div class="row">
       <div class="col-md-2 col-sm-3 col-xs-4" pi="Conv/UserList" view="user/view"></div><!-- col-md-3 -->
       <div class="col-md-10 col-sm-9 col-xs-8">
-         <div pi="Conv/Text"
-            class="row"
-            text="col-md-9 col-sm-8 col-xs-8"
-            stamp="col-md-3 col-sm-4 col-xs-4">
-         </div>
+         <div pi="Conv/Text" row="conv/row"></div>
       </div><!-- col-md-9 -->
    </div><!-- row -->
 

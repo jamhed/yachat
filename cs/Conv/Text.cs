@@ -1,6 +1,6 @@
 define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
-   attr: -> super.concat ["stamp", "text"]
+   attr: -> super.concat ["row"]
 
    draw: (rows) ->
       @clear()
@@ -30,9 +30,4 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
    append: (user, msg) ->
       [stamp,text] = msg
-      text_div = $("<div>").addClass(@a.text).html(text)
-      stamp_div = $("<div>").addClass(@a.stamp).html(stamp + "&nbsp;&nbsp;" + Cmon.displayNameA(user) + ":")
-      holder = $("<div>").addClass("row")
-      holder.prepend text_div
-      holder.prepend stamp_div
-      @e.prepend holder
+      @e.prepend @tmpl @a.row, timestamp: stamp, username: Cmon.displayNameA(user), text: text
