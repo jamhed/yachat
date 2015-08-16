@@ -92,5 +92,5 @@ click([#todo{}], [#todo_item{id=ItemId}]) ->
 
 click(_, _) -> fail.
 
-click([#todo{id=Id}]) -> dbd:delete(todo, Id);
-click(_) -> fail.
+del([#todo{id=Id}]) -> dbd:delete(todo, Id);
+del(_) -> fail.
