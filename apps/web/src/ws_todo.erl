@@ -3,7 +3,7 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 -compile({no_auto_import,[get/1,put/2]}).
--import(db_todo, [put/2, get/1, get/2, get_item/1, add/2, del/2, del/1]).
+-import(db_todo, [put/2, get/1, get/2, get_item/1, add/2, click/2, click/1]).
 
 jiffy_wrapper(List) -> [ {Item} || Item <- List ].
 
@@ -57,11 +57,11 @@ msg(M = <<"todo/add">>, [Uid, Text]) ->
 	[M] ++ [add(db_todo:get_default(Uid), Text)];
 
 %msg del or move item from todo list
-msg(M = <<"todo/del">>, [Uid, Tid]) ->
-	[M] ++ [del(get(Uid, Tid))];
+msg(M = <<"todo/click">>, [Uid, Tid]) ->
+	[M] ++ [click(get(Uid, Tid))];
 
 %msg del or move item from todo list
 msg(M = <<"todo/del">>, [Uid, Tid, ItemId]) ->
-	[M] ++ [del(get(Uid, Tid), get_item(ItemId))];
+	[M] ++ [click(get(Uid, Tid), get_item(ItemId))];
 
 msg(_,_) -> skip.

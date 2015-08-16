@@ -1,5 +1,5 @@
-# define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
-define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+# define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
 	seq: 0
 	cb_nsend: null

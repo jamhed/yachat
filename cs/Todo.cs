@@ -24,8 +24,8 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 	edit_dialog: (List) ->
 		e = @append "todo/dialog", List
 
-	delete_item: (Data) ->
-		@nsend ["todo/del", Cmon.sid(), Data.listId, Data.id], => @query()
+	click_item: (Data) ->
+		@nsend ["todo/click", Cmon.sid(), Data.listId, Data.id], => @query()
 
 	delete: (Data) -> @nsend ["todo/del", Cmon.sid(), Data.id], => @query()
 
