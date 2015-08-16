@@ -48,8 +48,8 @@ add_file(Plist, []) -> Plist.
 
 user_to_props([U]) ->
    Plist = to_proplist(U),
-   Plist1 = proplists:delete(password, Plist),
-   add_file(Plist1, db_file:by_type(U#user.id, <<"avatar">>));
+   Plist1 = proplists:delete(password, Plist);
+   % add_file(Plist1, db_file:by_type(U#user.id, <<"avatar">>));
 user_to_props(_) -> [].
 
 detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
@@ -64,7 +64,7 @@ conv(Uid) ->
 	dbd:do(Q).
 
 files(Uid) ->
-	Q = qlc:q([ [C#user_file.id,C#user_file.type,C#user_file.mime] || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
+	Q = qlc:q([ map_user_file([C]) || C <- mnesia:table(user_file), C#user_file.user_id == Uid ]),
 	dbd:do(Q).
 
 files(Uid, Type) ->
@@ -72,7 +72,30 @@ files(Uid, Type) ->
       C#user_file.user_id == Uid, C#user_file.type == Type ]),
 	dbd:do(Q).
 
-file_delete(_Uid, FileId) -> dbd:delete(user_file, FileId).
+delete_avatar_attr(_, [], _) -> ok;
+delete_avatar_attr(Uid, [{[{name,<<"avatar">>},{value, FileId}]}], FileId) ->
+   db_msg:sys_notify(Uid, [<<"avatar/change">>, FileId]),
+   dbd:delete(user_attr, <<"avatar">>);
+delete_avatar_attr(_, [_], _) -> ok.
+
+map_user_file([#user_file{id=Id,type=Type,mime=Mime}]) -> [Id, Type, Mime];
+map_user_file([]) -> [].
+
+get_avatar_real([]) -> [];
+get_avatar_real([{[{name,<<"avatar">>},{value, FileId}]}]) ->
+   map_user_file(dbd:get(user_file, FileId)).
+
+get_avatar(Uid) -> get_avatar_real(attr_get(Uid, <<"avatar">>)).
+
+set_avatar(Uid, FileId) ->
+   db_msg:sys_notify(Uid, [<<"avatar/change">>, FileId]),
+   attr_set(Uid, <<"avatar">>, FileId).
+
+file_delete(Uid, FileId) ->
+   Path = filename:join("store", integer_to_list(FileId)),
+   file:delete(Path),
+   delete_avatar_attr(Uid, attr_get(Uid, <<"avatar">>), FileId), 
+   dbd:delete(user_file, FileId).
 
 list_online(Limit) ->
 	Q = qlc:q([ C#user_online.user_id || C <- mnesia:table(user_online) ]),
@@ -81,7 +104,6 @@ list_online(Limit) ->
 list_online(Offset, Limit) ->
    Q = qlc:q([ C#user_online.user_id || C <- mnesia:table(user_online) ]),
    detail(dbd:limit(Q, Offset, Limit)).
-
 
 pids([H | T]) -> [ pids(H) ] ++ [ pids(Uid) || Uid <- T ];
 pids(Uid) ->

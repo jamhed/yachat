@@ -144,7 +144,6 @@ msg(M = <<"user/new">>, []) ->
 msg(M = <<"user/login">>, [Email, Password]) ->
    [M] ++ user_login(Password, db_user:get_by_email(Email));
 
-
 msg(M = <<"user/login/name">>, [Name, Password]) ->
    [M] ++ user_login(Password, db_user:get_by_name(Name));
 
@@ -195,21 +194,25 @@ msg(M = <<"user/conv_list">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/files">>, [Uid]) when is_number(Uid) ->
    [M] ++ user_file_list(Uid);
 
-%msg delete file
-msg(M = <<"user/file/delete">>, [Uid, FileId]) when is_number(Uid) ->
-   [M] ++ db_user:file_delete(Uid, FileId);
-
 %msg get user's files
 msg(M = <<"user/files">>, [Uid, _Type]) when is_number(Uid) ->
    [M] ++ user_file_list(Uid);
+
+%msg delete file
+msg(M = <<"user/file/delete">>, [Uid, FileId]) when is_number(Uid) ->
+   [M, db_user:file_delete(Uid, FileId)];
 
 %msg get user's online peers 
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
    [M, db_user:list_online(20)];
 
-%msg get user's online peers 
+%msg get user's avatars 
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
-   [M] ++ user_file_list(Uid, <<"avatar">>);
+   [M] ++ db_user:get_avatar(Uid);
+
+%msg set user's avatar
+msg(M = <<"user/avatar/set">>, [Uid, FileId]) when is_number(Uid), is_number(FileId) ->
+   [M, db_user:set_avatar(Uid, FileId)];
 
 %msg get user's attribute
 msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->

@@ -18,4 +18,4 @@ store([], Mime, Store, Uid, Type, Data) ->
    FileId.
 
 store(Store, Data, Uid, Type, Mime) when is_number(Uid) ->
-   store( db_user:files(Uid, Type), Mime, Store, Uid, Type, Data).
+   store([], Mime, Store, Uid, Type, Data).

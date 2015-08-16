@@ -34,7 +34,7 @@ handle_upload(Req, StorePath) ->
    [Sid, Data, Mime, Type] = get_props(Plist, [sid,file,mime,type]),
    Uid = db_user:sid_to_uid(erlang:binary_to_integer(Sid)),
    FileId = user_file:store(StorePath, Data, Uid, Type, Mime),
-   db_msg:sys_notify(Uid, [<<"avatar/upload">>, FileId]),
+   db_msg:sys_notify(Uid, [<<"image/upload">>, FileId]),
    % cowboy_req:reply(200, Req). BUG?
    cowboy_req:reply(200, [{<<"connection">>, <<"close">>}], Req).
 
