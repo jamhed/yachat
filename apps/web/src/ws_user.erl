@@ -80,6 +80,7 @@ user_update([User], Plist) when is_record(User, user) ->
          Ux = db_user:set_by_props(User, Plist),
          dbd:put(Ux),
          get_fb_avatar(User#user.id, proplists:get_value(<<"facebook_id">>, Plist)),
+         db_msg:sys_notify(User#user.id, [<<"user/update">>]),
          [ok];
       [_,_,Fb] ->
          [fail, exists, Fb]

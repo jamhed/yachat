@@ -24,10 +24,13 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
 
 		@bsub "conv/status/part", (e,args) => @clear()
 		@bsub "conv/status/join", (e, args) => @query()
-		@bsub "user/status/registered", (ev, args) => @query()
-		@bsub "user/status/anonymous", (ev, args) => @query()
-		@bsub "user/status/not_logged", (ev, args) => @clear()
 
+		@bsub "user/status", (ev, [status, args]) =>
+			if status == "anonymous" or status == "registered"
+				@query()
+			else
+				@clear()
+				
 	append: (user, msg) ->
 		[stamp,text] = msg
 		@e.prepend @tmpl @a.row, timestamp: stamp, username: Cmon.displayNameA(user), text: text

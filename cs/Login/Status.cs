@@ -17,6 +17,8 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class LoginStat
 	init: ->
 		super
 		
-		@bsub "user/status/registered", (ev, user) => @logged user
-		@bsub "user/status/not_logged", (ev) => @not_logged()
-		@bsub "user/status/anonymous", (ev, user) => @logged user
+		@bsub "user/status", (ev, [status, user]) =>
+			if status == "anonymous" or status == "registered"
+				@logged user
+			else
+				@not_logged()
