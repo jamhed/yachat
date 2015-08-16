@@ -67,7 +67,7 @@ check_user_keys(U, Plist) ->
 get_fb_avatar(Uid, FbId) when is_binary(FbId) ->
    {Mime, Data} = ext_auth:fb_picture(erlang:binary_to_integer(FbId)),
    FileId = user_file:store("store", Data, Uid, <<"avatar">>, Mime),
-   db_msg:sys_notify(Uid, [<<"avatar/upload">>, FileId]);
+   db_msg:sys_notify(Uid, [<<"image/upload">>, FileId]);
 get_fb_avatar(Uid, Fbid) ->
    ?INFO("no fb avatar:~p ~p", [Uid, Fbid]),
    ok.

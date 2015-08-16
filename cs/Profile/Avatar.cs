@@ -7,13 +7,11 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class ProfileAvatar extends Pi
 
 		@wait_ajax_done => @query()
 
-	draw: (avatar) ->
-		@debug avatar
+	draw: ([id, mime]) ->
 		@clear()
-		if avatar?
+		if id
 			stamp = Date.now()
-			[id,type] = avatar
 			im = $("<img>").attr("src", "/store/avatar/#{id}?#{stamp}").addClass "img-responsive" 
 			@e.append im
 
-	query: -> @nsend ["user/avatar", Cmon.sid()], (id, type, mime) => @draw [id, mime], ""
+	query: -> @nsend ["user/avatar", Cmon.sid()], (id, type, mime) => @draw [id, mime]
