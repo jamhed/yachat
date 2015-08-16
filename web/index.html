@@ -17,18 +17,18 @@ body {
 <script pi="pi/Source" name="dialog/login" type="text/x-dot">
 <div pi="Dialog/Simple" title="Login">
 <div class="form-group">
-   <label for="email">Email</label>
-   <input class="form-control login" type="text" id="email" placeholder="Email">
-   <label for="password">Password</label>
-   <input class="form-control login" type="password" id="password" placeholder="Password">
+	<label for="email">Email</label>
+	<input class="form-control login" type="text" id="email" placeholder="Email">
+	<label for="password">Password</label>
+	<input class="form-control login" type="password" id="password" placeholder="Password">
 </div>
 <input type="button" class="btn" value="Login" pi="Form" el=".login" target="parent@close #bullet@login">
 <input type="button" class="btn" value="Cancel" style="margin-left: 40px" pi="pi/Button" target="parent@close">
 <input type="button" class="btn" value="Anonymous" style="margin-left: 80px" pi="pi/Button" target="parent@close #bullet@anonymous">
 {{? it.fb_connect }}
-   <div style="width: 100%; border-top: 1px solid grey; margin-top: 10px; padding-top: 10px">
-      <input type="button" class="btn" value="Facebook Login" pi="pi/Button" target="#bullet@fb_login parent@close"">
-   </div>
+	<div style="width: 100%; border-top: 1px solid grey; margin-top: 10px; padding-top: 10px">
+		<input type="button" class="btn" value="Facebook Login" pi="pi/Button" target="#bullet@fb_login parent@close"">
+	</div>
 {{?}}
 </div>
 </script>
@@ -38,85 +38,85 @@ body {
 
 <script pi="pi/Source" name="dialog/error" type="text/x-dot">
 <div pi="Dialog/Simple" title="Error">
-   <div>
-      {{! it.text }}
-   </div>
-   <div style="margin-top: 20px">
-      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
-   </div>
+	<div>
+		{{! it.text }}
+	</div>
+	<div style="margin-top: 20px">
+		<input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+	</div>
 </div>
 </script>
 
 <script pi="pi/Source" name="dialog/info" type="text/x-dot">
 <div pi="Dialog/Simple" title="Info">
-   <div>
-      {{! it.text }}
-   </div>
-   <div style="margin-top: 20px">
-      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
-   </div>
+	<div>
+		{{! it.text }}
+	</div>
+	<div style="margin-top: 20px">
+		<input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+	</div>
 </div>
 </script>
 
 <script pi="pi/Source" name="menu/logged" type="text/x-dot">
 <ul class="nav navbar-nav">   
-   <li><a href="#about">About</a></li>
-   <li><a href="#profile">Profile</a></li>
-   <li><a href="#friends">Friends</a></li>
-   <li><a href="#todo">ToDo</a></li>
+	<li><a href="#about">About</a></li>
+	<li><a href="#profile">Profile</a></li>
+	<li><a href="#friends">Friends</a></li>
+	<li><a href="#todo">ToDo</a></li>
 </ul>
 <div class="navbar-form navbar-right">
-   <span style="color: white; margin-right: 20px">{{! it.display }}</span>
-   <button type="submit" class="btn btn-default" pi="pi/Button" target="#bullet@logout">Logout</button>
+	<span style="color: white; margin-right: 20px">{{! it.display }}</span>
+	<button type="submit" class="btn btn-default" pi="pi/Button" target="#bullet@logout">Logout</button>
 </div>
 </script>
 
 <script pi="pi/Source" name="menu/login" type="text/x-dot">
 <ul class="nav navbar-nav">
-   <li><a href="#about">About</a></li>
+	<li><a href="#about">About</a></li>
 </ul>
 <div class="navbar-form navbar-right">
-   <button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
+	<button type="submit" class="btn btn-default" pi="Login" dialog="dialog/login">Login</button>
 </div>
 </script>
 
 <script pi="pi/Source" name="dialog/invite" type="text/x-dot">
 <div pi="Dialog/Simple" title="Invite">
-   <div>
-      <input type="text" id="email" class="form-control invite" placeholder="Invite user by email">
-   </div>
-   <div style="margin-top: 20px">
-      <input type="button" class="btn" value="Invite" pi="Form" el=".invite" target="#bullet@invite parent@close">
-      <input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
-   </div>
+	<div>
+		<input type="text" id="email" class="form-control invite" placeholder="Invite user by email">
+	</div>
+	<div style="margin-top: 20px">
+		<input type="button" class="btn" value="Invite" pi="Form" el=".invite" target="#bullet@invite parent@close">
+		<input type="button" class="btn" value="Cancel" pi="pi/Button" target="parent@close">
+	</div>
 </div>
 </script>
 
 <!-- END TEMPLATES -->
 
-   <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-               <span class="sr-only">Toggle navigation</span>
-               <span class="icon-bar"></span>
-               <span class="icon-bar"></span>
-               <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#" style="color: #fff" pi="Conn/Status">YChat</a>
-         </div>
-         <div id="navbar" class="collapse navbar-collapse"
-            pi="Login/Status" login="menu/login" logout="menu/logged">
-         </div>
-      </div>
-   </nav>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" style="color: #fff" pi="Conn/Status">YChat</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse"
+				pi="Login/Status" login="menu/login" logout="menu/logged">
+			</div>
+		</div>
+	</nav>
 
-   <div id="bullet" pi="Bullet" fb_app="800053446775351"></div>
+	<div id="bullet" pi="Bullet" fb_app="800053446775351"></div>
 
-   <div pi="Login/Init"></div>
+	<div pi="Login/Init"></div>
 
-   <!-- 
-   <pre id="log" style="margin-top: 100px"></pre>
-   -->
+	<!-- 
+	<pre id="log" style="margin-top: 100px"></pre>
+	-->
 </body>
 </html>

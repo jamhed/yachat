@@ -125,7 +125,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 				@user_status "registered", userInfo
 			else
 				Cmon.set_sid null
-				@error "Login or password error: " + userId 
+				@error "Login or password error: " + sessionId
 				return @user_status "not_logged"
 
 		# conversation events (join, part)
@@ -177,7 +177,7 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
  
 	user_status: (status, userRec) ->
 		@_user_status = status
-		@event "user/status/#{status}", userRec
+		@event "user/status", [status, userRec]
 
 	conv_status: (status, convId) ->
 		@_conv_status = status

@@ -30,9 +30,12 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
 		@bsub "conv/update", (ev, args) => @query()
 		@bsub "conv/status/join", (ev, args) => @query()
 		@bsub "conv/status/part", (ev, args) => @query()
-		@bsub "user/status/registered", (ev, args) => @query()
-		@bsub "user/status/anonymous", (ev, args) => @query()
-		@bsub "user/status/not_logged", (ev, args) => @clear()
+		
+		@bsub "user/status", (ev, [status, user]) =>
+			if status == "anonymous" or status == "registered"
+				@query()
+			else
+				@clear()
 
 		@wait_ajax_done =>
 			@nsend ["user/conv_list", Cmon.sid()], (status, List) => @autojoin List

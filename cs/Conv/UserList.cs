@@ -14,9 +14,13 @@ define ["Nsend", "pi/m/Source", "Cmon"], (aPi, mSource, Cmon) -> class ConvList 
 	init: ->
 		super
 		@bsub "conv/update", (ev, args) => @query()
+		
 		@bsub "conv/status/invite", (ev, args) => @query()
 		@bsub "conv/status/join", (ev, args) => @query()
 		@bsub "conv/status/part", (ev, args) => @clear()
-		@bsub "user/status/registered", (ev, args) => @query()
-		@bsub "user/status/anonymous", (ev, args) => @query()
-		@bsub "user/status/not_logged", (ev, args) => @clear()
+
+		@bsub "user/status", (ev, [status, args]) =>
+			if status == "anonymous" or status == "registered"
+				@query()
+			else
+				@clear()

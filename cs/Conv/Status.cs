@@ -15,6 +15,7 @@ define ["Nsend", "pi/m/Source"], (aPi, mSource) -> class ConvStatus extends aPi
 			@e.html @tmpl @a.join, {}
 			@process @e
 
-		@bsub "user/status/not_logged", (ev, args) =>
-			@e.html @tmpl @a.join, {}
-			@process @e
+		@bsub "user/status", (ev, [status, user]) =>
+			if status == "not_logged"
+				@e.html @tmpl @a.join, {}
+				@process @e
