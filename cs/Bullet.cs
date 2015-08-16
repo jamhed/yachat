@@ -1,5 +1,5 @@
-define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
-# define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+# define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
+define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"], (Pi, Bullet, Cmon) -> class Bullet extends Pi
 
 	seq: 0
 	cb_nsend: null
@@ -285,12 +285,6 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
  
 	handle_fb_register_ok: (status) ->
 		if status == "ok"
-			@send "user/profile", Cmon.sid()
+         @check_user_id()
 		else
 			@error "Error updating profile."
-
-	set_user_attr: ->
-		@send "user/attr/set", Cmon.sid(), test: "value", more: 123
-
-	get_user_attr: ->
-		@send "user/attr/get", Cmon.sid()
