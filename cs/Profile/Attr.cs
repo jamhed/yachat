@@ -1,20 +1,20 @@
 define ["Nsend", "Cmon", "Util"], (P, Cmon, Util) -> class ProfileAttr extends P
-   
+
 	attr: -> super.concat ["template"]
 
 	init: ->
-   		super
-   		@wait_ajax_done => @query()
+		super
+		@bsub "sys/avatar/change", (e, avatarId) => @query()
+		@wait_ajax_done => @query()
 
-   	draw: (List) ->
-   		@e.empty()
-   		@e.append @tmpl @a.template, Attr for Attr in List
-   		@process()
+	draw: (List) ->
+		@e.empty()
+		@e.append @tmpl @a.template, Attr for Attr in List
+		@process()
 
-   	edit: (Data) ->
-   		@nsend ["user/attr/get", Cmon.sid(), Data.name], (Attr) => 
-   			@debug Attr
-   			@append "attr/dialog", Attr
+	edit: (Data) ->
+		@nsend ["user/attr/get", Cmon.sid(), Data.name], (Attr) => 
+		@append "attr/dialog", Attr
 
 	add_dialog: -> @append "attr/dialog"
 
@@ -27,4 +27,4 @@ define ["Nsend", "Cmon", "Util"], (P, Cmon, Util) -> class ProfileAttr extends P
 		@nsend ["user/attr/set", Cmon.sid(), Attr.name, Attr.value], () => @query()
 
 	query: ->
-   		@nsend ["user/attr/list", Cmon.sid()], (List) => @draw List
+		@nsend ["user/attr/list", Cmon.sid()], (List) => @draw List

@@ -1,17 +1,19 @@
-define ["Nsend", "Cmon"], (Pi, Cmon) -> class ConvText extends Pi
+define ["Nsend", "Cmon"], (Pi, Cmon) -> class ProfileAvatar extends Pi
 
-   draw: (avatarList, stamp) ->
-      @clear()
-      if avatarList? && avatarList.length > 0
-         [id,type] = avatarList[0]
-         im = $("<img>").attr("src", "/store/avatar/#{id}?#{stamp}").addClass "img-responsive" 
-         @e.append im
+	init: ->
+		super
+		
+		@bsub "sys/avatar/change", (e, avatarId) => @query()
 
-   query: -> @nsend ["user/avatar", Cmon.sid()], (status, avatarList) => @draw avatarList, ""
+		@wait_ajax_done => @query()
 
-   init: ->
-      super
-      
-      @bsub "sys/avatar/upload", (e, avatarId) => @draw [[avatarId, "image"]], Date.now()
+	draw: (avatar) ->
+		@debug avatar
+		@clear()
+		if avatar?
+			stamp = Date.now()
+			[id,type] = avatar
+			im = $("<img>").attr("src", "/store/avatar/#{id}?#{stamp}").addClass "img-responsive" 
+			@e.append im
 
-      @wait_ajax_done => @query()
+	query: -> @nsend ["user/avatar", Cmon.sid()], (id, type, mime) => @draw [id, mime], ""
