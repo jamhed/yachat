@@ -73,10 +73,12 @@ put(Uid, Todo = #todo{}) ->
 	dbd:put(Todo#todo{stamp=now(), id=Id}),
 	dbd:put(#user_todo{user_id=Uid, todo_id=Id, id=dbd:make_uid()}).
 
-add([#todo{id=Tid}], Text) ->
+add([#todo{id=Tid}], Text) when is_binary(Text), byte_size(Text)>0 ->
 	Id = dbd:make_uid(),
 	dbd:put(#todo_item{id=Id, stamp=now(), text=Text, todo_id=Tid}),
 	Tid;
+
+add(_, Text) when is_binary(Text), byte_size(Text)==0 -> empty;
 
 add(_, _) -> fail.
 

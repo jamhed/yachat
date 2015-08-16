@@ -20,8 +20,11 @@ msg(M = <<"msg/p2p">>, [Sid, PeerId, Message]) when is_number(Sid), is_number(Pe
    [M] ++ msg_p2p(db_conv:sid_to_pid(Sid), PeerId, Message);
 
 %msg conv message
-msg(M = <<"msg/conv">>, [UserId, ConvId, Message]) when is_number(UserId), is_number(ConvId)  ->
-   MsgId = send_msg(db_conv:get(ConvId), UserId, Message),
-   [M, ok, ConvId, MsgId];
+msg(M = <<"msg/conv">>, [UserId, ConvId, Message])
+   when is_number(UserId), is_number(ConvId), is_binary(Message), byte_size(Message)>0  ->
+      MsgId = send_msg(db_conv:get(ConvId), UserId, Message),
+      [M, ok, ConvId, MsgId];
+
+msg(M = <<"msg/conv">>, _) -> [M, fail, format];
 
 msg(_,_) -> skip.
