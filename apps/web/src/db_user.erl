@@ -46,10 +46,7 @@ user_to_props_short(_) -> [].
 add_file(Plist, [{Name, Id}]) -> Plist ++ [{Name,Id}];
 add_file(Plist, []) -> Plist.
 
-user_to_props([U]) ->
-   Plist = to_proplist(U),
-   Plist1 = proplists:delete(password, Plist);
-   % add_file(Plist1, db_file:by_type(U#user.id, <<"avatar">>));
+user_to_props([U]) -> proplists:delete(password, to_proplist(U));
 user_to_props(_) -> [].
 
 detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
@@ -116,18 +113,19 @@ sid_to_uid(Sid) ->
       _    -> fail
    end.
 
+
 attr_get(Uid, Name) ->
-   Q = qlc:q([ {[{name, A#user_attr.id}, {value, A#user_attr.value}]} || A <- mnesia:table(user_attr),
-      A#user_attr.user_id == Uid, A#user_attr.id == Name ]),
+   Q = qlc:q([ A || A <- mnesia:table(user_attr), A#user_attr.user_id == Uid, A#user_attr.id == Name ]),
    dbd:do(Q).
 
-attr_get_all(Uid) -> [ {UA#user_attr.id, UA#user_attr.value} || UA <- dbd:index(user_attr, user_id, Uid) ].
-
-attr_list(Uid) -> [ {[{name, UA#user_attr.id}, {value, UA#user_attr.value}]} || UA <- dbd:index(user_attr, user_id, Uid) ].
+attr_list(Uid) -> dbd:index(user_attr, user_id, Uid).
 
 attr_set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
 
-attr_del(Uid, Name) -> dbd:delete(user_attr, Name).
+attr_delete([#user_attr{id=Id}]) -> dbd:delete(user_attr, Id);
+attr_delete([]) -> ok.
+
+attr_del(Uid, Name) -> attr_delete(attr_get(Uid, Name)).
 
 select_one([]) -> [];
 select_one([U|_]) -> [U].
