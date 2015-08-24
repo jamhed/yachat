@@ -9,12 +9,12 @@ jiffy_wrapper(List) -> [ {Item} || Item <- List ].
 
 to_props_with_items([H = #todo{id=Tid} | T]) ->
 	Items = db_todo:get_items(Tid),
-	Props = db_todo:to_proplist(H),
+	Props = db_todo:add_tags_prop(db_todo:to_proplist(H)),
 	[{Props ++ [{items, jiffy_wrapper(db_todo:to_proplist(Items))}]}] ++ to_props_with_items(T);
 to_props_with_items([]) -> [].
 
 to_props([H = #todo{} | T]) ->
-	Props = db_todo:to_proplist(H),
+	Props = db_todo:add_tags_prop(db_todo:to_proplist(H)),
 	[{Props}] ++ to_props(T);
 to_props([]) -> [].
 
@@ -22,7 +22,10 @@ to_props([]) -> [].
 msg(M = <<"todo/update">>, [Uid, Form]) ->
 	Plist = db_func:form_to_plist(Form),
 	Todo = db_todo:from_proplist(Plist),
-	[M] ++ [put(Uid, Todo)];
+	Tags = proplists:get_value(tags, Plist),
+	Tid = put(Uid, Todo),
+	db_todo:update_tags(Tid, Tags),
+	[M, Tid];
 
 %msg get all todo lists with items for user
 msg(M = <<"todo/get">>, [Uid]) ->
@@ -63,5 +66,9 @@ msg(M = <<"todo/del">>, [Uid, Tid]) ->
 %msg del or move item from todo list
 msg(M = <<"todo/click">>, [Uid, Tid, ItemId]) ->
 	[M] ++ [click(get(Uid, Tid), get_item(ItemId))];
+
+%msg get list of todo projects
+msg(M = <<"todo/tags">>, [Uid]) ->
+	[M] ++ [ Tag || #todo_tag{tag=Tag} <- db_todo:get_tags(Uid) ];
 
 msg(_,_) -> skip.

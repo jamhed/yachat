@@ -65,6 +65,12 @@ span.ui-selectmenu-text {
     <select id="move_to" class="todo form-control" pi="Todo/List" default="{{!it.move_to}}" bullet="#bullet">
     </select>
   </div>    
+
+  <div class="form-group">
+    <label for="prio">Tags:</label>
+      <input type="text" id="tags" class="form-control todo" placeholder="Tags" value="{{! it.tags }}">
+  </div>
+
   <div style="margin-top: 20px">
     <input type="button" class="btn" value="Save" data-id="{{! it.id }}" pi="Form" el=".todo"
       target="#lists@update parent@close">

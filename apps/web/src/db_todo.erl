@@ -8,8 +8,10 @@
 
 %to_proplist(#todo{})
 ?TO_PROPS(todo);
+
 %to_proplist(#todo_item{})
 ?TO_PROPS(todo_item);
+
 %list processor
 to_proplist([H | T]) -> [to_proplist(H)] ++ to_proplist(T);
 to_proplist([]) -> [].
@@ -36,6 +38,22 @@ get(Uid) ->
 			T <- mnesia:table(todo), T#todo.id == UT#user_todo.todo_id
 			]),
 	lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)).
+
+check_tag(Tid, Tag) ->
+	Q = qlc:q([ T || T <- mnesia:table(todo_tag), T#todo_tag.todo_id == Tid, T#todo_tag.tag == Tag ]),
+	dbd:do(Q).
+
+to_bool([_X]) -> true;
+to_bool([]) -> false.
+
+by_tag(Uid, Tag) ->
+	Q = qlc:q([ T ||
+			UT <- mnesia:table(user_todo), UT#user_todo.user_id == Uid,
+			T <- mnesia:table(todo), T#todo.id == UT#user_todo.todo_id
+			]),
+	L = lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)),
+	lists:filter(fun(#todo{id=Id}) -> to_bool(check_tag(Id,Tag)) end, L).
+
 
 get_default(Uid) ->
 	Q = qlc:q([ T ||
@@ -64,14 +82,16 @@ clear_default(_Uid, #todo{}) -> ok.
 put(Uid, Todo = #todo{id=Id}) when is_number(Id) ->
 	[#todo{}] = get(Uid, Id),
 	clear_default(Uid, Todo),
-	dbd:put(Todo#todo{stamp=now()});
+	dbd:put(Todo#todo{stamp=now()}),
+	Id;
 
 % create	
 put(Uid, Todo = #todo{}) ->
 	clear_default(Uid, Todo),
 	Id = dbd:make_uid(),
 	dbd:put(Todo#todo{stamp=now(), id=Id}),
-	dbd:put(#user_todo{user_id=Uid, todo_id=Id, id=dbd:make_uid()}).
+	dbd:put(#user_todo{user_id=Uid, todo_id=Id, id=dbd:make_uid()}),
+	Id.
 
 add([#todo{id=Tid}], Text) when is_binary(Text), byte_size(Text)>0 ->
 	Id = dbd:make_uid(),
@@ -94,3 +114,40 @@ click(_, _) -> fail.
 
 del([#todo{id=Id}]) -> dbd:delete(todo, Id);
 del(_) -> fail.
+
+get_unique_tags(Uid) ->
+	TagList = [ Tag || #todo_tag{tag=Tag} <- get_all_tags(Uid) ],
+	lists:usort(TagList).
+
+get_all_tags(Uid) ->
+	Q = qlc:q([ T ||
+			UT <- mnesia:table(user_todo), UT#user_todo.user_id == Uid,
+			T <- mnesia:table(todo_tag), T#todo_tag.todo_id == UT#user_todo.todo_id
+		]),
+	dbd:do(Q).
+
+get_tags(Tid) ->
+	Q = qlc:q([ T || T <- mnesia:table(todo_tag), T#todo_tag.todo_id == Tid	]),
+	dbd:do(Q).
+
+delete_tags(Tid) ->
+	[ dbd:delete(todo_tag, Id) || #todo_tag{id=Id} <- get_tags(Tid) ].
+
+set_tag(_Tid, <<"">>) -> ok;
+set_tag(Tid, Tag) -> dbd:put(#todo_tag{id=dbd:next_id(todo_tag), todo_id=Tid, tag=Tag}).
+
+update_tags(Tid, Tags) ->
+	TagList = binary:split(Tags, <<" ">>, [global]),
+	delete_tags(Tid),
+	[ set_tag(Tid, Tag) || Tag <- TagList ].
+
+join_binary(A, B) when bit_size(B) > 0 -> join_binary(A, B, <<" ">>);
+join_binary(A, _) -> A.
+join_binary(A, B, S) -> <<A/binary, S/binary, B/binary>>. 
+
+tags_as_binary(Tid) ->
+	lists:foldr(fun join_binary/2, <<"">>, [ Tag || #todo_tag{tag=Tag} <- get_tags(Tid) ]).
+
+add_tags_prop(P) ->
+	Tid = proplists:get_value(id, P),
+	P ++ [{tags, tags_as_binary(Tid)}].

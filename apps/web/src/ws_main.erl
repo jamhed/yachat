@@ -16,7 +16,7 @@ module_route(Uid, Msg, Args) -> module_route(Msg, [Uid] ++ Args).
 module_route(Msg, Args) -> route_msg(handlers(), Msg, Args).
 
 pre_handle(Req, State, [<<"nmsg">>, Seq, [Msg, Sid | Args]]) when is_number(Seq), is_number(Sid)  ->
-   ?INFO("N-MSG: ~p MSG: ~p SID: ~p ARGS: ~p", [Seq, Msg, Sid, Args]),
+   ?INFO("N-MSG: ~180p MSG: ~180p SID: ~180p ARGS: ~180p", [Seq, Msg, Sid, Args]),
    Raw = module_route( db_user:sid_to_uid(Sid), Msg, Args ),
    Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
    ?INFO("N-MSG REPLY: ~ts", [Reply]),
