@@ -54,6 +54,10 @@ by_tag(Uid, Tag) ->
 	L = lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)),
 	lists:filter(fun(#todo{id=Id}) -> to_bool(check_tag(Id,Tag)) end, L).
 
+uniget(Uid, [Tag]) ->
+	?INFO("uniget: ~p ~p", [Uid, Tag]),
+	by_tag(Uid, Tag);
+uniget(Uid, []) -> get(Uid).
 
 get_default(Uid) ->
 	Q = qlc:q([ T ||

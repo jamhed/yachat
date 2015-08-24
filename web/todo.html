@@ -12,6 +12,10 @@ span.ui-selectmenu-text {
 }
 </style>
 
+<script pi="pi/Source" name="todo/tag" type="text/x-dot">
+<button pi="pi/Button" target="parent@set" data-tag="{{!it.tag}}" style="margin-right: 5px" class="btn {{?it.current}}btn-primary{{??}}btn-default{{?}}">{{!it.tag}}</button>
+</script>
+
 <script pi="pi/Source" name="todo" type="text/x-dot">
 <div style="margin-bottom: 10px">
   <div class="row form-inline todo-header {{? it.default }}todo-default{{?}}" >
@@ -84,6 +88,10 @@ span.ui-selectmenu-text {
 </script>
 
 <script pi="pi/Source" name="content/logged" type="text/x-dot">
+  <div class="row">
+    <div pi="Todo/Tags" template="todo/tag" lists="#lists" class="col-md-12" style="margin-bottom: 5px"></div>
+  </div>
+
   <div class="row">
     <div class="col-md-12">
 		  <button

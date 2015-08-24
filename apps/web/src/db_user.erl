@@ -239,3 +239,12 @@ check_friendship(Uid, FriendId) ->
    Q = qlc:q([ C || C <- mnesia:table(user_friend),
       C#user_friend.user_id == Uid, C#user_friend.friend_id == FriendId ]),
    dbd:do(Q).
+
+session_data_set(Sid, Name, Value) ->
+   dbd:put(#user_session_data{id={Sid,Name}, name=Name, value=Value, session_id=Sid}).
+
+session_data_get(Sid, Name) ->
+   [ Value || #user_session_data{value=Value} <- dbd:get(user_session_data, {Sid, Name}) ].
+
+session_data(Sid) -> [ [{name, Name}, {value,Value}] || 
+   #user_session_data{name=Name, value=Value} <- dbd:index(user_session_data, session_id, Sid) ].

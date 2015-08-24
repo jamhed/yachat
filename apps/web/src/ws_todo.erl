@@ -28,15 +28,16 @@ msg(M = <<"todo/update">>, [Uid, Form]) ->
 	[M, Tid];
 
 %msg get all todo lists with items for user
-msg(M = <<"todo/get">>, [Uid]) ->
-	[M] ++ [to_props_with_items(get(Uid))];
+msg(M = <<"todo/get">>, [Uid, Sid]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	[M] ++ [to_props_with_items(db_todo:uniget(Uid, Tag))];
 
 % get all todo lists without items for user
 msg(M = <<"todo/list">>, [Uid]) ->
 	[M] ++ [to_props(get(Uid))];
 
 %msg get todo list by id
-msg(M = <<"todo/get">>, [Uid, Tid]) ->
+msg(M = <<"todo/load">>, [Uid, Tid]) ->
 	[M] ++ [to_props(get(Uid, Tid))];
 
 %msg add item to todo list
@@ -67,8 +68,13 @@ msg(M = <<"todo/del">>, [Uid, Tid]) ->
 msg(M = <<"todo/click">>, [Uid, Tid, ItemId]) ->
 	[M] ++ [click(get(Uid, Tid), get_item(ItemId))];
 
-%msg get list of todo projects
-msg(M = <<"todo/tags">>, [Uid]) ->
-	[M] ++ [ Tag || #todo_tag{tag=Tag} <- db_todo:get_tags(Uid) ];
+%msg get list of todo tags
+msg(M = <<"todo/tags">>, [Uid, Sid]) ->
+	[M, db_user:session_data_get(Sid, tag)] ++ [lists:usort([ Tag || #todo_tag{tag=Tag} <- db_todo:get_all_tags(Uid) ])];
+
+%msg get list of todo tags
+msg(M = <<"todo/tag/set">>, [_Uid, Sid, Tag]) ->
+	db_user:session_data_set(Sid, tag, Tag),
+	[M];
 
 msg(_,_) -> skip.
