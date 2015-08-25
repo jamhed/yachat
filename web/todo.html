@@ -21,7 +21,7 @@ span.ui-selectmenu-text {
   <div class="row form-inline todo-header {{? it.default }}todo-default{{?}}" >
     <div class="form-group col-md-4"
       style="cursor:pointer; bottom: -10px" pi="pi/Button" target="#lists@edit" data-id="{{=it.id}}">
-      <h3 style="display:inline">{{=it.name}}</h3>
+      <h3 style="display:inline">{{!it.name || "_"}}</h3>
     </div>
     <div class="col-md-1" style="bottom: -14px">
       <input type="checkbox" class="default"
@@ -72,7 +72,7 @@ span.ui-selectmenu-text {
 
   <div class="form-group">
     <label for="prio">Tags:</label>
-      <input type="text" id="tags" class="form-control todo" placeholder="Tags" value="{{! it.tags }}">
+      <input type="text" id="tags" class="form-control todo" placeholder="Tags" value="{{! it.tags || 'Default' }}">
   </div>
 
   <div style="margin-top: 20px">
@@ -89,7 +89,10 @@ span.ui-selectmenu-text {
 
 <script pi="pi/Source" name="content/logged" type="text/x-dot">
   <div class="row">
-    <div pi="Todo/Tags" template="todo/tag" lists="#lists" class="col-md-12" style="margin-bottom: 5px"></div>
+    <div class="col-md-1">
+    <button pi="pi/Button" target="#tags@clear" style="margin-right: 5px" class="btn btn-default">Clear</button>
+    </div>
+    <div id="tags" pi="Todo/Tags" template="todo/tag" lists="#lists" class="col-md-11" style="margin-bottom: 5px"></div>
   </div>
 
   <div class="row">

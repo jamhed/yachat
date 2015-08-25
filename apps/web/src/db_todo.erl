@@ -65,7 +65,11 @@ by_tag(Uid, Tag) ->
 get_by_tag(Uid, [Tag]) -> by_tag(Uid, Tag);
 get_by_tag(Uid, []) -> get(Uid).
 
-get_default(Uid, [Tag]) -> lists:filter(fun(#todo{id=Id}) -> to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
+get_default(Uid, [Tag]) ->
+	lists:filter(fun(#todo{id=Id}) -> to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
+
+clear_default(Uid, [Tag]) ->
+	[ set_tag(Tid, Tag, false) || #todo{id=Tid} <- get_default(Uid, [Tag]) ].
 
 get_item(ItemId) -> dbd:get(todo_item, ItemId).
 
