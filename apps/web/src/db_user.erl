@@ -79,8 +79,7 @@ map_user_file([#user_file{id=Id,type=Type,mime=Mime}]) -> [Id, Type, Mime];
 map_user_file([]) -> [].
 
 get_avatar_real([]) -> [];
-get_avatar_real([{[{name,<<"avatar">>},{value, FileId}]}]) ->
-   map_user_file(dbd:get(user_file, FileId)).
+get_avatar_real([#user_attr{value=FileId}]) -> map_user_file(dbd:get(user_file, FileId)).
 
 get_avatar(Uid) -> get_avatar_real(attr_get(Uid, <<"avatar">>)).
 
