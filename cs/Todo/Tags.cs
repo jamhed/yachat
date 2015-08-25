@@ -7,10 +7,16 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@wait_ajax_done => @sub "#{@a.lists}@update", => @query()
 		@query()
 
+	clear: ->
+		@nsend ["todo/tag/clear", [Cmon.sid()]], => @refresh()
+
+	refresh: ->
+		@rpc "#{@a.lists}@self", [], (b) => b.query()
+		@query()
+	
 	set: (data) ->
-		@nsend ["todo/tag/set", [Cmon.sid()], data.tag], => 
-			@rpc "#{@a.lists}@self", [], (b) => b.query()
-			@query()
+		@nsend ["todo/tag/set", [Cmon.sid()], data.tag], => @refresh()
+
 
 	draw: (CurrentTag, List) ->
 		@e.empty()
