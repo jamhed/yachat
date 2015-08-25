@@ -27,4 +27,4 @@ define ["Nsend", "Cmon", "pi/lib/jquery-ui"], (Pi, Cmon, UI) -> class TodoList e
 			@e.selectmenu "refresh"
 
 	query: ->
-		@nsend ["todo/list", Cmon.sid()], (List) => @draw(List)
+		@nsend ["todo/list", [Cmon.sid()]], (List) => @draw(List)

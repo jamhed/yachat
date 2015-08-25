@@ -13,11 +13,19 @@ route_msg([H|T], M,A) ->
    end.
 
 module_route(Uid, Msg, Args) -> module_route(Msg, [Uid] ++ Args).
+module_route(Uid, Sid, Msg, Args) -> module_route(Msg, [Uid, Sid] ++ Args).
 module_route(Msg, Args) -> route_msg(handlers(), Msg, Args).
 
 pre_handle(Req, State, [<<"nmsg">>, Seq, [Msg, Sid | Args]]) when is_number(Seq), is_number(Sid)  ->
    ?INFO("N-MSG: ~180p MSG: ~180p SID: ~180p ARGS: ~180p", [Seq, Msg, Sid, Args]),
    Raw = module_route( db_user:sid_to_uid(Sid), Msg, Args ),
+   Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
+   ?INFO("N-MSG REPLY: ~ts", [Reply]),
+   {reply, Reply, Req, State};
+
+pre_handle(Req, State, [<<"nmsg">>, Seq, [Msg, [Sid] | Args]]) when is_number(Seq), is_number(Sid)  ->
+   ?INFO("N-MSG SID: ~180p MSG: ~180p SID: ~180p ARGS: ~180p", [Seq, Msg, Sid, Args]),
+   Raw = module_route( db_user:sid_to_uid(Sid), Sid, Msg, Args ),
    Reply = jiffy:encode([<<"nmsg">>, Seq, Raw]),
    ?INFO("N-MSG REPLY: ~ts", [Reply]),
    {reply, Reply, Req, State};
@@ -45,7 +53,7 @@ init(_Transport, Req, Opts, _Active) ->
 stream(M = <<"ping">>, Req, State) -> {reply, M, Req, State};
 
 stream(JSON, Req, State) ->
-   % ?INFO("RAW: ~p", [Raw]),
+   ?INFO("RAW: ~ts", [JSON]),
    pre_handle(Req, State, jiffy:decode(JSON)).
 
 info({msg, _Sender, Data}, Req, State) ->

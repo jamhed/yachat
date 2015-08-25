@@ -20,7 +20,6 @@ from_proplist(Plist) ->
 	?INFO("proplist: ~p", [Plist]),
 	#todo{
 		name = proplists:get_value(name, Plist),
-		default = proplists:get_value(default, Plist),
 		id = proplists:get_value(id, Plist),
 		move_to = proplists:get_value(move_to, lists:reverse(Plist)),
 		prio = proplists:get_value(prio, Plist)
@@ -43,6 +42,15 @@ check_tag(Tid, Tag) ->
 	Q = qlc:q([ T || T <- mnesia:table(todo_tag), T#todo_tag.todo_id == Tid, T#todo_tag.tag == Tag ]),
 	dbd:do(Q).
 
+check_default(Tid, Tag) ->
+	Q = qlc:q([ T || T <- mnesia:table(todo_tag),
+		T#todo_tag.todo_id == Tid,
+		T#todo_tag.tag == Tag,
+		T#todo_tag.default == true
+	]),
+	dbd:do(Q).
+
+
 to_bool([_X]) -> true;
 to_bool([]) -> false.
 
@@ -54,17 +62,10 @@ by_tag(Uid, Tag) ->
 	L = lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)),
 	lists:filter(fun(#todo{id=Id}) -> to_bool(check_tag(Id,Tag)) end, L).
 
-uniget(Uid, [Tag]) ->
-	?INFO("uniget: ~p ~p", [Uid, Tag]),
-	by_tag(Uid, Tag);
-uniget(Uid, []) -> get(Uid).
+get_by_tag(Uid, [Tag]) -> by_tag(Uid, Tag);
+get_by_tag(Uid, []) -> get(Uid).
 
-get_default(Uid) ->
-	Q = qlc:q([ T ||
-			UT <- mnesia:table(user_todo), UT#user_todo.user_id == Uid,
-			T <- mnesia:table(todo), T#todo.id == UT#user_todo.todo_id, T#todo.default == true
-			]),
-	dbd:do(Q).
+get_default(Uid, [Tag]) -> lists:filter(fun(#todo{id=Id}) -> to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
 
 get_item(ItemId) -> dbd:get(todo_item, ItemId).
 
@@ -77,21 +78,15 @@ get(Uid, Tid) ->
 			]),
 	dbd:do(Q).
 
-clear_default(Uid, #todo{default=true}) ->
-	[ put(Uid, T#todo{default=false}) || T <- get_default(Uid) ];
-
-clear_default(_Uid, #todo{}) -> ok.
 
 % update
 put(Uid, Todo = #todo{id=Id}) when is_number(Id) ->
 	[#todo{}] = get(Uid, Id),
-	clear_default(Uid, Todo),
 	dbd:put(Todo#todo{stamp=now()}),
 	Id;
 
 % create	
 put(Uid, Todo = #todo{}) ->
-	clear_default(Uid, Todo),
 	Id = dbd:make_uid(),
 	dbd:put(Todo#todo{stamp=now(), id=Id}),
 	dbd:put(#user_todo{user_id=Uid, todo_id=Id, id=dbd:make_uid()}),
@@ -138,7 +133,12 @@ delete_tags(Tid) ->
 	[ dbd:delete(todo_tag, Id) || #todo_tag{id=Id} <- get_tags(Tid) ].
 
 set_tag(_Tid, <<"">>) -> ok;
-set_tag(Tid, Tag) -> dbd:put(#todo_tag{id=dbd:next_id(todo_tag), todo_id=Tid, tag=Tag}).
+set_tag(Tid, Tag) -> set_tag(Tid, Tag, false).
+
+set_tag(Tid, [Tag], Default) -> set_tag(Tid, Tag, Default);
+set_tag(Tid, [], Default) -> ok;
+set_tag(Tid, Tag, Default) -> dbd:put(#todo_tag{id={Tid,Tag}, todo_id=Tid, tag=Tag, default=Default}).
+
 
 update_tags(Tid, Tags) ->
 	TagList = binary:split(Tags, <<" ">>, [global]),

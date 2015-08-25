@@ -8,7 +8,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@query()
 
 	set: (data) ->
-		@nsend ["todo/tag/set", Cmon.sid(), Cmon.sid(), data.tag], => 
+		@nsend ["todo/tag/set", [Cmon.sid()], data.tag], => 
 			@rpc "#{@a.lists}@self", [], (b) => b.query()
 			@query()
 
@@ -18,4 +18,4 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@process()
 
 	query: ->
-		@nsend ["todo/tags", Cmon.sid(), Cmon.sid()], ([CurrentTag], List) => @draw(CurrentTag, List)
+		@nsend ["todo/tags", [Cmon.sid()] ], ([CurrentTag], List) => @draw(CurrentTag, List)

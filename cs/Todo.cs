@@ -30,7 +30,7 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 	delete: (Data) -> @nsend ["todo/del", Cmon.sid(), Data.id], => @query()
 
 	edit: (data) ->
-		@nsend ["todo/load", Cmon.sid(), data.id], ([List]) => @edit_dialog List
+		@nsend ["todo/load", [Cmon.sid()], data.id], ([List]) => @edit_dialog List
 
 	update: (Todo, Params) ->
 		h = Util.list2hash Todo
@@ -43,4 +43,4 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 	add_dialog: -> @append "todo/dialog"
 
 	query: ->
-		@nsend ["todo/get", Cmon.sid(), Cmon.sid()], (List) => @draw List
+		@nsend ["todo/get", [Cmon.sid()]], (List) => @draw List

@@ -11,7 +11,7 @@
 
 % todo
 
--record(todo,      {id, stamp, name, default, prio, move_to}).
+-record(todo,      {id, stamp, name, prio, move_to}).
 -record(todo_item, {id, todo_id, prev_id, stamp, text}).
--record(todo_tag,  {id, todo_id, tag}).
+-record(todo_tag,  {id, todo_id, tag, default}).
 -record(user_todo, {id, user_id, todo_id}).

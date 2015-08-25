@@ -1,5 +1,5 @@
 -module(ws_todo).
--export([msg/2,to_props/1]).
+-export([msg/2,to_props/2,to_props_with_items/2]).
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 -compile({no_auto_import,[get/1,put/2]}).
@@ -7,16 +7,26 @@
 
 jiffy_wrapper(List) -> [ {Item} || Item <- List ].
 
-to_props_with_items([H = #todo{id=Tid} | T]) ->
+to_props_with_items([Tag], [H = #todo{id=Tid} | T]) ->
 	Items = db_todo:get_items(Tid),
 	Props = db_todo:add_tags_prop(db_todo:to_proplist(H)),
-	[{Props ++ [{items, jiffy_wrapper(db_todo:to_proplist(Items))}]}] ++ to_props_with_items(T);
-to_props_with_items([]) -> [].
+	[{Props
+		++ [{default, db_todo:to_bool(db_todo:check_default(Tid, Tag))}]
+		++ [{items, jiffy_wrapper(db_todo:to_proplist(Items))}]
+	}] ++ to_props_with_items([Tag], T);
 
-to_props([H = #todo{} | T]) ->
-	Props = db_todo:add_tags_prop(db_todo:to_proplist(H)),
-	[{Props}] ++ to_props(T);
-to_props([]) -> [].
+to_props_with_items([], T) -> to_props_with_items([<<"">>], T);
+
+to_props_with_items(_Tag, []) -> [].
+
+to_props([Tag], [H = #todo{id=Tid} | T]) ->
+	Props = db_todo:add_tags_prop(db_todo:to_proplist(H))
+		++ [{default, db_todo:to_bool(db_todo:check_default(Tid, Tag))}],
+	[{Props}] ++ to_props([Tag], T);
+
+to_props([], T) -> to_props([<<"">>], T);
+
+to_props(Tag, []) -> [].
 
 %msg create or update todo list
 msg(M = <<"todo/update">>, [Uid, Form]) ->
@@ -30,35 +40,40 @@ msg(M = <<"todo/update">>, [Uid, Form]) ->
 %msg get all todo lists with items for user
 msg(M = <<"todo/get">>, [Uid, Sid]) ->
 	Tag = db_user:session_data_get(Sid, tag),
-	[M] ++ [to_props_with_items(db_todo:uniget(Uid, Tag))];
+	[M] ++ [to_props_with_items(Tag, db_todo:get_by_tag(Uid, Tag))];
 
 % get all todo lists without items for user
-msg(M = <<"todo/list">>, [Uid]) ->
-	[M] ++ [to_props(get(Uid))];
+msg(M = <<"todo/list">>, [Uid, Sid]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	[M] ++ [to_props(Tag, db_todo:get_by_tag(Uid, Tag))];
 
 %msg get todo list by id
-msg(M = <<"todo/load">>, [Uid, Tid]) ->
-	[M] ++ [to_props(get(Uid, Tid))];
+msg(M = <<"todo/load">>, [Uid, Sid, Tid]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	[M] ++ [to_props(Tag, get(Uid, Tid))];
 
 %msg add item to todo list
 msg(M = <<"todo/add">>, [Uid, Tid, Text]) ->
 	[M] ++ [add(get(Uid, Tid), Text)];
 
 %msg get default todo list (check we can write)
-msg(M = <<"todo/default">>, [Uid]) ->
-	[M] ++ [to_props(db_todo:get_default(Uid))];
+msg(M = <<"todo/default">>, [Uid, Sid]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	[M] ++ [to_props(Tag, db_todo:get_default(Uid, Tag))];
 
-msg(M = <<"todo/default">>, [Uid, Tid, State]) ->
-	[T] = get(Uid, Tid),
-	[M] ++ [db_todo:put(Uid, T#todo{default=State})];
+msg(M = <<"todo/default">>, [_Uid, Sid, Tid, State]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	db_todo:set_tag(Tid, Tag, State),
+	[M, ok];
 
 msg(M = <<"todo/move_to">>, [Uid, Tid, MoveTo]) ->
 	[T] = get(Uid, Tid),
 	[M] ++ [db_todo:put(Uid, T#todo{move_to=MoveTo})];
 
 %msg add item to todo list
-msg(M = <<"todo/add">>, [Uid, Text]) ->
-	[M] ++ [add(db_todo:get_default(Uid), Text)];
+msg(M = <<"todo/add">>, [Uid, Sid, Text]) ->
+	Tag = db_user:session_data_get(Sid, tag),
+	[M] ++ [add(db_todo:get_default(Uid, Tag), Text)];
 
 %msg del todo list
 msg(M = <<"todo/del">>, [Uid, Tid]) ->
