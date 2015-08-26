@@ -6,14 +6,14 @@
 
 %msg get user's attribute
 msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
-   [M] ++ attr_map(get(Uid, Name));
+   [M] ++ db_util:jiffy_wrapper(attr_map(get(Uid, Name)));
 
 msg(M = <<"user/attr/del">>, [Uid, Name]) when is_number(Uid) ->
    [M] ++ [del(Uid, Name)];
 
 %msg list user's attributes
 msg(M = <<"user/attr/list">>, [Uid]) when is_number(Uid) ->
-   [M] ++ [attr_map(list(Uid))];
+   [M] ++ [db_util:jiffy_wrapper(attr_map(list(Uid)))];
 
 %msg set user's attribute
 msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
@@ -21,6 +21,6 @@ msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
 
 %msg set user's attributes from json object [{k,v}, ..., {k,v}]
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
-   [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
+   [M] ++ lists:flatten([ db_attr:set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
 
 msg(_, _) -> skip.
