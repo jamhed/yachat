@@ -85,7 +85,7 @@ get_avatar(Uid) -> get_avatar_real(db_attr:get(Uid, <<"avatar">>)).
 
 set_avatar(Uid, FileId) ->
    db_msg:sys_notify(Uid, [<<"avatar/change">>, FileId]),
-   attr_set(Uid, <<"avatar">>, FileId).
+   db_user:set(Uid, <<"avatar">>, FileId).
 
 file_delete(Uid, FileId) ->
    Path = filename:join("store", integer_to_list(FileId)),
