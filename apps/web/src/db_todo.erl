@@ -69,7 +69,7 @@ clear_default(Uid, [Tag]) ->
 
 get_item(ItemId) -> dbd:get(todo_item, ItemId).
 
-get_items(Tid) -> lists:reverse(dbd:index(todo_item, todo_id, Tid)).
+get_items(Tid) -> lists:sort(fun(#todo_item{stamp=A},#todo_item{stamp=B}) -> A>B end, dbd:index(todo_item, todo_id, Tid)).
 
 get(Uid, Tid) ->
 	Q = qlc:q([ T ||
@@ -136,7 +136,7 @@ set_tag(_Tid, <<"">>) -> ok;
 set_tag(Tid, Tag) -> set_tag(Tid, Tag, false).
 
 set_tag(Tid, [Tag], Default) -> set_tag(Tid, Tag, Default);
-set_tag(Tid, [], Default) -> ok;
+set_tag(_Tid, [], _Default) -> ok;
 set_tag(Tid, Tag, Default) -> dbd:put(#todo_tag{id={Tid,Tag}, todo_id=Tid, tag=Tag, default=Default}).
 
 
