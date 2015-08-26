@@ -21,16 +21,16 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 		@process()
 		$("#entry-field").focus()
 
-	edit_dialog: (List) ->
-		e = @append "todo/dialog", List
-
 	click_item: (Data) ->
 		@nsend ["todo/click", Cmon.sid(), Data.listId, Data.id], => @query()
 
 	delete: (Data) -> @nsend ["todo/del", Cmon.sid(), Data.id], => @query()
 
 	edit: (data) ->
-		@nsend ["todo/load", [Cmon.sid()], data.id], ([List]) => @edit_dialog List
+		@nsend ["todo/load", [Cmon.sid()], data.id], ([List]) => @append "todo/dialog", List
+
+	add_dialog: ->
+		@nsend ["todo/tag/current", [Cmon.sid()] ], ([Tag]) => @append "todo/dialog", current_tag: Tag
 
 	update: (Todo, Params) ->
 		h = Util.list2hash Todo
@@ -40,7 +40,5 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 			@event "update", Todo
 			@query()
 	
-	add_dialog: -> @append "todo/dialog"
-
 	query: ->
 		@nsend ["todo/get", [Cmon.sid()]], (List) => @draw List
