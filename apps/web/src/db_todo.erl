@@ -112,7 +112,9 @@ click([#todo{}], [#todo_item{id=ItemId}]) ->
 
 click(_, _) -> fail.
 
-del([#todo{id=Id}]) -> dbd:delete(todo, Id);
+del([#todo{id=Tid}]) ->
+	dbd:delete(todo, Tid),
+	lists:foreach(fun(#todo_item{id=Id}) -> dbd:delete(todo_item, Id) end, dbd:index(todo_item, todo_id, Tid));
 del(_) -> fail.
 
 get_unique_tags(Uid) ->
