@@ -18,4 +18,9 @@ msg(M = <<"todo/tag/clear">>, [_Uid, Sid]) ->
 	db_session:del(Sid, tag),
 	[M, ok];
 
+%msg get current tag
+msg(M = <<"todo/tag/current">>, [_Uid, Sid]) ->
+	Tag = db_session:get(Sid, tag),
+	[M, Tag];
+
 msg(_,_) -> skip.

@@ -128,9 +128,6 @@ user_make_p2p(Uid, PeerId) ->
          [ok, Cid, Peer]
    end.
 
-attr_map(AttrList) ->
-   [ {[{name, A#user_attr.id}, {value, A#user_attr.value}]} || A <- AttrList ].
-
 %
 % MESSAGES
 %
@@ -217,31 +214,6 @@ msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
 %msg set user's avatar
 msg(M = <<"user/avatar/set">>, [Uid, FileId]) when is_number(Uid), is_number(FileId) ->
    [M, db_user:set_avatar(Uid, FileId)];
-
-%msg get user's attribute
-msg(M = <<"user/attr/get">>, [Uid, Name]) when is_number(Uid) ->
-   [M] ++ attr_map(db_user:attr_get(Uid, Name));
-
-msg(M = <<"user/attr/del">>, [Uid, Name]) when is_number(Uid) ->
-   [M] ++ [db_user:attr_del(Uid, Name)];
-
-%msg list user's attributes
-msg(M = <<"user/attr/list">>, [Uid]) when is_number(Uid) ->
-   [M] ++ [attr_map(db_user:attr_list(Uid))];
-
-%msg get user's attributes as json object
-msg(M = <<"user/attr/get">>, [Uid]) when is_number(Uid) ->
-   R = [M] ++ [{db_user:attr_get_all(Uid)}],
-   ?INFO("~p", [R]), R;
-
-%msg set user's attribute
-msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
-   [M] ++ db_user:attr_set(Uid, Name, Value);
-
-% [{k,v}, ..., {k,v}]
-%msg set user's attributes from json object
-msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
-   [M] ++ lists:flatten([ db_user:attr_set(Uid, P, proplists:get_value(P,Plist)) || P <- proplists:get_keys(Plist) ]);
 
 msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
    ok = db_user:add_friend(Uid, FriendId),

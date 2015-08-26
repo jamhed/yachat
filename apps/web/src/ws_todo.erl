@@ -21,7 +21,8 @@ to_props_with_items(_Tag, []) -> [].
 
 to_props([Tag], [H = #todo{id=Tid} | T]) ->
 	Props = db_todo:add_tags_prop(db_todo:to_proplist(H))
-		++ [{default, db_todo:to_bool(db_todo:check_default(Tid, Tag))}],
+		++ [{default, db_todo:to_bool(db_todo:check_default(Tid, Tag))}]
+		++ [{current_tag, Tag}],
 	[{Props}] ++ to_props([Tag], T);
 
 to_props([], T) -> to_props([<<"">>], T);
