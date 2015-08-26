@@ -17,7 +17,8 @@ msg(M = <<"user/attr/list">>, [Uid]) when is_number(Uid) ->
 
 %msg set user's attribute
 msg(M = <<"user/attr/set">>, [Uid, Name, Value]) when is_number(Uid) ->
-   [M] ++ set(Uid, Name, Value);
+   set(Uid, Name, Value),
+   [M, ok];
 
 %msg set user's attributes from json object [{k,v}, ..., {k,v}]
 msg(M = <<"user/attr/set">>, [Uid, {Plist}]) when is_number(Uid) ->
