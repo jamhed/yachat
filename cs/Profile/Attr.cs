@@ -13,8 +13,7 @@ define ["Nsend", "Cmon", "Util"], (P, Cmon, Util) -> class ProfileAttr extends P
 		@process()
 
 	edit: (Data) ->
-		@nsend ["user/attr/get", Cmon.sid(), Data.name], (Attr) => 
-		@append "attr/dialog", Attr
+		@nsend ["user/attr/get", Cmon.sid(), Data.name], (Attr) => @append "attr/dialog", Attr
 
 	add_dialog: -> @append "attr/dialog"
 
