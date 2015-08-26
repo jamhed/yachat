@@ -5,17 +5,15 @@
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
-%XXX: replace to jiffy wrapper
 attr_map(AttrList) ->
-   [ {[{name, A#user_attr.id}, {value, A#user_attr.value}]} || A <- AttrList ].
+   [ [{name, A#user_attr.name}, {value, A#user_attr.value}] || A <- AttrList ].
 
-get(Uid, Name) ->
-   Q = qlc:q([ A || A <- mnesia:table(user_attr), A#user_attr.user_id == Uid, A#user_attr.id == Name ]),
-   dbd:do(Q).
+get(Uid, Name) -> dbd:get(user_attr, {Uid,Name}).
 
 list(Uid) -> dbd:index(user_attr, user_id, Uid).
 
-set(Uid, Name, Value) -> dbd:put(#user_attr{ id=Name, value=Value, user_id=Uid }), [ok].
+set(Uid, Name, Value) ->
+	dbd:put(#user_attr{ id={Uid,Name}, name=Name, value=Value, user_id=Uid }).
 
 del([#user_attr{id=Id}]) -> dbd:delete(user_attr, Id);
 del([]) -> ok.
