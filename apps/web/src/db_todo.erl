@@ -50,23 +50,19 @@ check_default(Tid, Tag) ->
 	]),
 	dbd:do(Q).
 
-
-to_bool([_X]) -> true;
-to_bool([]) -> false.
-
 by_tag(Uid, Tag) ->
 	Q = qlc:q([ T ||
 			UT <- mnesia:table(user_todo), UT#user_todo.user_id == Uid,
 			T <- mnesia:table(todo), T#todo.id == UT#user_todo.todo_id
 			]),
 	L = lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)),
-	lists:filter(fun(#todo{id=Id}) -> to_bool(check_tag(Id,Tag)) end, L).
+	lists:filter(fun(#todo{id=Id}) -> db_util:to_bool(check_tag(Id,Tag)) end, L).
 
 get_by_tag(Uid, [Tag]) -> by_tag(Uid, Tag);
 get_by_tag(Uid, []) -> get(Uid).
 
 get_default(Uid, [Tag]) ->
-	lists:filter(fun(#todo{id=Id}) -> to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
+	lists:filter(fun(#todo{id=Id}) -> db_util:to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
 
 clear_default(Uid, [Tag]) ->
 	[ set_tag(Tid, Tag, false) || #todo{id=Tid} <- get_default(Uid, [Tag]) ].

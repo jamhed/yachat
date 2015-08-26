@@ -5,14 +5,12 @@
 -compile({no_auto_import,[get/1,put/2]}).
 -import(db_todo, [put/2, get/1, get/2, get_item/1, add/2, click/2, del/1]).
 
-jiffy_wrapper(List) -> [ {Item} || Item <- List ].
-
 to_props_with_items([Tag], [H = #todo{id=Tid} | T]) ->
 	Items = db_todo:get_items(Tid),
 	Props = db_todo:add_tags_prop(db_todo:to_proplist(H)),
 	[{Props
 		++ [{default, db_todo:to_bool(db_todo:check_default(Tid, Tag))}]
-		++ [{items, jiffy_wrapper(db_todo:to_proplist(Items))}]
+		++ [{items, db_util:jiffy_wrapper(db_todo:to_proplist(Items))}]
 	}] ++ to_props_with_items([Tag], T);
 
 to_props_with_items([], T) -> to_props_with_items([<<"">>], T);
