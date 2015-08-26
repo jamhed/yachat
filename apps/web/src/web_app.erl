@@ -5,6 +5,7 @@
 start(_StartType, _StartArgs) ->
 	logger:check_config(),
 	dbd:check_config(),
+	ws_main:check_config(),
 	dbd:initialize(),
 	srv_cleanup:start(),
 	web_sup:start_link().

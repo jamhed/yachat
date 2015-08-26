@@ -1,10 +1,13 @@
 -module(ws_main).
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
--export([init/4, stream/3, info/3, terminate/2]).
+-include_lib("cmon/include/config.hrl").
+-export([check_config/0, init/4, stream/3, info/3, terminate/2]).
 -record(state, {}).
 
-handlers() -> [ws_user, ws_msg, ws_conv, ws_todo, ws_todo_tag, ws_user_attr, ws_stub].
+check_config() -> cfg:validate([?CFG_EXISTS(handlers)]).
+
+handlers() -> ?CFG(handlers). 
 
 route_msg([H|T], M,A) ->
    case H:msg(M,A) of

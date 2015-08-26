@@ -5,6 +5,9 @@
 -define(PATH, "cfg").
 -define(ETS_NAME, cfg).
 
+map_cfg(undefined, Error) -> {fail, Error};
+map_cfg(Value, _Error) -> {ok, Value}.
+
 validate(Props) ->
    case proplists:get_value(fail, Props) of
       undefined -> ok;
