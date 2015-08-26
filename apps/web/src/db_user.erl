@@ -81,16 +81,16 @@ map_user_file([]) -> [].
 get_avatar_real([]) -> [];
 get_avatar_real([#user_attr{value=FileId}]) -> map_user_file(dbd:get(user_file, FileId)).
 
-get_avatar(Uid) -> get_avatar_real(attr_get(Uid, <<"avatar">>)).
+get_avatar(Uid) -> get_avatar_real(db_attr:get(Uid, <<"avatar">>)).
 
 set_avatar(Uid, FileId) ->
    db_msg:sys_notify(Uid, [<<"avatar/change">>, FileId]),
-   attr_set(Uid, <<"avatar">>, FileId).
+   db_user:set(Uid, <<"avatar">>, FileId).
 
 file_delete(Uid, FileId) ->
    Path = filename:join("store", integer_to_list(FileId)),
    file:delete(Path),
-   delete_avatar_attr(Uid, attr_get(Uid, <<"avatar">>), FileId), 
+   delete_avatar_attr(Uid, db_attr:get(Uid, <<"avatar">>), FileId), 
    dbd:delete(user_file, FileId).
 
 list_online(Limit) ->
