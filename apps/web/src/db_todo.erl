@@ -102,9 +102,10 @@ add(_, Text) when is_binary(Text), byte_size(Text)==0 -> empty;
 add(_, _) -> fail.
 
 click([#todo{move_to=MoveTo}], [Item = #todo_item{}]) when is_number(MoveTo) ->
-	dbd:put(Item#todo_item{todo_id=MoveTo});
+	dbd:put(Item#todo_item{todo_id=MoveTo, stamp=now()});
 
-click([#todo{move_to= <<"keep">>}], [#todo_item{}]) -> keep;
+click([#todo{move_to= <<"keep">>}], [Item = #todo_item{}]) ->
+	dbd:put(Item#todo_item{stamp=now()});
 
 click([#todo{}], [#todo_item{id=ItemId}]) ->
 	dbd:delete(todo_item, ItemId);
