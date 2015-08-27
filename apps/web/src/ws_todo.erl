@@ -44,7 +44,8 @@ msg(M = <<"todo/get">>, [Uid, Sid]) ->
 % get all todo lists without items for user
 msg(M = <<"todo/list">>, [Uid, Sid]) ->
 	Tag = db_session:get(Sid, tag),
-	[M] ++ [to_props(Tag, db_todo:get_by_tag(Uid, Tag))];
+	[M] ++ [to_props(Tag, db_todo:get_by_tag(Uid, Tag))]
+		++ [to_props(Tag, db_todo:get_default(Uid, Tag))];
 
 %msg get todo list by id
 msg(M = <<"todo/load">>, [Uid, Sid, Tid]) ->
