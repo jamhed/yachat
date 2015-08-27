@@ -17,7 +17,6 @@ to_proplist([H | T]) -> [to_proplist(H)] ++ to_proplist(T);
 to_proplist([]) -> [].
 
 from_proplist(Plist) ->
-	?INFO("proplist: ~p", [Plist]),
 	#todo{
 		name = proplists:get_value(name, Plist),
 		id = proplists:get_value(id, Plist),

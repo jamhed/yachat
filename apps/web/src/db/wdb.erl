@@ -16,7 +16,8 @@ metainfo() ->
     	?TABLE(user_file, [user_id]),
     	?TABLE(user_friend, [user_id, friend_id]),
         ?TABLE(user_session_data, [session_id]),
-        
+        ?TABLE(user_note, [user_id]),
+                
         % todo lists
         ?TABLE(todo, []),
         ?TABLE(todo_tag, [todo_id, tag]),

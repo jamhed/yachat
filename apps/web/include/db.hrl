@@ -1,4 +1,3 @@
-% conversations. type=p2p, group, game
 -record(user, {id, stamp, username, firstname, lastname, gender, email, password, facebook_id, birthdate, city}).
 -record(conv, {id, stamp, type}).
 -record(message, {id, text, stamp, user_id, conv_id}).
@@ -8,6 +7,7 @@
 -record(user_file, {id, user_id, stamp, type, mime}).
 -record(user_friend, {id, stamp, type, user_id, friend_id}).
 -record(user_session_data, {id, session_id, name, value}).
+-record(user_note, {id, user_id, stamp, text}).
 
 % todo
 

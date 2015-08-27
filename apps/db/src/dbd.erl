@@ -65,7 +65,6 @@ limit(QH, Limit) ->
 limit(QH, 0, Limit) -> limit(QH, Limit);
 limit(QH, 1, Limit) -> limit(QH, Limit);
 limit(QH, Offset, Limit) ->
-	?INFO("limit", []),
 	F = fun() ->
 		QC = qlc:cursor(qlc:sort(QH, {order, descending})),
 		qlc:next_answers(QC, Offset - 1), % skip

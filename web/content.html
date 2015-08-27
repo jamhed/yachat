@@ -1,76 +1,26 @@
-<script pi="pi/Source" name="button/join" type="text/x-dot">
-<input type="button" class="btn" value="Join/Create" pi="pi/Button" target="#bullet@join_conv">
-</script>
-
-<script pi="pi/Source" name="button/leave" type="text/x-dot">
-<button type="button" class="btn" pi="pi/Button" target="#bullet@leave_conv">Leave</button>
-<button type="button" class="btn" pi="pi/Button" target="#bullet@dialog_invite" style="margin-left: 20px">Invite</button>
-</script>
-
-<script pi="pi/Source" name="conv/view" type="text/x-dot">
-<button class="btn btn-default" style="margin-right: 10px" pi="pi/Button" target="#bullet@join_conv" data-conv="{{!it.id}}">{{!it.name}}</button>
-</script>
-
-<script pi="pi/Source" name="conv/row" type="text/x-dot">
-<div class="row">
-  <div class="col-md-3 col-sm-4 col-xs-4">
-    {{!it.timestamp}}&nbsp;&nbsp;{{!it.username}}:
-  </div>
-  <div class="col-md-9 col-sm-8 col-xs-8">
-    {{!it.text}}
-  </div>
+<script pi="pi/Source" name="note" type="text/x-dot">
+<div style="margin-bottom: 5px; border-bottom: 1px solid #ccc">
+  {{!it.text}}
 </div>
 </script>
 
-<script pi="pi/Source" name="user/view" type="text/x-dot">
-<div>
-<a href="#" pi="pi/Button" target="#bullet@init_p2p" data-user_id="{{!it.id}}">{{!it.display}}</a>
-</div>
-</script>
-
-<script pi="pi/Source" name="content/logout" type="text/x-dot">
-  <div class="row" style="margin-bottom:10px">
-     <div class="col-md-12" pi="Conv/List" view="conv/view"></div>
-  </div>
-
-  <div class="row">
-     <div class="col-md-12">
-        <div class="form-inline">
-           <div class="form-group">
-              <input type="text" class="form-control" id="chatId" placeholder="Chat ID">
-              <span pi="Conv/Status" join="button/join" leave="button/leave" display="#chatId"></span>
-           </div><!-- /.form-group -->
-        </div><!-- /.form-inline -->
-     </div><!-- col-md-12 -->
-  </div><!-- /.row -->
-      
-  <div class="row" style="margin-top:10px">
-     <div class="col-md-12">
-        <div class="form-inline">
-           <div class="form-group" style="width: 100%">
-              <input type="text" style="width: 100%" class="form-control" placeholder="Message" pi="Msg">
-           </div>
-        </div>
-     </div>
-  </div>
-
-   <div class="row" style="margin-top: 10px">
-      <div class="col-md-2 col-sm-3 col-xs-4">Users</div><!-- col-md-3 -->
-      <div class="col-md-10 col-sm-9 col-xs-8">Chat</div><!-- col-md-9 -->
-   </div><!-- row -->
-
-   <div class="row">
-      <div class="col-md-2 col-sm-3 col-xs-4" pi="Conv/UserList" view="user/view"></div><!-- col-md-3 -->
-      <div class="col-md-10 col-sm-9 col-xs-8">
-         <div pi="Conv/Text" row="conv/row"></div>
-      </div><!-- col-md-9 -->
-   </div><!-- row -->
-
-   <div class="row">
-      <div class="col-md-12 col-sm-12 col-xs-12">
-         <h1>Lobby</h1>
+<script pi="pi/Source" name="content/logged" type="text/x-dot">
+<div class="row" style="margin-bottom: 20px">
+  <div class="col-md-6">
+    <div class="form-inline">
+      <div class="form-group" style="width: 100%">
+        <textarea id="text" style="width: 100%" rows=4 class="el form-control" placeholder="What's on your mind?"></textarea>
       </div>
-      <div class="col-md-12 col-sm-12 col-xs-12" pi="Online" view="user/view"></div>
+    </div><!--form inline -->
+    <div style="margin-top: 5px">
+      <button class="pull-right btn btn-primary" value="Post" pi="Form" el=".el" target="#note@add">Post</button>
+    </div>
+  </div><!-- col-md-6 -->
+</div><!-- row -->
+
+<div class="row">
+  <div class="col-md-6" id="note" pi="Note" template="note"></div>
+</div>
 </script>
 
 <script pi="pi/Source" name="content/login" type="text/x-dot">
@@ -78,4 +28,5 @@
 You can login anonymously.
 </script>
 
-<div class="container" pi="Login/Status" login="content/login" logout="content/logout"></div>
+<div class="container" pi="Login/Status" login="content/login" logout="content/logged">
+</div>
