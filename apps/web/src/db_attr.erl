@@ -5,8 +5,11 @@
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
+attr_map_name({Name, Value}) -> Name;
+attr_map_name(Name) -> Name.
+
 attr_map(AttrList) ->
-   [ [{name, A#user_attr.name}, {value, A#user_attr.value}] || A <- AttrList ].
+   [ [{name, attr_map_name(A#user_attr.name)}, {value, A#user_attr.value}] || A <- AttrList ].
 
 get(Uid, Name) -> dbd:get(user_attr, {Uid,Name}).
 

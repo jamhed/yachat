@@ -57,14 +57,16 @@ by_tag(Uid, Tag) ->
 	L = lists:sort(fun(#todo{prio=A},#todo{prio=B}) -> A < B end, dbd:do(Q)),
 	lists:filter(fun(#todo{id=Id}) -> db_util:to_bool(check_tag(Id,Tag)) end, L).
 
-get_by_tag(Uid, [Tag]) -> by_tag(Uid, Tag);
-get_by_tag(Uid, []) -> get(Uid).
+get_default_todo(Uid, Tag) ->
+	Tid = get_attr_value(db_attr:get(Uid, {default, Tag})),
+	dbd:get(todo, Tid).
+set_default_todo(Uid, Tid, Tag) -> db_attr:set(Uid, {default, Tag}, Tid).
 
-get_default(Uid, [Tag]) ->
-	lists:filter(fun(#todo{id=Id}) -> db_util:to_bool(check_default(Id,Tag)) end, by_tag(Uid, Tag)).
+get_attr_value([#user_attr{value=Value}]) -> Value;
+get_attr_value([]) -> <<"">>.
 
-clear_default(Uid, [Tag]) ->
-	[ set_tag(Tid, Tag, false) || #todo{id=Tid} <- get_default(Uid, [Tag]) ].
+get_default_tag(Uid) -> get_attr_value(db_attr:get(Uid, tag)).
+set_default_tag(Uid, Tag) -> db_attr:set(Uid, tag, Tag).
 
 get_item(ItemId) -> dbd:get(todo_item, ItemId).
 
@@ -154,6 +156,19 @@ join_binary(A, B, S) -> <<A/binary, S/binary, B/binary>>.
 tags_as_binary(Tid) ->
 	lists:foldr(fun join_binary/2, <<"">>, [ Tag || #todo_tag{tag=Tag} <- get_tags(Tid) ]).
 
-add_tags_prop(P) ->
-	Tid = proplists:get_value(id, P),
-	P ++ [{tags, tags_as_binary(Tid)}].
+to_props([H = #todo{} | T]) -> [to_props(H)] ++ to_props(T);
+to_props([]) -> [];
+to_props(T = #todo{}) -> to_proplist(T).
+
+add_props(List, [H|T]) -> add_props(add_props(List,H), T);
+add_props(List, []) -> List;
+add_props(List, Attr) when is_list(List) -> [add_to_props(P, Attr) || P <- List].
+
+add_to_props(Props, tags) ->
+	Props ++ [{tags, tags_as_binary(proplists:get_value(id, Props))}];
+add_to_props(Props, items) ->
+	Items = get_items(proplists:get_value(id, Props)),
+	Props ++ [{items, db_util:jiffy_wrapper(db_todo:to_proplist(Items))}].
+
+to_props_jiffy(List, Attrs) -> db_util:jiffy_wrapper(add_props(to_props(List), Attrs)).
+to_props_jiffy(List) -> db_util:jiffy_wrapper(add_props(to_props(List), [tags])).

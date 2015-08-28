@@ -8,14 +8,16 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@query()
 
 	clear: ->
-		@nsend ["todo/tag/clear", [Cmon.sid()]], => @refresh()
+		@nsend ["todo/tag/clear", Cmon.sid()], => @refresh()
 
 	refresh: ->
-		@rpc "#{@a.lists}@self", [], (b) => b.query()
+		@rpc "#{@a.lists}@self", [], (b) =>
+			b.notify()
+			b.query()
 		@query()
 	
 	set: (data) ->
-		@nsend ["todo/tag/set", [Cmon.sid()], data.tag], => @refresh()
+		@nsend ["todo/tag/set", Cmon.sid(), data.tag], => @refresh()
 
 
 	draw: (CurrentTag, List) ->
@@ -24,4 +26,4 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@process()
 
 	query: ->
-		@nsend ["todo/tags", [Cmon.sid()] ], ([CurrentTag], List) => @draw(CurrentTag, List)
+		@nsend ["todo/tags", Cmon.sid()], (CurrentTag, List) => @draw(CurrentTag, List)

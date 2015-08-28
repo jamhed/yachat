@@ -23,10 +23,6 @@ span.ui-selectmenu-text {
       style="cursor:pointer; bottom: -10px" pi="pi/Button" target="#lists@edit" data-id="{{=it.id}}">
       <h3 style="display:inline">{{!it.name || "_"}}</h3>
     </div>
-    <div class="col-md-1" style="bottom: -14px">
-      <input type="checkbox" class="default"
-        pi="Todo/Default" target="#lists@query" id="{{!it.id}}" {{?it.default}}checked{{?}}>
-    </div>
     <div class="form-group col-md-2">
       <select style="width: 100%" id="{{!it.id}}" inline="1" pi="Todo/List" default="{{!it.move_to}}"></select>    
     </div>
@@ -59,11 +55,6 @@ span.ui-selectmenu-text {
       <input type="text" id="prio" class="form-control todo" placeholder="Prio" value="{{! it.prio }}">
   </div>
 
-  <div class="checkbox">
-    <label>
-      <input id="default" name="default" class="todo" type="checkbox" {{? it.default }}checked{{?}}>Default list
-    </label>
-  </div>
   <div class="form-group">
     <label for="move_to">On click move to:</label>
     <select id="move_to" class="todo form-control" pi="Todo/List" default="{{!it.move_to}}" bullet="#bullet">
@@ -114,7 +105,7 @@ span.ui-selectmenu-text {
     </div><!-- form-inline -->
   </div><!-- col-md-10 -->
   <div class="col-md-2 form-group">
-    <select style="width: 100%" inline="1" pi="Todo/Target"></select>    
+    <select style="width: 100%" inline="1" lists="#lists" pi="Todo/Target"></select>    
   </div>
 </div>
 <div id="lists" pi="Todo" todo="todo" item="item"></div>
