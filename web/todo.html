@@ -80,10 +80,11 @@ span.ui-selectmenu-text {
 
 <script pi="pi/Source" name="content/logged" type="text/x-dot">
 <div class="row">
-  <div class="col-md-1" style="padding-bottom: 5px">
+  <div class="col-md-2" style="padding-bottom: 5px">
     <button pi="pi/Button" target="#tags@clear" class="btn btn-default">Clear</button>
+    <button pi="pi/Button" target="#lists@export" class="btn btn-default">Export</button>
   </div>
-  <div style="padding-bottom: 5px" id="tags" pi="Todo/Tags" template="todo/tag" lists="#lists" class="col-md-11"></div>
+  <div style="padding-bottom: 5px" id="tags" pi="Todo/Tags" template="todo/tag" lists="#lists" class="col-md-10"></div>
 </div>
 
 <div class="row">
