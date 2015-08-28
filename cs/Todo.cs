@@ -42,6 +42,18 @@ define ["Nsend", "Cmon", "Util"], (Pi, Cmon, Util) -> class Todo extends Pi
 			@notify Todo
 			@query()
 	
+	export: ->
+		@nsend ["todo/export", Cmon.sid()], (Data) =>
+			blob = new Blob([Data], type: "text/plain")
+			url = window.URL.createObjectURL(blob)
+			a = document.createElement("a")
+			document.body.appendChild(a)
+			a.style = "display: none"
+			a.href = url
+			a.download = "todo.txt"
+			a.click()
+			window.URL.revokeObjectURL(url)
+
 	notify: (Msg = "") -> @event "update", Msg
 
 	query: ->

@@ -60,4 +60,6 @@ msg(M = <<"todo/del">>, [Uid, Tid]) ->
 msg(M = <<"todo/click">>, [Uid, Tid, ItemId]) ->
 	[M] ++ [click(get(Uid, Tid), get_item(ItemId))];
 
+msg(M = <<"todo/export">>, [Uid]) -> [M, db_todo:export(Uid)];
+
 msg(_,_) -> skip.
