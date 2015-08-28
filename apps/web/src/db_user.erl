@@ -20,7 +20,6 @@ extend_with_props(User, []) -> User.
 delete_files([#user_file{id=Id} | T]) -> user_file:delete(Id), delete_files(T);
 delete_files([]) -> ok.
 
-% FIXME: delete user files
 delete(Uid) ->
    delete_files(dbd:index(user_file, user_id, Uid)),
    db_todo:del(db_todo:get(Uid)),
@@ -245,6 +244,37 @@ add_friend(Uid, FriendId, []) ->
    }).
 
 check_friendship(Uid, FriendId) ->
-   Q = qlc:q([ C || C <- mnesia:table(user_friend),
-      C#user_friend.user_id == Uid, C#user_friend.friend_id == FriendId ]),
-   dbd:do(Q).
+	Q = qlc:q([ C || C <- mnesia:table(user_friend),
+		C#user_friend.user_id == Uid, C#user_friend.friend_id == FriendId ]),
+	dbd:do(Q).
+
+% bans
+
+get_bans_ids(Uid) ->
+	Q = qlc:q([ C#user_ban.ban_id || C <- mnesia:table(user_ban),
+		C#user_ban.user_id == Uid ]),
+	dbd:do(Q).
+
+get_bans(Uid) -> [ add_online_status(detail_short(BanId)) || BanId <- get_bans_ids(Uid) ].
+
+del_ban_record(#user_ban{id=Id}) -> dbd:delete(user_ban, Id).
+
+del_ban(Uid, BanId) -> del_ban(check_banship(Uid, BanId)).
+del_ban(List) when is_list(List) -> lists:foreach(fun del_ban_record/1, List).
+
+add_ban(Uid, BanId) -> add_ban(Uid, BanId, check_banship(Uid, BanId)).
+
+add_ban(_Uid, _BanId, [_F|_Rest]) -> ok;
+add_ban(Uid, BanId, []) ->
+	dbd:put(#user_ban{
+		id=dbd:next_id(user_ban),
+		stamp=now(),
+		user_id=Uid,
+		ban_id=BanId,
+		type=ban
+	}).
+
+check_banship(Uid, BanId) ->
+	Q = qlc:q([ C || C <- mnesia:table(user_ban),
+		C#user_ban.user_id == Uid, C#user_ban.ban_id == BanId ]),
+	dbd:do(Q).

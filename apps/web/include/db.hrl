@@ -6,6 +6,7 @@
 -record(user_online, {id, stamp, pid, user_id, session_id, online}).
 -record(user_file, {id, user_id, stamp, type, mime}).
 -record(user_friend, {id, stamp, type, user_id, friend_id}).
+-record(user_ban, {id, stamp, type, user_id, ban_id}).
 -record(user_session_data, {id, session_id, name, value}).
 -record(user_note, {id, user_id, stamp, text}).
 

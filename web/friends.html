@@ -1,7 +1,14 @@
+<script pi="pi/Source" name="profile/user" type="text/x-dot">
+<div class="col-md-4">
+  {{! it.username }}, {{! it.status }}
+</div>
+</script>
+
+
 <script pi="pi/Source" name="profile/friend" type="text/x-dot">
 <div>
-	{{= it.username }} status: {{= it.status }}, 
-	<a href="#" pi="pi/Button" target="parent@remove" data-id="{{= it.id }}">remove</a>
+	{{! it.username }} status: {{! it.status }}, 
+	<a href="#" pi="pi/Button" target="parent@remove" data-id="{{! it.id }}">remove</a>
 </div>
 </script>
 
@@ -18,16 +25,40 @@
 </script>
 
 <div class="container">
-   <div class="row">
-   		<div class="col-md-12">
-			<button
-				type="button" class="btn" pi="pi/Button" target="#friends@search_dialog">
-					Add friend
-			</button>
-		</div>
-    	<div class="col-md-12">
-    		<h1>Friends</h1>
-    	</div><!-- col-md-12 -->
-    	<div class="col-md-12" id="friends" pi="Profile/Friends" friend="profile/friend"></div>
-    </div><!-- row -->
+
+  <div class="row" style="margin-bottom: 5px">
+    <div class="col-md-12">
+      <input type="text" style="width: 100%" class="form-control" placeholder="Filter users" pi="Profile/Filter" template="profile/user" el="#search">
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom: 5px" id="search">
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <button type="button" class="btn" pi="pi/Button" target="#friends@search_dialog">
+        Add friend
+      </button>
+    </div>
+    <div class="col-md-12">
+      <h1>Friends</h1>
+    </div><!-- col-md-12 -->
+    <div class="col-md-12" id="friends" pi="Profile/Friends" friend="profile/friend"></div>
+  </div><!-- row -->
+
+</div><!-- container -->
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <button type="button" class="btn" pi="pi/Button" target="#bans@search_dialog">
+        Add ban
+      </button>
+    </div>
+    <div class="col-md-12">
+      <h1>Bans</h1>
+    </div><!-- col-md-12 -->
+    <div class="col-md-12" id="bans" pi="Profile/Bans" ban="profile/ban"></div>
+  </div><!-- row -->
 </div><!-- container -->
