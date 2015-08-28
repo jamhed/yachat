@@ -181,7 +181,7 @@ to_props_jiffy(List, Attrs) -> db_util:jiffy_wrapper(add_props(to_props(List), A
 to_props_jiffy(List) -> db_util:jiffy_wrapper(add_props(to_props(List), [tags])).
 
 
-format_item_text(#todo{name=Name}, #todo_item{text=Text}) -> io_lib:format("~ts: ~ts", [Name, Text]).
+format_item_text(#todo{name=Name}, #todo_item{text=Text}) -> io_lib:format("~s: ~s", [Name, Text]).
 
 export_items(Todo = #todo{id=Id}) ->
 	[ format_item_text(Todo, Item) || Item <- dbd:index(todo_item, todo_id, Id)].
