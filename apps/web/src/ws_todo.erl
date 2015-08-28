@@ -12,6 +12,7 @@ msg(M = <<"todo/update">>, [Uid, Form]) ->
 	Tags = proplists:get_value(tags, Plist),
 	Tid = put(Uid, Todo),
 	db_todo:update_tags(Tid, Tags),
+	db_todo:set_default_tag(Uid),
 	[M, Tid];
 
 %msg get all todo lists with items for user
