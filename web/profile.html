@@ -28,7 +28,7 @@
 
 
 <script pi="pi/Source" name="attr/row" type="text/x-dot">
-<div class="form-group">
+<div class="col-md-4 form-group">
 	<label for="{{!it.name}}">{{!it.name}}:</label>
 	<div class="input-group">
 		<input type="text" id="{{!it.name}}" class="form-control" value="{{!it.value}}">
@@ -94,7 +94,7 @@
 		<div style="margin-bottom: 20px">
 			<button type="button" class="btn btn-default" pi="pi/Button" target="#attr@add_dialog">Add</button>
 		</div>
-		<div id="attr" pi="Profile/Attr" template="attr/row"></div>   
+		<div class="row" id="attr" pi="Profile/Attr" template="attr/row"></div>   
 	
 	</div>
 	
