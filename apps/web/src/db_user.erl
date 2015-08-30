@@ -17,6 +17,29 @@ filter_props(Props, List) -> [ { F, proplists:get_value(F, Props) } || F <- List
 extend_with_props(User, [{Name,Value} | Props]) -> extend_with_props(  User ++ [{Name,Value}], Props );
 extend_with_props(User, []) -> User.
 
+delete_files([#user_file{id=Id} | T]) -> user_file:delete(Id), delete_files(T);
+delete_files([]) -> ok.
+
+% FIXME: delete user files
+delete(Uid) ->
+   delete_files(dbd:index(user_file, user_id, Uid)),
+   [ dbd:delete(message, M#message.id) || M <- dbd:index(message, user_id, Uid)],
+   [ dbd:delete(user_conv, M#user_conv.id) || M <- dbd:index(user_conv, user_id, Uid)],
+   [ dbd:delete(user_attr, M#user_attr.id) || M <- dbd:index(user_attr, user_id, Uid)],
+   [ dbd:delete(user_file, M#user_file.id) || M <- dbd:index(user_file, user_id, Uid)],
+   [ dbd:delete(user_friend, M#user_friend.id) || M <- dbd:index(user_friend, user_id, Uid)],
+   [ dbd:delete(user_note, M#user_note.id) || M <- dbd:index(user_note, user_id, Uid)],
+   dbd:delete(user, Uid).
+
+match(Username, Term) when is_binary(Username) -> match(binary:bin_to_list(Username), Term);
+match(Username, Term) -> string:str(Username, Term) > 0.
+
+search(Term) when is_binary(Term) -> search(binary:bin_to_list(Term));
+search(Term) ->
+   Q = qlc:q([ U || U <- mnesia:table(user),
+      match(U#user.username, Term) ]),
+   dbd:limit(Q, 10).
+
 enum_f() -> 
    Fields = record_info(fields, user),
    FNums  = lists:zip(Fields, lists:seq(2,length(Fields)+1)),
@@ -85,11 +108,10 @@ get_avatar(Uid) -> get_avatar_real(db_attr:get(Uid, <<"avatar">>)).
 
 set_avatar(Uid, FileId) ->
    db_msg:sys_notify(Uid, [<<"avatar/change">>, FileId]),
-   db_user:set(Uid, <<"avatar">>, FileId).
+   db_attr:set(Uid, <<"avatar">>, FileId).
 
 file_delete(Uid, FileId) ->
-   Path = filename:join("store", integer_to_list(FileId)),
-   file:delete(Path),
+   user_file:delete(FileId),
    delete_avatar_attr(Uid, db_attr:get(Uid, <<"avatar">>), FileId), 
    dbd:delete(user_file, FileId).
 
