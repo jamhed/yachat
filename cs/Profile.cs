@@ -15,6 +15,11 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class Profile extends Pi
 	query: ->
 		@nsend ["user/get", Cmon.sid()], (status, sessionId, userInfo) => @draw userInfo
 
+	delete: ->
+    	@nsend ["user/delete", Cmon.sid()], =>
+        	Cmon.set_conv_id null
+        	window.location = "#"
+
 	update: (List)  ->
 		h = Cmon.list2hash List
 		@nsend ["user/update", Cmon.sid(), h], (status, a) =>

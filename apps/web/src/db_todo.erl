@@ -121,15 +121,13 @@ click([#todo{}], [#todo_item{id=ItemId}]) ->
 
 click(_, _) -> fail.
 
-delete_tag_if_empty(_Uid, _Tag, 0) -> ?INFO("zero", []), ok;
+delete_tag_if_empty(_Uid, _Tag, 0) -> ok;
 delete_tag_if_empty(Uid, #todo_tag{tag=Tag, id=Id}, _Use) ->
-	?INFO("attr uid: ~p, tag: ~p", [Uid, Tag]),
 	dbd:delete(user_attr, {Uid,{default,Tag}}),
 	dbd:delete(todo_tag, Id).
 
 check_tags_to_delete(_Uid, []) -> ok;
 check_tags_to_delete(Uid, [Tag = #todo_tag{tag=TagText} | Rest]) ->
-	?INFO("uid: ~p text: ~p tag: ~p rest: ~p", [Uid, TagText, Tag, by_tag(Uid, TagText)]),
 	delete_tag_if_empty(Uid, Tag, length(by_tag(Uid, TagText))),
 	check_tags_to_delete(Uid, Rest).
 
@@ -144,11 +142,12 @@ del_todo_items([#todo_item{id=Id} | Rest]) ->
 	dbd:delete(todo_item, Id),
 	del_todo_items(Rest).
 
-del([#todo{id=Tid}]) ->
+del([#todo{id=Tid} | Rest]) ->
 	del_todo_items(dbd:index(todo_item, todo_id, Tid)),
 	del_todo_maps(dbd:index(user_todo, todo_id, Tid)),
-	dbd:delete(todo, Tid);
-del(_) -> fail.
+	dbd:delete(todo, Tid),
+	del(Rest);
+del([]) -> ok.
 
 get_unique_tags(Uid) ->
 	TagList = [ Tag || #todo_tag{tag=Tag} <- get_all_tags(Uid) ],
