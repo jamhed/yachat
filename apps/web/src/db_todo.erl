@@ -121,9 +121,33 @@ click([#todo{}], [#todo_item{id=ItemId}]) ->
 
 click(_, _) -> fail.
 
+delete_tag_if_empty(_Uid, _Tag, 0) -> ?INFO("zero", []), ok;
+delete_tag_if_empty(Uid, #todo_tag{tag=Tag, id=Id}, _Use) ->
+	?INFO("attr uid: ~p, tag: ~p", [Uid, Tag]),
+	dbd:delete(user_attr, {Uid,{default,Tag}}),
+	dbd:delete(todo_tag, Id).
+
+check_tags_to_delete(_Uid, []) -> ok;
+check_tags_to_delete(Uid, [Tag = #todo_tag{tag=TagText} | Rest]) ->
+	?INFO("uid: ~p text: ~p tag: ~p rest: ~p", [Uid, TagText, Tag, by_tag(Uid, TagText)]),
+	delete_tag_if_empty(Uid, Tag, length(by_tag(Uid, TagText))),
+	check_tags_to_delete(Uid, Rest).
+
+del_todo_maps([]) -> ok;
+del_todo_maps([#user_todo{id=Id, user_id=Uid, todo_id=Tid} | Rest]) ->
+	check_tags_to_delete(Uid, get_tags(Tid)),
+	dbd:delete(user_todo, Id),
+	del_todo_maps(Rest).
+
+del_todo_items([]) -> ok;
+del_todo_items([#todo_item{id=Id} | Rest]) ->
+	dbd:delete(todo_item, Id),
+	del_todo_items(Rest).
+
 del([#todo{id=Tid}]) ->
-	dbd:delete(todo, Tid),
-	lists:foreach(fun(#todo_item{id=Id}) -> dbd:delete(todo_item, Id) end, dbd:index(todo_item, todo_id, Tid));
+	del_todo_items(dbd:index(todo_item, todo_id, Tid)),
+	del_todo_maps(dbd:index(user_todo, todo_id, Tid)),
+	dbd:delete(todo, Tid);
 del(_) -> fail.
 
 get_unique_tags(Uid) ->
