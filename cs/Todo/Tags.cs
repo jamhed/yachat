@@ -17,8 +17,7 @@ define ["Nsend", "Cmon"], (Pi, Cmon) -> class TodoTags extends Pi
 		@query()
 	
 	set: (data) ->
-		@nsend ["todo/tag/set", Cmon.sid(), data.tag], => @refresh()
-
+		@nsend ["todo/tag/set", Cmon.sid(), "#{data.tag}"], => @refresh()
 
 	draw: (CurrentTag, List) ->
 		@e.empty()
