@@ -169,6 +169,11 @@ msg(M = <<"user/profile">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/lookup">>, [_Uid, Term]) ->
    [M] ++ get_user_info(db_user:lookup(Term));
 
+msg(M = <<"user/delete">>, [Uid]) ->
+   db_user:logout(self()),
+   db_user:delete(Uid),
+   [M, ok];
+
 %msg get user info 
 msg(M = <<"user/info">>, [Uid, PeerId]) when is_number(Uid), is_number(PeerId) ->
    [M] ++ user_info(Uid, PeerId);

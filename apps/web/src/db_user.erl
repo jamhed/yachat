@@ -23,6 +23,7 @@ delete_files([]) -> ok.
 % FIXME: delete user files
 delete(Uid) ->
    delete_files(dbd:index(user_file, user_id, Uid)),
+   db_todo:del(db_todo:get(Uid)),
    [ dbd:delete(message, M#message.id) || M <- dbd:index(message, user_id, Uid)],
    [ dbd:delete(user_conv, M#user_conv.id) || M <- dbd:index(user_conv, user_id, Uid)],
    [ dbd:delete(user_attr, M#user_attr.id) || M <- dbd:index(user_attr, user_id, Uid)],
