@@ -15,6 +15,7 @@ metainfo() ->
     	?TABLE(user_online, [user_id, pid, session_id]),
     	?TABLE(user_file, [user_id]),
     	?TABLE(user_friend, [user_id, friend_id]),
+        ?TABLE(user_ban, [user_id, ban_id]),
         ?TABLE(user_session_data, [session_id]),
         ?TABLE(user_note, [user_id]),
                 
