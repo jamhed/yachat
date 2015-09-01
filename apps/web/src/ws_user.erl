@@ -210,7 +210,7 @@ msg(M = <<"user/file/delete">>, [Uid, FileId]) when is_number(Uid) ->
 
 %msg get user's online peers 
 msg(M = <<"user/online">>, [Uid]) when is_number(Uid) ->
-	[M, db_user:list_online(20)];
+	[M, db_util:jiffy_wrapper(db_user:list_online(20))];
 
 %msg get user's avatars 
 msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
@@ -220,9 +220,9 @@ msg(M = <<"user/avatar">>, [Uid]) when is_number(Uid) ->
 msg(M = <<"user/avatar/set">>, [Uid, FileId]) when is_number(Uid), is_number(FileId) ->
 	[M, db_user:set_avatar(Uid, FileId)];
 
-msg(M = <<"user/search">>, [_Uid, Term]) ->
-	Re = [db_user:detail(Uid) || Uid <- db_user:search(Term)],
-	[M, Re];
+msg(M = <<"user/search">>, [Uid, Term]) ->
+	Re = [db_user:detail_short(Uid) || #user{id=Uid} <- db_user:search(Term)],
+	[M, db_user:full_traits(Uid, Re)];
 
 msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
 	ok = db_user:add_friend(Uid, FriendId),

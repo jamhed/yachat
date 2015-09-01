@@ -31,6 +31,7 @@ delete(Uid) ->
    [ dbd:delete(user_note, M#user_note.id) || M <- dbd:index(user_note, user_id, Uid)],
    dbd:delete(user, Uid).
 
+match(undefined, Term) -> false;
 match(Username, Term) when is_binary(Username) -> match(binary:bin_to_list(Username), Term);
 match(Username, Term) -> string:str(Username, Term) > 0.
 
@@ -63,21 +64,6 @@ set_by_props(U, [{Name,Value} | Rest]) ->
    NameAtom = erlang:binary_to_atom(Name, utf8),
    set_by_props( set_by_name(U, NameAtom, Value), Rest ).
     
-user_to_props_short([U]) -> filter_props( to_proplist(U), [id,username,email] );
-user_to_props_short(_) -> [].
-
-add_file(Plist, [{Name, Id}]) -> Plist ++ [{Name,Id}];
-add_file(Plist, []) -> Plist.
-
-user_to_props([U]) -> proplists:delete(password, to_proplist(U));
-user_to_props(_) -> [].
-
-detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
-detail(Uid) -> {user_to_props( get(Uid) )}.
-
-detail_short(List) when is_list(List)  -> [detail_short(Uid) || Uid <- List];
-detail_short(Uid) -> {user_to_props_short( get(Uid) )}.
-
 % id of convs user is in
 conv(Uid) ->
 	Q = qlc:q([ C#user_conv.conv_id || C <- mnesia:table(user_conv), C#user_conv.user_id == Uid ]),
@@ -278,3 +264,37 @@ check_banship(Uid, BanId) ->
 	Q = qlc:q([ C || C <- mnesia:table(user_ban),
 		C#user_ban.user_id == Uid, C#user_ban.ban_id == BanId ]),
 	dbd:do(Q).
+
+% props filter and manipulation
+
+user_to_props_short([U]) -> filter_props( to_proplist(U), [id,username,email] );
+user_to_props_short(_) -> [].
+
+user_to_props([U]) -> proplists:delete(password, to_proplist(U));
+user_to_props(_) -> [].
+
+detail(List) when is_list(List) -> [ detail(Uid) || Uid <- List ];
+detail(Uid) -> {user_to_props( get(Uid) )}.
+
+detail_short(List) when is_list(List)  -> [detail_short(Uid) || Uid <- List];
+detail_short(Uid) -> {user_to_props_short( get(Uid) )}.
+
+add_props(Uid, List, [H|T]) -> add_props(Uid, add_props(Uid, List, H), T);
+add_props(Uid, List, []) -> List;
+add_props(Uid, List, Attr) when is_list(List) -> [add_to_props(Uid, P, Attr) || P <- List].
+
+add_to_props(_Uid, {Props}, online) ->
+   Uid = proplists:get_value(id, Props),
+   {Props ++ [{online, db_util:to_bool(get_online_status(Uid))}]};
+
+add_to_props(Uid, {Props}, friend) ->
+   Peer = proplists:get_value(id, Props),
+   {Props ++ [{friend, db_util:to_bool(check_friendship(Uid,Peer))}]};
+
+add_to_props(Uid, {Props}, ban) ->
+   Peer = proplists:get_value(id, Props),
+   {Props ++ [{ban, db_util:to_bool(check_banship(Uid,Peer))}]}.
+
+% props shortcuts
+
+full_traits(Uid, List) -> add_props(Uid, List, [online, friend, ban]).
