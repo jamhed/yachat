@@ -221,7 +221,7 @@ msg(M = <<"user/avatar/set">>, [Uid, FileId]) when is_number(Uid), is_number(Fil
 	[M, db_user:set_avatar(Uid, FileId)];
 
 msg(M = <<"user/search">>, [Uid, Term]) ->
-	Re = [db_user:detail_short(Uid) || #user{id=Uid} <- db_user:search(Term)],
+	Re = [db_user:detail_short(Id) || #user{id=Id} <- db_user:search(Term)],
 	[M, db_user:full_traits(Uid, Re)];
 
 msg(M = <<"user/add/friend">>, [Uid, FriendId]) when is_number(Uid), is_number(FriendId) ->
