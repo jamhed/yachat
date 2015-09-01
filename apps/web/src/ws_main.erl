@@ -2,7 +2,7 @@
 -include_lib("cmon/include/logger.hrl").
 -include_lib("web/include/db.hrl").
 -include_lib("cmon/include/config.hrl").
--export([check_config/0, init/4, stream/3, info/3, terminate/2]).
+-export([init/4, stream/3, info/3, terminate/2, check_config/0]).
 -record(state, {}).
 
 check_config() -> cfg:validate([?CFG_EXISTS(handlers)]).

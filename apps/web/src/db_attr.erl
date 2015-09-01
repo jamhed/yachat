@@ -5,7 +5,7 @@
 -include_lib("web/include/db.hrl").
 -include_lib("stdlib/include/qlc.hrl").
 
-attr_map_name({Name, Value}) -> Name;
+attr_map_name({Name, _Value}) -> Name;
 attr_map_name(Name) -> Name.
 
 attr_map(AttrList) ->
