@@ -258,7 +258,10 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 		if @fb_status == "connected"
 			@send "user/fb", [@fb_id, @fb_token]
 		else
-			@error "Connect profile to facebook first!"
+			if not FB?
+				@error "Connect profile to facebook first!"
+			else
+				@register_facebook()
 
 	handle_fb_auth: (r) ->
 		if r.status == "connected"
