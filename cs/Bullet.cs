@@ -251,23 +251,27 @@ define ["Nsend", "/js/bullet.js", "Cmon", "//connect.facebook.net/en_US/sdk.js"]
 	dialog_invite: ->
 		@append "dialog/invite"
 
+	fb_login: ->
+      if @fb_status == "connected"
+         @send "user/fb", [@fb_id, @fb_token]
+      else
+         @login_facebook()
+
 	register_facebook: ->
 		FB.login ((r) => @handle_fb_register(r)), scope: "public_profile,email"
 
-	fb_login: ->
-		if FB?
-			if @fb_status == "connected"
-				@send "user/fb", [@fb_id, @fb_token]
-			else
-				@error "Connect profile to facebook first!"
-		else
-			@register_facebook()
+	login_facebook: ->
+		FB.login ((r) => @handle_fb_login(r)), scope: "public_profile,email"
 
 	handle_fb_auth: (r) ->
 		if r.status == "connected"
 			@fb_status = "connected"
 			@fb_token = r.authResponse.accessToken
 			@fb_id = r.authResponse.userID
+
+	handle_fb_login: (r) ->
+		@handle_fb_auth r
+		@fb_login()
 
 	handle_fb_register: (r) ->
 		if r.status == "connected"
