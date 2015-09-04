@@ -1,7 +1,9 @@
 -module(db_func).
 -compile(export_all).
 
-nv_to_tuple({[{<<"name">>,Name},{<<"value">>,Value}]}) -> {erlang:binary_to_atom(Name, utf8), Value}.
+nv_to_tuple({[{<<"name">>,Name},{<<"value">>,Value}]}) -> {erlang:binary_to_atom(Name, utf8), Value};
+nv_to_tuple({[{<<"name">>,Name}]}) -> {erlang:binary_to_atom(Name, utf8), null}.
+
 
 form_to_plist(List) when is_list(List) -> [nv_to_tuple(P) || P <- List];
 form_to_plist(E) -> form_to_plist([E]).
