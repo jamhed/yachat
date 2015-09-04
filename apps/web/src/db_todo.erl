@@ -20,7 +20,6 @@ from_proplist(Plist) ->
 	#todo{
 		name = proplists:get_value(name, Plist),
 		id = proplists:get_value(id, Plist),
-		move_to = proplists:get_value(move_to, lists:reverse(Plist)),
 		prio = proplists:get_value(prio, Plist)
 	}.
 

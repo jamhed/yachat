@@ -10,7 +10,7 @@ msg(M = <<"todo/update">>, [Uid, Form]) ->
 	Plist = db_func:form_to_plist(Form),
 	Todo = db_todo:from_proplist(Plist),
 	Tags = proplists:get_value(tags, Plist),
-	Tid = put(Uid, Todo),
+	Tid = put(Uid, Todo#todo{move_to= <<"keep">>}),
 	db_todo:update_tags(Tid, Tags),
 	db_todo:set_default_tag(Uid),
 	[M, Tid];
