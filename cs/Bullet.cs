@@ -255,10 +255,13 @@ define ["Nsend", "/js/bullet.js", "Cmon"], (Pi, Bullet, Cmon) -> class Bullet ex
 		FB.login ((r) => @handle_fb_register(r)), scope: "public_profile,email"
 
 	fb_login: ->
-		if @fb_status == "connected"
-			@send "user/fb", [@fb_id, @fb_token]
+		if FB?
+			if @fb_status == "connected"
+				@send "user/fb", [@fb_id, @fb_token]
+			else
+				@error "Connect profile to facebook first!"
 		else
-			@error "Connect profile to facebook first!"
+			@register_facebook()
 
 	handle_fb_auth: (r) ->
 		if r.status == "connected"
